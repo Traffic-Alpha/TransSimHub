@@ -19,7 +19,6 @@ Note: This module relies on the `VehicleInfo` class defined in the `vehicle.py` 
 
 @LastEditTime: 2023-08-23 18:15:31
 '''
-
 import traci
 from loguru import logger
 from dataclasses import asdict
