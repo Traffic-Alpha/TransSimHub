@@ -2,24 +2,16 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-
-Classes:
-- AircraftBuilder: Class for creating and controlling aircraft.
-
-Functionality:
-- Create aircraft and add them to the aircraft dictionary.
-- Get information about all aircraft.
-- Control the behavior of aircraft.
-
-@LastEditTime: 2023-08-23 21:19:38
+@LastEditTime: 2023-08-24 15:21:54
 '''
 from dataclasses import asdict
 from typing import Dict, Tuple
+from loguru import logger
 
 from .aircraft import AircraftInfo
 
 class AircraftBuilder:
-    def __init__(self, aircraft_inits: Dict[str, Dict[str, any]]=None) -> None:
+    def __init__(self, aircraft_inits: Dict[str, Dict[str, any]]={}) -> None:
         """
         初始化 AircraftBuilder 类的实例。
 
@@ -27,8 +19,14 @@ class AircraftBuilder:
             aircraft_inits (Dict[str, Dict[str, any]], optional): 航空器的初始参数字典。默认为 None。
                 下面是一个例子，包含 aircraft 的 id, 和初始位置, 初始速度, 初始 heading 角度, 和通讯距离：
                 aircraft_inits = {
-                    'a1': {"position":(10,10,10), "speed":10, "heading":(1,1,0), "communication_range":100},
-                    'a2': {"position":(10,10,100), "speed":10, "heading":(1,1,0), "communication_range":100}
+                    'a1': {
+                        "position":(10,10,10), "speed":10, "heading":(1,1,0), "communication_range":100, 
+                        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+                    },
+                    'a2': {
+                        "position":(10,10,100), "speed":10, "heading":(1,1,0), "communication_range":100, 
+                        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+                    }
                 }
         """
         self.aircraft_dict = {}
@@ -40,8 +38,11 @@ class AircraftBuilder:
             position: Tuple[float, float, float], 
             speed: float, 
             heading: Tuple[float, float, float], 
-            communication_range: float
-        ):
+            communication_range: float,
+            if_sumo_visualization: bool = False,
+            img_file: str = None,
+            sumo = None,
+        ) -> None:
         """
         创建 aircraft 并将其添加到 aircraft_dict 中。
 
@@ -55,7 +56,10 @@ class AircraftBuilder:
         Returns:
             None
         """
-        aircraft = AircraftInfo.create(id, position, speed, heading, communication_range)
+        aircraft = AircraftInfo.create(
+            id, position, speed, heading, communication_range,
+            if_sumo_visualization, img_file, sumo
+        )
         self.aircraft_dict[id] = aircraft
 
     def get_aircraft_info(self) -> Dict[str, dict]:
@@ -106,8 +110,17 @@ class AircraftBuilder:
         aircraft.speed = speed
         aircraft.heading = heading
         # 根据给定的速度和航向计算新的位置
-        aircraft.position = (
+        new_position = (
             aircraft.position[0] + speed * heading[0],
             aircraft.position[1] + speed * heading[1],
             aircraft.position[2] + speed * heading[2]
         )
+        # 确保高度不小于0
+        if new_position[2] >= 0:
+            aircraft.position = new_position
+            aircraft.update_ground_cover_radius()
+        else:
+            logger.warning(f'SIM: Aircraft 的高度不能小于 0, 现在高度为 {new_position[2]}.')
+            logger.warning('SIM: Aircraft 的位置不变.')
+        # 如果开启可视化, 更新 aircraft 在地图上的位置
+        aircraft.update_sumo_visualization()

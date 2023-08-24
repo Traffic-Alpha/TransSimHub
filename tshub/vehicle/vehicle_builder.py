@@ -57,7 +57,7 @@ class VehicleBuilder:
             speed, lane_index = action
             self._log_vehicle_info(vehicle_id, speed, lane_index)
             self.sumo.vehicle.slowDown(vehicle_id, speed, duration=1)
-            # self.sumo.vehicle.changeLane(vehicle_id, lane_index, duration=1)
+            self.sumo.vehicle.changeLane(vehicle_id, lane_index, duration=1)
             if hightlight:
                 self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=-1)
 
@@ -80,4 +80,4 @@ class VehicleBuilder:
         self.subscribed_vehicles_id = running_vehicle_ids
 
     def _log_vehicle_info(self, vehicle_id, speed, lane_index):
-        logger.debug(f'SIM: {vehicle_id:<15} | {speed:<6} | {lane_index:<6}')
+        logger.debug(f'SIM: {vehicle_id:<30} | Speed: {speed:<6} | Lane Index: {lane_index:<6}')
