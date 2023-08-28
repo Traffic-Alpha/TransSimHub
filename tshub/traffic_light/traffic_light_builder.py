@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-08-28 16:30:38
+@LastEditTime: 2023-08-28 17:51:20
 '''
 import traci
 import numpy as np
@@ -143,7 +143,11 @@ class TrafficLightBuilder:
 
     def get_traffic_lights_infos(self):
         """
-        获取场景中所有交通信号灯的信息
+        获取场景中所有交通信号灯的信息, 主要有以下的步骤:
+        1. 获得探测器的结果
+        2. 处理探测器的结果, 得到 processed_data
+        3. 根据处理好的数据去更新 traffic light 的信息
+        4. 将更新好的结果转换为 dict 进行输出
         """
         detector_result = self.sumo.lanearea.getAllSubscriptionResults()
         processed_data = self.process_detector_data(detector_result)
@@ -151,7 +155,7 @@ class TrafficLightBuilder:
         # 最后需要将其转换为 dict 进行输出
         tls_features = {}
         for _tls_id in self.tls_ids:
-            tls_features[_tls_id] = self.traffic_lights[_tls_id].get_feature()
+            tls_features[_tls_id] = self.traffic_lights[_tls_id].get_features()
         return tls_features
 
     def control_traffic_lights(self, actions):

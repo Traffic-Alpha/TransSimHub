@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-08-28 16:30:01
+@LastEditTime: 2023-08-28 17:01:55
 '''
 from __future__ import annotations
 
@@ -102,7 +102,7 @@ class TrafficLightInfo:
         # 当前的 traffic light 是否可以执行动作
         self.can_perform_action = (self.tls_action.sim_step == self.tls_action.next_action_time)
 
-    def get_feature(self) -> Dict[str, Any]:
+    def get_features(self) -> Dict[str, Any]:
         """
         返回交通信号灯的特征, 不需要包含 SUMO 的连接
         """
