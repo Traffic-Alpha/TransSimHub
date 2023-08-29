@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-@LastEditTime: 2023-08-24 15:21:54
+@LastEditTime: 2023-08-29 20:57:39
 '''
 from dataclasses import asdict
 from typing import Dict, Tuple
@@ -35,6 +35,7 @@ class AircraftBuilder:
 
     def create_aircraft(
             self, id:str, 
+            action_type:str, 
             position: Tuple[float, float, float], 
             speed: float, 
             heading: Tuple[float, float, float], 
@@ -57,7 +58,8 @@ class AircraftBuilder:
             None
         """
         aircraft = AircraftInfo.create(
-            id, position, speed, heading, communication_range,
+            id, action_type, 
+            position, speed, heading, communication_range,
             if_sumo_visualization, img_file, sumo
         )
         self.aircraft_dict[id] = aircraft
@@ -118,7 +120,7 @@ class AircraftBuilder:
         # 确保高度不小于0
         if new_position[2] >= 0:
             aircraft.position = new_position
-            aircraft.update_ground_cover_radius()
+            aircraft.update_ground_cover_radius() # 更新 ground cover radius
         else:
             logger.warning(f'SIM: Aircraft 的高度不能小于 0, 现在高度为 {new_position[2]}.')
             logger.warning('SIM: Aircraft 的位置不变.')

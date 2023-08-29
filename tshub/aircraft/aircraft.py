@@ -2,19 +2,25 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:01
 @Description: Aircraft Infomation
-@LastEditTime: 2023-08-24 15:21:47
+@LastEditTime: 2023-08-29 20:58:08
 '''
 import traci
 import math
-from dataclasses import dataclass
-from typing import Tuple
+from dataclasses import dataclass, asdict
+from typing import Tuple, Dict, Any
 from loguru import logger
 
+from .aircraft_action_type import aircraft_action_type
+from .aircraft_type.stationary import StationaryAction
+from .aircraft_type.horizontal_movement import HorizontalMovementAction
+from .aircraft_type.vertical_movement import VerticalMovementAction
+from .aircraft_type.combined_movement import CombinedMovementAction
 from ..utils.get_abs_path import get_abs_path
 
 @dataclass
 class AircraftInfo:
     id: str
+    action_type: str # aircraft 的动作类型
     position: tuple[float, float, float]
     speed: tuple[float, float, float]
     heading: tuple[float, float, float]
@@ -28,9 +34,21 @@ class AircraftInfo:
         """
         初始化后根据高度更新地面覆盖半径。
         """
+        # 初始化 aircraft 的动作类型
+        _action = aircraft_action_type(self.action_type)
+        if _action == aircraft_action_type.Stationary:
+            self.aircraft_action = StationaryAction(id=self.id)
+        elif _action == aircraft_action_type.HorizontalMovement:
+            self.aircraft_action = HorizontalMovementAction(id=self.id)
+        elif _action == aircraft_action_type.VerticalMovement:
+            self.aircraft_action = VerticalMovementAction(id=self.id)
+        elif _action == aircraft_action_type.CombinedMovement:
+            self.aircraft_action = CombinedMovementAction(id=self.id)
+        
+        # 初始化 aircraft
         self.current_file_path = get_abs_path(__file__)
-        self.update_ground_cover_radius()
-        self.check_sumo_visualization()
+        self.update_ground_cover_radius() # 更新地面覆盖半径
+        self.check_sumo_visualization() # 检查是否需要可视化
 
     def update_ground_cover_radius(self) -> None:
         """
@@ -98,6 +116,7 @@ class AircraftInfo:
     @classmethod
     def create(cls, 
             id:str, 
+            action_type:str,
             position: Tuple[float, float, float], 
             speed: float, 
             heading: Tuple[float, float, float], 
@@ -133,8 +152,17 @@ class AircraftInfo:
             AircraftInfo: 创建的 AircraftInfo 实例。
         """
         aircraft = cls(
-            id, position, speed, heading, communication_range, 0.0, 
+            id, action_type, position, speed, heading, communication_range, 0.0, 
             if_sumo_visualization, img_file, sumo
         )
         aircraft.update_ground_cover_radius()
         return aircraft
+    
+    def update_features(self):
+        pass
+
+    def get_features(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    def control_aircraft(self):
+        pass
