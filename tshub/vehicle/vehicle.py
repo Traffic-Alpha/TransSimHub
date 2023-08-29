@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-08-28 20:16:42
+@LastEditTime: 2023-08-29 17:26:33
 '''
 import traci
 from typing import Dict, Any
@@ -24,9 +24,8 @@ class VehicleInfo:
     position: Tuple[float]  # The position of the vehicle
     speed: float  # The current speed of the vehicle
     road_id: str  # The ID of the road the vehicle is on
-    # road number, 这个 road 有多少车道
     lane_id: str  # The ID of the lane the vehicle is on
-    # lane index, 目前的车所在的车道 index
+    lane_index: int # 目前的车所在的车道 index
     edges: List[str]  # The edges the vehicle has traversed
     waiting_time: float  # The waiting time of the vehicle
     next_tls: List[str]  # The IDs of the next traffic lights the vehicle will encounter
@@ -45,8 +44,8 @@ class VehicleInfo:
                 [
                     traci.constants.VAR_POSITION, traci.constants.VAR_SPEED,
                     traci.constants.VAR_ROAD_ID, traci.constants.VAR_LANE_ID,
-                    traci.constants.VAR_EDGES, traci.constants.VAR_WAITING_TIME,
-                    traci.constants.VAR_NEXT_TLS
+                    traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
+                    traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS, 
                 ]
             )
 
@@ -54,12 +53,13 @@ class VehicleInfo:
     def create_vehicle(cls, id: str, action_type:str,
                        sumo:traci.connection.Connection,
                        position: Tuple[float], speed: float,
-                       road_id: str, lane_id: str, edges: List[str],
+                       road_id: str, lane_id: str, 
+                       lane_index:int, edges: List[str], 
                        waiting_time: float, next_tls: List[str]):
         logger.info(f'SIM: Init Vehicle, {id}')
         return cls(id=id, action_type=action_type, sumo=sumo,
             position=position, speed=speed,
-            road_id=road_id, lane_id=lane_id,
+            road_id=road_id, lane_id=lane_id, lane_index=lane_index,
             edges=edges, waiting_time=waiting_time,
             next_tls=next_tls
         )
@@ -78,6 +78,7 @@ class VehicleInfo:
             'speed': 64,
             'road_id': 80,
             'lane_id': 81,
+            'lane_index': 82,
             'edges': 84,
             'waiting_time': 122,
             'next_tls': 112
@@ -85,12 +86,13 @@ class VehicleInfo:
         return feature_mapping.get(feature, -1)
     
     def update_features(self, vehicle_info:Dict[int, Any]) -> None:
-        self.position=vehicle_info[VehicleInfo.get_feature_index('position')],
-        self.speed=vehicle_info[VehicleInfo.get_feature_index('speed')],
-        self.road_id=vehicle_info[VehicleInfo.get_feature_index('road_id')],
-        self.lane_id=vehicle_info[VehicleInfo.get_feature_index('lane_id')],
-        self.edges=vehicle_info[VehicleInfo.get_feature_index('edges')],
-        self.waiting_time=vehicle_info[VehicleInfo.get_feature_index('waiting_time')],
+        self.position=vehicle_info[VehicleInfo.get_feature_index('position')]
+        self.speed=vehicle_info[VehicleInfo.get_feature_index('speed')]
+        self.road_id=vehicle_info[VehicleInfo.get_feature_index('road_id')]
+        self.lane_id=vehicle_info[VehicleInfo.get_feature_index('lane_id')]
+        self.lane_index=vehicle_info[VehicleInfo.get_feature_index('lane_index')]
+        self.edges=vehicle_info[VehicleInfo.get_feature_index('edges')]
+        self.waiting_time=vehicle_info[VehicleInfo.get_feature_index('waiting_time')]
         self.next_tls=vehicle_info[VehicleInfo.get_feature_index('next_tls')]
 
     def get_features(self):
@@ -102,5 +104,11 @@ class VehicleInfo:
                 output_dict[field_name] = field_value
         return output_dict
 
-    def control_vehicle(self, action) -> None:
-        self.vehicle_action.execute(action)
+    def control_vehicle(self, lane_change, target_speed) -> None:
+        current_speed = self.speed # 目前车辆的速度
+        current_lane_index = self.lane_index # 目前车辆所在的 index
+        current_road_id = self.road_id # 目前所在的 road id
+        self.vehicle_action.execute(
+            lane_change=lane_change, target_speed=target_speed, 
+            current_speed=current_speed, current_lane_index=current_lane_index, current_road_id=current_road_id
+        )

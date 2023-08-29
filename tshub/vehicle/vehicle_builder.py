@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-08-28 20:29:20
+@LastEditTime: 2023-08-29 17:30:36
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -29,6 +29,7 @@ class VehicleBuilder:
             speed=0,
             road_id='road_id',
             lane_id='lane_id',
+            lane_index=0,
             edges=[],
             waiting_time=0,
             next_tls=[],
@@ -100,10 +101,13 @@ class VehicleBuilder:
                      Each action is represented as a tuple (speed, lane_index).
         """
         for vehicle_id, action in actions.items():
-            self._log_vehicle_info(vehicle_id, action)
-            self.vehicles[vehicle_id].control_vehicle(action)
+            lane_change, target_speed = action
+            self._log_vehicle_info(vehicle_id, lane_change, target_speed)
+            self.vehicles[vehicle_id].control_vehicle(lane_change, target_speed)
             if hightlight:
                 self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=255, duration=1)
 
-    def _log_vehicle_info(self, vehicle_id, action) -> None:
-        logger.debug(f'SIM: {vehicle_id:<30} | Action: {action:<20}')
+    def _log_vehicle_info(self, vehicle_id, lane_change, target_speed) -> None:
+        if target_speed == None:
+            target_speed = 'None'
+        logger.debug(f'SIM: {vehicle_id:<20} | Lane Change: {lane_change:<7} | Target Speed: {target_speed:<7}')
