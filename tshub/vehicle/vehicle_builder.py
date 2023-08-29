@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-08-29 17:30:36
+@LastEditTime: 2023-08-29 17:38:47
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -14,7 +14,7 @@ class VehicleBuilder:
     Provides methods to retrieve information and control all vehicles in the scene.
     """
 
-    def __init__(self, sumo, action_type):
+    def __init__(self, sumo, action_type) -> None:
         self.sumo = sumo  # sumo connection]
         self.action_type = action_type # lane, lane_continuous_speed
         self.vehicles: Dict[str, VehicleInfo] = {}

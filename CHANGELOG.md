@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-08-28 16:53:28
+ * @LastEditTime: 2023-08-29 17:39:08
 -->
 # Change Log
 
@@ -64,15 +64,19 @@ Copy and pasting the git commit messages is **NOT** enough.
 
 ### Changed
 
-- 修改了 vehicle 的定义
+- Modified the vehicle module to no longer create multiple classes for the same vehicle.
+  - Added `update_vehicle_feature`, which updates the current information of the vehicle at each step.
+  - Added and improved different vehicle action types, including `lane` and `lane with continuous speed`.
+  - Added attributes to the vehicle, including `action type` and `lane index`.
 
+<!-- v0.4 -->
+<!-- 添加生成 route 的模块
+添加整合生成 add 和 detector 的模块
+添加两个环境
+aircraft 得到一个更加高级的动作控制类型 -->
 
-
-
-<!-- - `sumo_tool` -->
-
-
-<!-- 加入 tsc 的模块 -->
+<!-- v0.5 -->
+<!-- 将三个内容整合在一起，得到一个 base env -->
 <!-- 添加 uml 框架图 -->
 
 
