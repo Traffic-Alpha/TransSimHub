@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-08-29 17:26:33
+@LastEditTime: 2023-08-29 17:40:47
 '''
 import traci
 from typing import Dict, Any
@@ -12,7 +12,7 @@ from typing import List, Tuple
 
 from .vehicle_action_type import vehicle_action_type
 from .vehicle_type.lane import LaneAction
-from .vehicle_type.lane_with_continue_speed import LaneWithContinuousSpeedAction
+from .vehicle_type.lane_with_continuous_speed import LaneWithContinuousSpeedAction
 
 @dataclass
 class VehicleInfo:
