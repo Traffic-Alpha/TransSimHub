@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-08-28 17:51:20
+@LastEditTime: 2023-08-30 15:16:02
 '''
 import traci
 import numpy as np
@@ -12,8 +12,9 @@ from typing import Dict, List
 from .traffic_light import TrafficLightInfo
 from .traffic_light_feature_convert import TSCKeyMeaningsConverter
 from ..utils.nested_dict_conversion import defaultdict2dict
+from ..tshub_env.base_builder import BaseBuilder
 
-class TrafficLightBuilder:
+class TrafficLightBuilder(BaseBuilder):
     def __init__(self, sumo, 
                  tls_ids:List[str], 
                  action_type:str, 
@@ -26,7 +27,7 @@ class TrafficLightBuilder:
         self.tsc_convert = TSCKeyMeaningsConverter()
 
         self.subscribe_detector() # 订阅传感器
-        self.create_traffic_lights() # 初始化场景所有信号灯
+        self.create_objects() # 初始化场景所有信号灯
         
 
     def subscribe_detector(self) -> None:
@@ -42,7 +43,7 @@ class TrafficLightBuilder:
                         traci.constants.LAST_STEP_OCCUPANCY, # 19, Note: 因为车辆之间有间隔, 所以即使排满了, occ 也不会是 100%
                     ])
 
-    def create_traffic_lights(self) -> None:
+    def create_objects(self) -> None:
         """
         为场景初始化所有的交通信号灯
         """
@@ -121,8 +122,8 @@ class TrafficLightBuilder:
         
         return defaultdict2dict(output)
 
-    def update_traffic_lights_state(self, processed_data) -> None:
-        """更新每一个信号灯的状态
+    def update_objects_state(self, processed_data) -> None:
+        """更新每一个信号灯的状态, 返回信息的时候, 使用信息去更新 object
 
         Args:
             processed_data (Dict[str, Dict[str, Dict[float]]]): 每一个路口每一个 movement 的数据
@@ -141,7 +142,7 @@ class TrafficLightBuilder:
         for _tls_id, _tls_data in processed_data.items():
             self.traffic_lights[_tls_id].update_features(_tls_data)
 
-    def get_traffic_lights_infos(self):
+    def get_objects_infos(self):
         """
         获取场景中所有交通信号灯的信息, 主要有以下的步骤:
         1. 获得探测器的结果
@@ -151,14 +152,14 @@ class TrafficLightBuilder:
         """
         detector_result = self.sumo.lanearea.getAllSubscriptionResults()
         processed_data = self.process_detector_data(detector_result)
-        self.update_traffic_lights_state(processed_data)
+        self.update_objects_state(processed_data)
         # 最后需要将其转换为 dict 进行输出
         tls_features = {}
         for _tls_id in self.tls_ids:
             tls_features[_tls_id] = self.traffic_lights[_tls_id].get_features()
         return tls_features
 
-    def control_traffic_lights(self, actions):
+    def control_objects(self, actions):
         """
         控制所有交通信号灯
         """

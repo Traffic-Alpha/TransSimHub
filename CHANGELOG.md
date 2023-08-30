@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-08-29 17:39:08
+ * @LastEditTime: 2023-08-30 16:39:27
 -->
 # Change Log
 
@@ -70,6 +70,30 @@ Copy and pasting the git commit messages is **NOT** enough.
   - Added attributes to the vehicle, including `action type` and `lane index`.
 
 <!-- v0.4 -->
+## [v0.4] - 2023-08-30
+
+### Add
+
+- Added four different aircraft action types:
+  - `stationary.py`: The aircraft remains stationary at its initial position.
+  - `horizontal_movement.py`: The aircraft can only move horizontally, with eight possible heading angles.
+  - `vertical_movement.py`: The aircraft can only move vertically, with three possible heading values: up, stationary, and down.
+  - `combined_movement.py`: The aircraft can move both upward and downward simultaneously, combining azimuth and pitch angles. There are a total of 40 combinations.
+
+### Changed
+
+- Added `base_builder.py` to standardize the interface between different builders:
+  - `aircraft_builder.py`, `vehicle_builder.py`, `traffic_light_builder.py`
+- Provided examples for vehicle, aircraft, and traffic light under the new builder:
+  - `traffic_light_action`: `tls_choosenextphase.py` and `tls_nextornot.py`
+  - `aircraft_actions`: `aircraft_combined.py`, `aircraft_horizontal.py`, `aircraft_stationary.py`, and `aircraft_vertical.py`
+  - `vehicle_action`: `vehicle_lane.py` and `vehicle_lane_with_continuous_speed.py`
+
+### Fixed
+
+- In `traffic_light.py`, set `this_phase` to False before each update in `__update_this_phase()`. Previously, it would cause all `this_phase` values to be True.
+
+
 <!-- 添加生成 route 的模块
 添加整合生成 add 和 detector 的模块
 添加两个环境

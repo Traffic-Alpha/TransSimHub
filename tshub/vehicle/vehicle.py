@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-08-29 17:40:47
+@LastEditTime: 2023-08-30 16:27:50
 '''
 import traci
 from typing import Dict, Any
@@ -56,7 +56,7 @@ class VehicleInfo:
                        road_id: str, lane_id: str, 
                        lane_index:int, edges: List[str], 
                        waiting_time: float, next_tls: List[str]):
-        logger.info(f'SIM: Init Vehicle, {id}')
+        logger.info(f'SIM: Init Vehicle: {id}')
         return cls(id=id, action_type=action_type, sumo=sumo,
             position=position, speed=speed,
             road_id=road_id, lane_id=lane_id, lane_index=lane_index,
