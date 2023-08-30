@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:27:57
 @Description: 将相对路径转换为绝对路径
-@LastEditTime: 2023-08-23 16:41:54
+@LastEditTime: 2023-08-24 17:01:22
 '''
 import os
 from loguru import logger
@@ -17,7 +17,7 @@ class get_abs_path(object):
         """将相对路径转换为绝对路径
         """
         if self.file_abspath is None:
-            logger.warning('没有设置当前文件路径')
+            logger.warning('SIM: 没有设置当前文件路径')
             self.file_abspath = os.path.abspath(__file__)
 
         folder_abspath = os.path.dirname(self.file_abspath)
