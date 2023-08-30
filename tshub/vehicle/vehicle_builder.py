@@ -2,14 +2,15 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-08-29 17:38:47
+@LastEditTime: 2023-08-30 16:18:10
 '''
 from loguru import logger
 from typing import Dict, Any
 
 from .vehicle import VehicleInfo
+from ..tshub_env.base_builder import BaseBuilder
 
-class VehicleBuilder:
+class VehicleBuilder(BaseBuilder):
     """
     Provides methods to retrieve information and control all vehicles in the scene.
     """
@@ -19,17 +20,17 @@ class VehicleBuilder:
         self.action_type = action_type # lane, lane_continuous_speed
         self.vehicles: Dict[str, VehicleInfo] = {}
 
-    def __create_vehicle(self, vehicle_id: str) -> None:
+    def create_objects(self, vehicle_id: str) -> None:
         """初始化车辆
         """
         vehicle_info = VehicleInfo.create_vehicle(
             id=vehicle_id,
             action_type=self.action_type,
-            position=(0,0),
+            position=self.sumo.vehicle.getPosition(vehicle_id),
             speed=0,
-            road_id='road_id',
-            lane_id='lane_id',
-            lane_index=0,
+            road_id=self.sumo.vehicle.getRoadID(vehicle_id),
+            lane_id=self.sumo.vehicle.getLaneID(vehicle_id),
+            lane_index=self.sumo.vehicle.getLaneIndex(vehicle_id),
             edges=[],
             waiting_time=0,
             next_tls=[],
@@ -58,7 +59,7 @@ class VehicleBuilder:
         """
         self.vehicles[vehicle_id].update_features(vehicle_info)
 
-    def update_scene_vehicles(self) -> None:
+    def update_objects_state(self) -> None:
         """更新场景中所有车辆信息, 包含三个部分:
         1. 对于之前就在环境中的车辆，更新这些车辆的信息；
         2. 对于离开环境的车辆，将其从 self.vehicles 中删除；
@@ -73,7 +74,7 @@ class VehicleBuilder:
                 vehicle_info = subscription_results[vehicle_id]
                 self.__update_existing_vehicle(vehicle_id, vehicle_info)
             else:
-                self.__create_vehicle(vehicle_id)
+                self.create_objects(vehicle_id)
 
         # 删除离开环境的车辆
         for vehicle_id in list(self.vehicles.keys()):
@@ -81,19 +82,19 @@ class VehicleBuilder:
                 self.__delete_vehicle(vehicle_id)
 
 
-    def get_all_vehicles_data(self):
+    def get_objects_infos(self):
         """
         Get information for all vehicles in the scene.
         Returns a dictionary where the keys are vehicle IDs and the values are the vehicle data.
         """
-        self.update_scene_vehicles() # 更新场景内的车辆信息
+        self.update_objects_state() # 更新场景内的车辆信息
         vehicle_features = {}
         for vehicle_id, vehicle_info in self.vehicles.items():
             vehicle_features[vehicle_id] = vehicle_info.get_features()
         return vehicle_features
 
 
-    def control_vehicles(self, actions, hightlight:bool=True):
+    def control_objects(self, actions, hightlight:bool=True):
         """
         Control all vehicles in the scene based on the provided actions.
         Args:

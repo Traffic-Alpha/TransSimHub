@@ -3,7 +3,7 @@
 @Date: 2023-08-23 15:50:00
 @Description: 获得场景中所有车辆的信息
 # 这里需要可以在每隔 Ns 获得当前车辆的所有信息
-@LastEditTime: 2023-08-28 20:04:34
+@LastEditTime: 2023-08-30 16:07:20
 '''
 import sumolib
 from loguru import logger
@@ -25,7 +25,7 @@ conn = traci.getConnection('0')
 
 scene_vehicles = VehicleBuilder(sumo=conn, action_type='lane')
 while conn.simulation.getMinExpectedNumber() > 0:
-    data = scene_vehicles.get_all_vehicles_data() # 获得车辆的信息
+    data = scene_vehicles.get_objects_infos() # 获得车辆的信息
     logger.info(f'SIM: {dict_to_str(data)}')
 
     conn.simulationStep()

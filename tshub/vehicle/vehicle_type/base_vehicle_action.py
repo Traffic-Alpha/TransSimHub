@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 19:13:31
 @Description: 车辆控制基类
-@LastEditTime: 2023-08-29 17:22:14
+@LastEditTime: 2023-08-29 20:19:13
 '''
 from abc import ABC, abstractmethod
 
@@ -13,7 +13,7 @@ class VehicleAction(ABC):
         self.sumo = sumo
 
     @abstractmethod
-    def execute(self, action_id) -> None:
+    def execute(self) -> None:
         pass
 
     def change_lane(self, lane_change:int, 
