@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 16:04:15
 @Description: Aircraft 同时控制水平与垂直
-@LastEditTime: 2023-08-30 16:04:16
+@LastEditTime: 2023-08-30 18:18:09
 '''
 import traci
 import sumolib
@@ -27,15 +27,16 @@ aircraft_inits = {
     'a1': {
         "action_type": "combined_movement", 
         "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
-        "if_sumo_visualization":True, "sumo":conn, "img_file":None},
+        "if_sumo_visualization":True, "img_file":None
+    },
     'a2': {
         "action_type": "combined_movement", 
         "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
-        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+        "if_sumo_visualization":True, "img_file":None
     }
 }
 
-scene_aircraft = AircraftBuilder(aircraft_inits)
+scene_aircraft = AircraftBuilder(sumo=conn, aircraft_inits=aircraft_inits)
 while conn.simulation.getMinExpectedNumber() > 0:
     conn.simulationStep() # 仿真到某一步
     actions = {

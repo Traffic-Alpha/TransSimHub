@@ -2,36 +2,41 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-@LastEditTime: 2023-08-30 15:40:22
+@LastEditTime: 2023-08-30 18:16:06
 '''
+import traci
 from typing import Dict, Tuple
-from loguru import logger
 
 from .aircraft import AircraftInfo
 from ..tshub_env.base_builder import BaseBuilder
 
 class AircraftBuilder(BaseBuilder):
-    def __init__(self, aircraft_inits: Dict[str, Dict[str, any]]={}) -> None:
+    def __init__(self, 
+                 sumo: traci.connection.Connection, 
+                 aircraft_inits: Dict[str, Dict[str, any]]={}) -> None:
         """
         初始化 AircraftBuilder 类的实例。
 
         Args:
+            sumo (traci.connection.Connection): sumo 的连接 
             aircraft_inits (Dict[str, Dict[str, any]], optional): 航空器的初始参数字典。默认为 None。
                 下面是一个例子，包含 aircraft 的 id, 和初始位置, 初始速度, 初始 heading 角度, 和通讯距离：
                 aircraft_inits = {
                     'a1': {
+                        "action_type": "horizontal_movement", 
                         "position":(10,10,10), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+                        "if_sumo_visualization":True, "img_file":None
                     },
                     'a2': {
+                        "action_type": "horizontal_movement", 
                         "position":(10,10,100), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+                        "if_sumo_visualization":True, "img_file":None
                     }
                 }
         """
         self.aircraft_dict = {} # 存储每一个 aircraft 的类
         for _aircraft_id, _aircraft_parameter in aircraft_inits.items():
-            self.create_objects(id=_aircraft_id, **_aircraft_parameter)
+            self.create_objects(id=_aircraft_id, sumo=sumo, **_aircraft_parameter)
 
     def create_objects(
             self, id:str, 

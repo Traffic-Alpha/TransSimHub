@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-29 20:18:04
 @Description: Base Aircraft Action
-@LastEditTime: 2023-08-29 20:35:19
+@LastEditTime: 2023-08-30 18:18:56
 '''
 from loguru import logger
 from typing import Tuple
@@ -21,11 +21,11 @@ class AircraftAction(ABC):
                                position:Tuple[float, float, float], 
                                speed: float, heading:Tuple[float, float, float]
                             ) -> Tuple[float, float, float]:
-        new_position = (
+        new_position = [
             position[0] + speed * heading[0],
             position[1] + speed * heading[1],
             position[2] + speed * heading[2]
-        )
+        ]
         if new_position[2] <= 0:
             logger.warning(f'SIM: Aircraft 的高度不能小于 0, 现在高度为 {new_position[2]}.')
             logger.warning('SIM: Aircraft 的位置不变.')

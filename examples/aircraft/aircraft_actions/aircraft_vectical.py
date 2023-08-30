@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 15:53:08
 @Description: Aircraft 垂直方向移动
-@LastEditTime: 2023-08-30 15:54:12
+@LastEditTime: 2023-08-30 18:20:47
 '''
 import traci
 import sumolib
@@ -27,15 +27,15 @@ aircraft_inits = {
     'a1': {
         "action_type": "vertical_movement", 
         "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
-        "if_sumo_visualization":True, "sumo":conn, "img_file":None},
+        "if_sumo_visualization":True, "img_file":None},
     'a2': {
         "action_type": "vertical_movement", 
         "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
-        "if_sumo_visualization":True, "sumo":conn, "img_file":None
+        "if_sumo_visualization":True, "img_file":None
     }
 }
 
-scene_aircraft = AircraftBuilder(aircraft_inits)
+scene_aircraft = AircraftBuilder(sumo=conn, aircraft_inits=aircraft_inits)
 while conn.simulation.getMinExpectedNumber() > 0:
     conn.simulationStep() # 仿真到某一步
     actions = {
