@@ -2,13 +2,14 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-08-28 17:01:55
+@LastEditTime: 2023-08-30 14:04:35
 '''
 from __future__ import annotations
 
 import traci
 from loguru import logger
 from dataclasses import dataclass, fields
+import numpy as np
 from typing import List, Dict, Any
 
 from .traffic_light_action_type import tls_action_type
@@ -72,11 +73,12 @@ class TrafficLightInfo:
                    this_phase, last_phase, next_phase, sumo)
     
     def __update_this_phase(self, phase_index:int) -> None:
-        """根据 phase_index 更新 this_phase, 将目前控制的 movement 设置为 True
+        """根据 phase_index 更新 this_phase, 将目前控制的 movement 设置为 True, 其余的设置为 False
 
         Args:
             phase_index (int): phase index
         """
+        self.this_phase = np.zeros(12).astype(bool).tolist()
         if phase_index in self.phase2movements:
             movements = self.phase2movements[phase_index]
             for movement in movements:
