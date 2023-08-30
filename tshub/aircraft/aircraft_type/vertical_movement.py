@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-29 18:11:22
 @Description: 飞翔器垂直方向移动
-@LastEditTime: 2023-08-29 20:44:33
+@LastEditTime: 2023-08-30 15:28:00
 '''
 from typing import Tuple
 from .base_aircraft_action import AircraftAction
@@ -21,5 +21,5 @@ class VerticalMovementAction(AircraftAction):
                 speed: float, heading_index: int) -> None:
         heading = self.HEADINGS[heading_index]
         new_position = self.calculate_new_position(position=position, speed=speed, heading=heading)
-        return new_position
+        return new_position, heading
 
