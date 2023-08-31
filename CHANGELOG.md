@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-08-31 11:47:54
+ * @LastEditTime: 2023-08-31 14:13:05
 -->
 # Change Log
 
@@ -128,10 +128,12 @@ Copy and pasting the git commit messages is **NOT** enough.
 - 在 `sumo_tools` 中添加 `generate_route.py` 模块, 用于快速给场景生成 route 文件
   - 主要的思路是 xx
   - 可以控制 ego 车辆和背景车辆的混合比例，以 ego 开头就是需要控制的车辆, 其他的车就是背景车, 只能获得 state, 无法进行控制
+  - 可以设置默认车辆的速度是 9m/s, 约等于 32.4km/h
 - 在 `sumo_tools` 中添加 `generate_add.py` 模块, 用于快速给场景生成 add 文件, 监测信号灯的状态变化
 - 初始化文档的模块，使用 Sphinx 进行文档的书写
-  - 书写 introduction 部分，介绍 
-  - 书写 installation 部分，介绍如何安装
+  - `doc` 支持 `readthedocs` 文档, [Transsimhub Documentation](https://transsimhub.readthedocs.io/)
+  - 书写 introduction 部分，介绍 TransSimHub 仓库
+  - 书写 installation 部分，介绍如何安装 TransSimHub
 
 ### Changed
 
