@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2023-08-23 11:34:39
+@LastEditTime: 2023-08-31 11:07:13
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -17,12 +17,23 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 setup(
     name='tshub',
-    version=0.1,
+    version=0.5,
     description='TransSimHub is a lightweight Python library for simulating and controlling transportation systems.',
     author='Traffic-Alpha',
     license='Apache License, Version 2.0',
-    keywords='transportation systems',
+    keywords=['V2X', 'transportation systems', 'reinforcement learning'],
+    python_requires='>=3.7',
     packages=find_packages(),
-    install_requires=[i.strip() for i in open(os.path.join(os.path.dirname(__file__), 'requirements.txt')).readlines() if i.strip()],
+    install_requires=[
+        i.strip() 
+        for i in open(os.path.join(os.path.dirname(__file__), 'requirements.txt')).readlines() 
+        if i.strip()
+    ],
+    extras_require={
+        'doc':[
+            "sphinx",
+            "sphinx_rtd_theme",
+        ]
+    },
     include_package_data=True,
 )
