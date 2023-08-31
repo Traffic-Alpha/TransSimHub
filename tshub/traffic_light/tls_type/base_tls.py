@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-@LastEditTime: 2023-08-25 20:01:55
+@LastEditTime: 2023-08-28 15:46:24
 '''
 from abc import ABC, abstractmethod
 from ...sumo_tools.sumo_infos.tls_connections import tls_connection
@@ -16,6 +16,16 @@ class BaseTLS(ABC):
         self.id = ts_id # 信号灯的 id
         self.sumo = sumo
 
+        # 获得路口连接
+        tls_info = tls_connection(self.sumo)
+        self.tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
+
+        # 信号灯 movement 和 phase 的基本信息
+        self.movement_ids = set()
+        self.movement_directions = {}
+        self.movement_lane_numbers = {}
+        self.phase2movements = {} # 记录每个 phase 由哪些 movement 组成
+
         self.lanes = list(dict.fromkeys(self.sumo.trafficlight.getControlledLanes(self.id)))  # Remove duplicates and keep order
         self.out_lanes = [link[0][1] for link in self.sumo.trafficlight.getControlledLinks(self.id) if link]
         self.out_lanes = list(set(self.out_lanes))
@@ -23,12 +33,21 @@ class BaseTLS(ABC):
 
         self.program_id = self.sumo.trafficlight.getProgram(self.id) # 获得这个信号的当前的 program id
 
+        # 初始化 traffic light
+        self.collect_movements_infos()
+        self.collect_controled_phase_movements()
+
     @abstractmethod
     def set_next_phases(self):
         """实现控制信号灯不同的动作
         """
         pass
-
+    
+    @property
+    def sim_step(self):
+        """Return current simulation second on SUMO
+        """
+        return self.sumo.simulation.getTime()
 
     def build_phases(self):
         """初始化信号灯的方案, 在中间添加黄灯状态, 下面是一个例子.
@@ -153,18 +172,19 @@ class BaseTLS(ABC):
             controled_phase[phase_index] = (True if 'G' in phase.state else False)
         return controled_phase
 
-    def get_movements_infos(self):
-        # movement 的 id, 且经过排序
-        logics = self.sumo.trafficlight.getAllProgramLogics(self.id) # 获得当前信号灯的情况
-        logic_index = [logic.programID for logic in logics].index(self.program_id) # 找到对应 program_id 的 logic
-        logic = logics[logic_index]
+    def collect_movements_infos(self):
+        for item in self.tls_connections:
+            if None in item:
+                continue
+            from_edge, _, _, _, _, direction, _ = item
+            movement_id = f"{from_edge}_{direction}"
+            self.movement_ids.add(movement_id)
+            self.movement_directions[movement_id] = direction
+            self.movement_lane_numbers[movement_id] = self.movement_lane_numbers.get(movement_id, 0) + 1
 
-        tls_info = tls_connection(self.sumo)
-        tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
-        print(1)
-        return (1,1,1)
+        self.movement_ids = sorted(self.movement_ids)
 
-    def controled_phase_movements(self):
+    def collect_controled_phase_movements(self):
         """得到每个 phase 由哪些 movement 组成, 返回的数据如下所示：
 
             {
@@ -180,21 +200,15 @@ class BaseTLS(ABC):
         logic_index = [logic.programID for logic in logics].index(self.program_id) # 找到对应 program_id 的 logic
         logic = logics[logic_index]
 
-        tls_info = tls_connection(self.sumo)
-        tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
-
-        phase2movements = dict() # 记录每个 phase 由哪些 movement 组成
         phase_id = 0
         for phase in logic.phases: # 每个 phase 的组成, 例如 rrrrrrGGGGrrrrrGGGr
             _movement_list = list() # 每个 phase 由哪些 movement 组成
             if 'G' in phase.state: # 判断是否是绿灯相位
-                for _conn_info, _phase_color in zip(tls_connections, phase.state):
+                for _conn_info, _phase_color in zip(self.tls_connections, phase.state):
                     if _phase_color == 'G':
                         fromEdge = _conn_info[0] # 获得 fronEdge
                         direction = _conn_info[5] # 获得 direction
                         _movement_list.append(f'{fromEdge}--{direction}')
-            
-                phase2movements[phase_id] = list(set(_movement_list))
+                _filtered_movement_list = [item for item in _movement_list if item != 'None--None']
+                self.phase2movements[phase_id] = list(set(_filtered_movement_list))
                 phase_id += 1
-
-        return phase2movements

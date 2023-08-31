@@ -2,27 +2,32 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-08-25 19:52:56
+@LastEditTime: 2023-08-30 15:16:02
 '''
 import traci
 import numpy as np
 from collections import defaultdict
-from typing import Dict
+from typing import Dict, List
 
 from .traffic_light import TrafficLightInfo
 from .traffic_light_feature_convert import TSCKeyMeaningsConverter
 from ..utils.nested_dict_conversion import defaultdict2dict
+from ..tshub_env.base_builder import BaseBuilder
 
-class TrafficLightBuilder:
-    def __init__(self, sumo, tls_ids, action_type) -> None:
+class TrafficLightBuilder(BaseBuilder):
+    def __init__(self, sumo, 
+                 tls_ids:List[str], 
+                 action_type:str, 
+                 delta_time:int=5) -> None:
         self.sumo = sumo
         self.tls_ids = tls_ids # 信号灯 id 列表
         self.action_type = action_type # 信号灯支持的动作类型
+        self.delta_time = delta_time # 信号灯的动作间隔
         self.traffic_lights = dict()  # 存储场景中的所有交通信号灯
         self.tsc_convert = TSCKeyMeaningsConverter()
 
         self.subscribe_detector() # 订阅传感器
-        self.create_traffic_lights() # 初始化场景所有信号灯
+        self.create_objects() # 初始化场景所有信号灯
         
 
     def subscribe_detector(self) -> None:
@@ -35,18 +40,19 @@ class TrafficLightBuilder:
                         traci.constants.LAST_STEP_MEAN_SPEED, # 17
                         traci.constants.JAM_LENGTH_VEHICLE, # 24
                         traci.constants.JAM_LENGTH_METERS, # 25
-                        traci.constants.LAST_STEP_OCCUPANCY, # 19
+                        traci.constants.LAST_STEP_OCCUPANCY, # 19, Note: 因为车辆之间有间隔, 所以即使排满了, occ 也不会是 100%
                     ])
 
-    def create_traffic_lights(self) -> None:
+    def create_objects(self) -> None:
         """
         为场景初始化所有的交通信号灯
         """
-        zeros = np.zeros(8)
+        zeros = np.zeros(12) # 十字路口包含 12 个 movement
         for _tls_id in self.tls_ids:
             traffic_light = TrafficLightInfo.create_traffic_light(
                 id=_tls_id,
                 action_type=self.action_type,
+                delta_time=self.delta_time,
                 last_step_mean_speed=zeros.tolist(), 
                 jam_length_vehicle=zeros.tolist(), 
                 jam_length_meters=zeros.tolist(),
@@ -54,7 +60,7 @@ class TrafficLightBuilder:
                 this_phase=zeros.astype(bool).tolist(), 
                 last_phase=zeros.astype(bool).tolist(), 
                 next_phase=zeros.astype(bool).tolist(), 
-                sumo=self.sumo
+                sumo=self.sumo,
             )
             self.traffic_lights[_tls_id] = traffic_light
 
@@ -116,8 +122,8 @@ class TrafficLightBuilder:
         
         return defaultdict2dict(output)
 
-    def update_traffic_lights_state(self, processed_data) -> None:
-        """更新每一个信号灯的状态
+    def update_objects_state(self, processed_data) -> None:
+        """更新每一个信号灯的状态, 返回信息的时候, 使用信息去更新 object
 
         Args:
             processed_data (Dict[str, Dict[str, Dict[float]]]): 每一个路口每一个 movement 的数据
@@ -136,19 +142,27 @@ class TrafficLightBuilder:
         for _tls_id, _tls_data in processed_data.items():
             self.traffic_lights[_tls_id].update_features(_tls_data)
 
-    def get_traffic_lights_infos(self):
+    def get_objects_infos(self):
         """
-        获取场景中所有交通信号灯的信息
+        获取场景中所有交通信号灯的信息, 主要有以下的步骤:
+        1. 获得探测器的结果
+        2. 处理探测器的结果, 得到 processed_data
+        3. 根据处理好的数据去更新 traffic light 的信息
+        4. 将更新好的结果转换为 dict 进行输出
         """
         detector_result = self.sumo.lanearea.getAllSubscriptionResults()
         processed_data = self.process_detector_data(detector_result)
-        self.update_traffic_lights_state(processed_data)
+        self.update_objects_state(processed_data)
         # 最后需要将其转换为 dict 进行输出
+        tls_features = {}
+        for _tls_id in self.tls_ids:
+            tls_features[_tls_id] = self.traffic_lights[_tls_id].get_features()
+        return tls_features
 
-    def control_traffic_lights(self):
+    def control_objects(self, actions):
         """
         控制所有交通信号灯
         """
-        # 在此处编写控制交通信号灯的代码
-        # 使用 setphase 来控制信号灯
-        pass
+        for _tls_id in self.tls_ids:
+            tls_action = actions[_tls_id] # 得到对应 tls 的 action
+            self.traffic_lights[_tls_id].control_traffic_light(tls_action)

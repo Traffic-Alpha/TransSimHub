@@ -1,0 +1,20 @@
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_0--gsndj_n6_0--r" lane=":htddj_gsndj_0_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_0--29257863#5_0--s" lane=":htddj_gsndj_1_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_1--29257863#5_1--s" lane=":htddj_gsndj_1_1" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_2--29257863#5_2--s" lane=":htddj_gsndj_1_2" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_3--gsndj_s5_1--l" lane=":htddj_gsndj_4_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--29257863#2--29257863#2_4--gsndj_s5_2--l" lane=":htddj_gsndj_4_1" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_n7--gsndj_n7_0--161701303#10_0--r" lane=":htddj_gsndj_6_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_n7--gsndj_n7_1--gsndj_n6_1--s" lane=":htddj_gsndj_7_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_n7--gsndj_n7_2--gsndj_n6_2--s" lane=":htddj_gsndj_7_1" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_n7--gsndj_n7_3--29257863#5_2--l" lane=":htddj_gsndj_9_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--161701303#7.248--161701303#7.248_0--gsndj_s5_0--r" lane=":htddj_gsndj_10_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--161701303#7.248--161701303#7.248_1--161701303#10_1--s" lane=":htddj_gsndj_11_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--161701303#7.248--161701303#7.248_2--161701303#10_2--s" lane=":htddj_gsndj_11_1" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--161701303#7.248--161701303#7.248_3--gsndj_n6_2--l" lane=":htddj_gsndj_13_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_s4--gsndj_s4_0--29257863#5_0--r" lane=":htddj_gsndj_14_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_s4--gsndj_s4_1--gsndj_s5_0--s" lane=":htddj_gsndj_15_0" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_s4--gsndj_s4_2--gsndj_s5_1--s" lane=":htddj_gsndj_15_1" pos="3"/>
+    <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--htddj_gsndj--gsndj_s4--gsndj_s4_3--161701303#10_3--l" lane=":htddj_gsndj_17_0" pos="3"/>
+</additional>
