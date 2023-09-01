@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-08-31 14:13:05
+ * @LastEditTime: 2023-09-01 14:15:55
 -->
 # Change Log
 
@@ -97,28 +97,29 @@ Copy and pasting the git commit messages is **NOT** enough.
 <!-- v0.5 -->
 ## [v0.5] - 2023-08-31
 
-### Add
+### Changelog
 
-- 添加 `tshub_env` module
-  - `base_sumo_env.py`, 启动 SUMO 的仿真环境;
-  - `tshub_env.py`, 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯），整体控制与获得信息
-- 添加 `sumo_env` 在 `example` 里面
-  - `single_junction`: 单路口环境
-  - `three_junctions`: 三个路口的环境, 车辆 id 前面有 `ego` 表示需要控制的车辆，其余是背景车
+#### Added
 
-### Changed
+- Added `tshub_env` module
+  - `base_sumo_env.py`: Initializes the SUMO simulation environment.
+  - `tshub_env.py`: Integrates "Veh" (vehicles), "Air" (aircraft), and "Traf" (traffic lights) for overall control and information retrieval.
+- Added `sumo_env` in `example`
+  - `single_junction`: Environment for a single junction.
+  - `three_junctions`: Environment for three junctions, including ego vehicle and background vehicles.
 
-- `aircraft_builder.py`: 将 sumo 从 aircraft_inits 中单独拿出来, 这样 builder 的时候传入一次 sumo 即可
-- 更新了 `utils` 中一系列的函数
-  - `check_folder.py`, 检查文件夹是否存在, 如果不存在则进行创建;
-  - `format_dict.py`, 格式化 dict, 用于 print 更好的显示;
-  - `nested_dict_conversion.py`, 嵌套的 dict 转换;
-  - `get_abs_path.py`, 相对路径转换为绝对路径;
+#### Changed
 
-### Fixed
+- `aircraft_builder.py`: Separated SUMO initialization from `aircraft_inits` and now pass SUMO once during the builder process.
+- Updated a series of utility functions in `utils`
+  - `check_folder.py`: Checks if a folder exists and creates it if it doesn't.
+  - `format_dict.py`: Formats a dictionary for better display when printing.
+  - `nested_dict_conversion.py`: Converts nested dictionaries.
+  - `get_abs_path.py`: Converts relative paths to absolute paths.
 
-- `base_aircraft_action.py` 修改 `new_position` 的类型, 将 tuple 修改为 list, 解决 TypeError 报错，TypeError: 'tuple' object does not support item assignment
+#### Fixed
 
+- Modified the type of `new_position` in `base_aircraft_action.py` from tuple to list to resolve a TypeError: 'tuple' object does not support item assignment.
 
 <!-- v0.6 -->
 ## [v0.6] - 2023-09-02
@@ -134,10 +135,17 @@ Copy and pasting the git commit messages is **NOT** enough.
   - `doc` 支持 `readthedocs` 文档, [Transsimhub Documentation](https://transsimhub.readthedocs.io/)
   - 书写 introduction 部分，介绍 TransSimHub 仓库
   - 书写 installation 部分，介绍如何安装 TransSimHub
+- `utils` 中添加 `normalization_dict.py`, 作用是对字典中的 key 进行归一化, 使其和为 1
 
 ### Changed
 
 - `setup.py`, 添加 `extras_require`, 添加额外的 doc 环境的支持
+- `init_log.py` 支持写入调用的文件和函数
+- vehicle 的属性中加入 vehicle type, 用于区分 ego vehicle 和 background vehicle.
+
+### Fixed
+
+- `dict_to_str` 考虑了 np.array 的格式, 无法直接进行转换, 故添加了类型判断和转换 TypeError: Object of type ndarray is not JSON serializable
 
 <!-- 添加生成 route 的模块, 添加整合生成 add 和 detector 的模块 -->
 
@@ -145,7 +153,7 @@ Copy and pasting the git commit messages is **NOT** enough.
 <!-- 将三个内容整合在一起，得到一个 base env -->
 <!-- 添加 uml 框架图 -->
 <!-- setup 的时候需要分模块进行安装, doc 的时候才需要安装 sphinx 库 -->
-
+<!-- log 可以设置 level -->
 <!-- v0.3 -->
 <!-- 添加 memory 模块 -->
 <!-- 环境适配 gym 和 rllib -->
