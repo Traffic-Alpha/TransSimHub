@@ -6,7 +6,7 @@ keep_lane: 保持车道, 加速
 slow_down: 保持车道, 减速
 change_lane_left: 向左变车道
 change_lane_right: 向右变车道
-@LastEditTime: 2023-08-29 17:22:38
+@LastEditTime: 2023-08-31 14:10:06
 '''
 import enum
 from .base_vehicle_action import VehicleAction
@@ -25,7 +25,7 @@ class LaneAction(VehicleAction):
                 current_speed:float, current_lane_index:int, current_road_id:str) -> None:
         action = LaneActionType(lane_change)
         if action == LaneActionType.keep_lane:
-            target_speed = min(current_speed + 3, 15)
+            target_speed = min(current_speed + 3, 15) # 15m/s -- 54km/h
             self.sumo.vehicle.slowDown(self.veh_id, target_speed, duration=1)
         elif action == LaneActionType.slow_down:
             target_speed = max(current_speed - 3, 2)
