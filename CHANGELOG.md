@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-01 14:15:55
+ * @LastEditTime: 2023-09-01 16:00:46
 -->
 # Change Log
 
@@ -97,9 +97,7 @@ Copy and pasting the git commit messages is **NOT** enough.
 <!-- v0.5 -->
 ## [v0.5] - 2023-08-31
 
-### Changelog
-
-#### Added
+### Added
 
 - Added `tshub_env` module
   - `base_sumo_env.py`: Initializes the SUMO simulation environment.
@@ -108,7 +106,7 @@ Copy and pasting the git commit messages is **NOT** enough.
   - `single_junction`: Environment for a single junction.
   - `three_junctions`: Environment for three junctions, including ego vehicle and background vehicles.
 
-#### Changed
+### Changed
 
 - `aircraft_builder.py`: Separated SUMO initialization from `aircraft_inits` and now pass SUMO once during the builder process.
 - Updated a series of utility functions in `utils`
@@ -117,46 +115,44 @@ Copy and pasting the git commit messages is **NOT** enough.
   - `nested_dict_conversion.py`: Converts nested dictionaries.
   - `get_abs_path.py`: Converts relative paths to absolute paths.
 
-#### Fixed
+### Fixed
 
 - Modified the type of `new_position` in `base_aircraft_action.py` from tuple to list to resolve a TypeError: 'tuple' object does not support item assignment.
 
+
 <!-- v0.6 -->
-## [v0.6] - 2023-09-02
+## [v0.6] - 2023-09-01
 
-### Add
+### Added
 
-- 在 `sumo_tools` 中添加 `generate_route.py` 模块, 用于快速给场景生成 route 文件
-  - 主要的思路是 xx
-  - 可以控制 ego 车辆和背景车辆的混合比例，以 ego 开头就是需要控制的车辆, 其他的车就是背景车, 只能获得 state, 无法进行控制
-  - 可以设置默认车辆的速度是 9m/s, 约等于 32.4km/h
-- 在 `sumo_tools` 中添加 `generate_add.py` 模块, 用于快速给场景生成 add 文件, 监测信号灯的状态变化
-- 初始化文档的模块，使用 Sphinx 进行文档的书写
-  - `doc` 支持 `readthedocs` 文档, [Transsimhub Documentation](https://transsimhub.readthedocs.io/)
-  - 书写 introduction 部分，介绍 TransSimHub 仓库
-  - 书写 installation 部分，介绍如何安装 TransSimHub
-- `utils` 中添加 `normalization_dict.py`, 作用是对字典中的 key 进行归一化, 使其和为 1
+- Added `generate_route.py` module in `sumo_tools` for quickly generating route files for scenarios.
+  - `generate_trip.py`: Generates *.trip.xml files based on the number of entering vehicles (veh/min) for each time period. Allows control over the mixture ratio of ego vehicles and background vehicles. The default maximum speed is 17 m/s, equivalent to 61.2 km/h.
+  - `generate_turn_def.py`: Generates *.turndefs.xml files based on the turning probabilities for each time period.
+  - `interpolation` module: Provides interpolation for smooth changes in flows or turndefs.
+- Added `generate_add.py` module in `sumo_tools` for quickly generating add files to monitor changes in traffic signal states.
+  - See [SUMO Simulation Output](https://sumo.dlr.de/docs/Simulation/Output/) for possible additional files to add.
+- Initialized documentation using Sphinx for writing the documentation.
+  - `doc` supports `readthedocs` documentation: [Transsimhub Documentation](https://transsimhub.readthedocs.io/)
+  - Wrote the `introduction` section to introduce the TransSimHub repository.
+  - Wrote the `installation` section to explain how to install TransSimHub.
+- Added `normalization_dict.py` in `utils`, which normalizes the keys in a dictionary to make their sum equal to 1.
+- Added `traffic_light_ids.py` in `sumo_tools/sumo_infos` to return the IDs of traffic lights in the network.
 
 ### Changed
 
-- `setup.py`, 添加 `extras_require`, 添加额外的 doc 环境的支持
-- `init_log.py` 支持写入调用的文件和函数
-- vehicle 的属性中加入 vehicle type, 用于区分 ego vehicle 和 background vehicle.
+- Modified `setup.py` to include `extras_require` for additional support for the `doc` environment.
+- Updated `init_log.py` to include the function and corresponding line numbers in the log.
+- Added a `vehicle type` attribute in `vehicle.py` to differentiate between ego vehicles and background vehicles.
 
 ### Fixed
 
-- `dict_to_str` 考虑了 np.array 的格式, 无法直接进行转换, 故添加了类型判断和转换 TypeError: Object of type ndarray is not JSON serializable
+- Updated `dict_to_str` to handle the format of np.array, as it cannot be directly converted. Added type checking and conversion to resolve TypeError: Object of type ndarray is not JSON serializable.
+- Fixed the highlighting functionality in `vehicle_builder.py` to avoid highlighting duplicate vehicles.
 
-<!-- 添加生成 route 的模块, 添加整合生成 add 和 detector 的模块 -->
-
-<!-- v0.5 -->
-<!-- 将三个内容整合在一起，得到一个 base env -->
+<!-- v0.6 -->
 <!-- 添加 uml 框架图 -->
-<!-- setup 的时候需要分模块进行安装, doc 的时候才需要安装 sphinx 库 -->
 <!-- log 可以设置 level -->
-<!-- v0.3 -->
-<!-- 添加 memory 模块 -->
 <!-- 环境适配 gym 和 rllib -->
 
-<!-- v0.5 -->
+<!-- v0.7 -->
 <!-- 添加 feature process 模块 -->
