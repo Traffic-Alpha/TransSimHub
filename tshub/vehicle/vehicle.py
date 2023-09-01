@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-08-30 16:27:50
+@LastEditTime: 2023-09-01 14:44:34
 '''
 import traci
 from typing import Dict, Any
@@ -21,6 +21,7 @@ class VehicleInfo:
     """
     id: str  # The ID of the vehicle
     action_type:str # 车辆的动作控制类型
+    vehicle_type:str # 车辆类型, ego or other
     position: Tuple[float]  # The position of the vehicle
     speed: float  # The current speed of the vehicle
     road_id: str  # The ID of the road the vehicle is on
@@ -45,23 +46,23 @@ class VehicleInfo:
                     traci.constants.VAR_POSITION, traci.constants.VAR_SPEED,
                     traci.constants.VAR_ROAD_ID, traci.constants.VAR_LANE_ID,
                     traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
-                    traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS, 
+                    traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS,
                 ]
             )
 
     @classmethod
-    def create_vehicle(cls, id: str, action_type:str,
+    def create_vehicle(cls, id: str, action_type:str, vehicle_type:str,
                        sumo:traci.connection.Connection,
                        position: Tuple[float], speed: float,
                        road_id: str, lane_id: str, 
                        lane_index:int, edges: List[str], 
                        waiting_time: float, next_tls: List[str]):
-        logger.info(f'SIM: Init Vehicle: {id}')
-        return cls(id=id, action_type=action_type, sumo=sumo,
-            position=position, speed=speed,
-            road_id=road_id, lane_id=lane_id, lane_index=lane_index,
-            edges=edges, waiting_time=waiting_time,
-            next_tls=next_tls
+        logger.info(f'SIM: Init Vehicle: {vehicle_type}: {id}')
+        return cls(id=id, action_type=action_type, vehicle_type=vehicle_type,
+                   sumo=sumo, position=position, speed=speed,
+                   road_id=road_id, lane_id=lane_id, lane_index=lane_index,
+                   edges=edges, waiting_time=waiting_time,
+                   next_tls=next_tls
         )
 
     @staticmethod
@@ -81,7 +82,7 @@ class VehicleInfo:
             'lane_index': 82,
             'edges': 84,
             'waiting_time': 122,
-            'next_tls': 112
+            'next_tls': 112,
         }
         return feature_mapping.get(feature, -1)
     

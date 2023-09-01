@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-08-30 16:18:10
+@LastEditTime: 2023-09-01 14:56:17
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -19,12 +19,14 @@ class VehicleBuilder(BaseBuilder):
         self.sumo = sumo  # sumo connection]
         self.action_type = action_type # lane, lane_continuous_speed
         self.vehicles: Dict[str, VehicleInfo] = {}
+        self.controled_vehicles = [] # 被控制过的车辆
 
     def create_objects(self, vehicle_id: str) -> None:
         """初始化车辆
         """
         vehicle_info = VehicleInfo.create_vehicle(
             id=vehicle_id,
+            vehicle_type=self.sumo.vehicle.getTypeID(vehicle_id),
             action_type=self.action_type,
             position=self.sumo.vehicle.getPosition(vehicle_id),
             speed=0,
@@ -105,8 +107,9 @@ class VehicleBuilder(BaseBuilder):
             lane_change, target_speed = action
             self._log_vehicle_info(vehicle_id, lane_change, target_speed)
             self.vehicles[vehicle_id].control_vehicle(lane_change, target_speed)
-            if hightlight:
-                self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=255, duration=1)
+            if hightlight and (vehicle_id not in self.controled_vehicles):
+                self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=-1)
+                self.controled_vehicles.append(vehicle_id)
 
     def _log_vehicle_info(self, vehicle_id, lane_change, target_speed) -> None:
         if target_speed == None:
