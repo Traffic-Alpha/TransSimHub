@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-01 13:45:26
 @Description: 给场景生成路网
-@LastEditTime: 2023-09-01 14:04:00
+@LastEditTime: 2023-09-01 14:32:04
 '''
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.utils.init_log import set_logger
@@ -35,7 +35,7 @@ generate_route(
     },
     veh_type={
         'ego': {'color':'26, 188, 156', 'probability':0.3},
-        'background': {'color':'155, 89, 182', 'probability':0.7},
+        'background': {'color':'155, 89, 182', 'speed':15, 'probability':0.7},
     },
     output_trip=current_file_path('./testflow.trip.xml'),
     output_turndef=current_file_path('./testflow.turndefs.xml'),

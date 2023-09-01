@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2023-08-30 17:56:11
+@LastEditTime: 2023-09-01 15:09:30
 '''
 import sumolib
 from typing import List
@@ -40,7 +40,7 @@ class BaseSumoEnvironment(ABC):
                 statistic_output:str=None, # 输出整个仿真过程的统计信息
                 summary:str=None, # 记录每一秒的状态, 这里为文件输出的位置, https://sumo.dlr.de/docs/Simulation/Output/Summary.html, halting 与车辆是否到达终点无关
                 queue_output:str=None, # 记录每一秒, 每一个车道的排队长度, 这里为输出文件位置, https://sumo.dlr.de/docs/Simulation/Output/QueueOutput.html
-                tls_state_add:List=None, # 是否记录 traffic light
+                tls_state_add:List[str]=None, # 是否记录 traffic light
                 use_gui:bool=False, # 使用 sumo-gui 或是 sumo
                 is_libsumo:bool=False, # 是否使用 libsumo
                 begin_time=0, 

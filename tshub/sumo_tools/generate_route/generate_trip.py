@@ -4,7 +4,7 @@
 @Description: 生成 trip 文件, 这里有两个步骤:
 1. generate_trip_xml, 按照要求给每个 edge 生成 trip
 2. edit_trip_xml, 对 trip 按照时间顺序排序
-@LastEditTime: 2023-08-31 20:05:21
+@LastEditTime: 2023-09-01 14:31:45
 '''
 import os
 import sumolib
@@ -100,8 +100,9 @@ class GenerateTrip(object):
                 vehicle_color = vehicle_info.get('color', 'red')  # 获得车辆的 rgb 颜色
                 vehicle_length = vehicle_info.get('length', 7)
                 vehicle_tau = vehicle_info.get('tau', 1)
-                file.write('    <vType id="{}" length="{}" tau="{}" color="{}"/> \n'.format(
-                    vehicle_id, float(vehicle_length), float(vehicle_tau), vehicle_color)
+                vehicle_speed = vehicle_info.get('speed', 17) # 17m/s -> 61.2km/h, 城区限速
+                file.write('    <vType id="{}" length="{}" tau="{}" color="{}" maxSpeed="{}"/> \n'.format(
+                    vehicle_id, float(vehicle_length), float(vehicle_tau), vehicle_color, float(vehicle_speed))
                 )
                 vehID_prob[vehicle_id] = vehicle_info.get('probability', 0.1) # 添加每种车辆出现的概率
             vehID_prob = normalize_dict(vehID_prob) # 概率归一化
