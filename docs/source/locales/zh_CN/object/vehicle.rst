@@ -15,10 +15,10 @@ Vehicle
 
 动作定义
 -----------
-- keep_lane：
-- slow_down：
-- change_lane_left：
-- change_lane_right：
+- keep_lane： 保持当前车道，速度增加3，但小于最高限速（15）
+- slow_down：速度减少3，但要高于最低限速（2）
+- change_lane_left：向左侧变道，且速度减少2，但高于最低限速（2）
+- change_lane_right：向右侧变道，且速度减少2，但高于最低限速（2）
 
 
 Action=(target_speed, lane_change)
