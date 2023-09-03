@@ -21,5 +21,5 @@ Traffic Signal Lights
     + 0 选择下一个相位
     + 1 保持当前相位
 
-- choose next phase: 选择下一个相位   
+- choose next phase: 选择下一个相位，从信号灯的相位列表中选择下一个相位。
 

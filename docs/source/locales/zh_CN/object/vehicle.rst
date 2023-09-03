@@ -12,6 +12,10 @@ Vehicle
 - edges: 车辆经过的边
 - next_tls: 车辆将遇到的下一个交通信号灯的 ID
 - waiting_time: 车辆的等待时间
+- last_step_mean_speed：
+- jam_length_vehicle：
+- jam_length_meters：
+- last_step_occupancy：
 
 动作定义
 -----------

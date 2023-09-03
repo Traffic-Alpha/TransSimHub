@@ -5,6 +5,6 @@ TSHub Objects
     :maxdepth: 2
     :caption: Objects
 
-    vehicle
     aircraft
+    vehicle
     traffic_light
