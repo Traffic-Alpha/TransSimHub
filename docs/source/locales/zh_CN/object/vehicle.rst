@@ -12,10 +12,10 @@ Vehicle
 - edges: 车辆经过的边
 - next_tls: 车辆将遇到的下一个交通信号灯的 ID
 - waiting_time: 车辆的等待时间
-- last_step_mean_speed：
-- jam_length_vehicle：
-- jam_length_meters：
-- last_step_occupancy：
+- last_step_mean_speed：上一次观测中，这个探测器位置的车的平均速度，-1表示没有车
+- jam_length_vehicle：排队车的数量
+- jam_length_meters：排队车的长度
+- last_step_occupancy：车道的平均占有率
 
 动作定义
 -----------
