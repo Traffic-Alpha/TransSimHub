@@ -118,4 +118,6 @@ Vehicle 控制例子
     scene_vehicles.control_objects(actions)
 
   
-如果我们将 `if_sumo_visualization` 设置为 `True`，可以看到仿真画面：
+如果我们将 `if_sumo_visualization` 设置为 `True`，可以看到仿真画面。如下图所示，带圆圈的 `vehicle` 表示正在被控制。
+.. image:: ../../../_static/object/vehicle_example.gif
+   :alt: vehicle_sumo_example
