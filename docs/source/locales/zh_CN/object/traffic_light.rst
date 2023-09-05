@@ -45,13 +45,13 @@ Traffic Signal Lights （信号灯）可以用于在 `SUMO` 中仿真交通路�
 
   .. list-table::
     :header-rows: 1
-
+    
     * - 参数
       - 描述
     * - Action (int)
       - `0` 切换到下一个相位， `1` 保持当前相位
    
-   信号灯控制例子
+信号灯控制例子
 -----------------------
 下面具体看一个信号灯的控制的例子（完整代码见 `TransSimHub Traffic Light Control <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/traffic_light/traffic_light_action>`_）。
 下面是初始化信号灯的参数。我们指定每一个信号灯的ID、相位、通行方向等：
