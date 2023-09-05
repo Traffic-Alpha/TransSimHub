@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-08-30 14:04:35
+@LastEditTime: 2023-09-05 15:22:52
 '''
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ class TrafficLightInfo:
     id: str
     action_type: str
     delta_time:int
+    this_phase_index:int
     last_step_mean_speed: List[float]
     jam_length_vehicle: List[float]
     jam_length_meters: List[float]
@@ -60,7 +61,7 @@ class TrafficLightInfo:
 
     @classmethod
     def create_traffic_light(
-            cls, id, action_type, delta_time,
+            cls, id, action_type, delta_time, this_phase_index,
             last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
             this_phase, last_phase, next_phase, 
             sumo) -> TrafficLightInfo:
@@ -68,7 +69,7 @@ class TrafficLightInfo:
         创建交通信号灯
         """
         logger.info(f'SIM: Init Traffic Light: {id}.')
-        return cls(id, action_type, delta_time,
+        return cls(id, action_type, delta_time, this_phase_index,
                    last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
                    this_phase, last_phase, next_phase, sumo)
     
@@ -78,6 +79,7 @@ class TrafficLightInfo:
         Args:
             phase_index (int): phase index
         """
+        self.this_phase_index = phase_index # 更新 phase 索引
         self.this_phase = np.zeros(12).astype(bool).tolist()
         if phase_index in self.phase2movements:
             movements = self.phase2movements[phase_index]
@@ -88,7 +90,7 @@ class TrafficLightInfo:
                 movement_index = self.movement_ids.index(movement_id)
                 self.this_phase[movement_index] = True
 
-    def update_features(self, tls_data):
+    def update_features(self, tls_data) -> None:
         """
         更新交通信号灯的属性
         """
