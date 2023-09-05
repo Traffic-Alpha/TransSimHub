@@ -2,7 +2,7 @@
 =========
 Vehicle（机动车）可用于在 `SUMO` 中仿真机动车，例如：自动驾驶汽车、卡车、小轿车等。
 关于 Vehicle 的代码例子 `TransSimHub Vehicle Example <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/vehicles>`_
-下面介绍 Vehicle 的 状态（` state`）， 动作类型（ `action type`）和使用例子:
+下面介绍 Vehicle 的 状态（ `state` ）， 动作类型（ `action type`）和使用例子:
 
 状态定义
 -----------
@@ -119,5 +119,6 @@ Vehicle 控制例子
 
   
 如果我们将 `if_sumo_visualization` 设置为 `True`，可以看到仿真画面。如下图所示，带圆圈的 `vehicle` 表示正在被控制。
+
 .. image:: ../../../_static/object/vehicle_example.gif
    :alt: vehicle_sumo_example
