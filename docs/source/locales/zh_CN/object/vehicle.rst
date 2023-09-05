@@ -21,6 +21,7 @@ Vehicle（机动车）可用于在 `SUMO` 中仿真机动车，例如：自动�
 -----------
 
 1. **lane**：  仅选择车道，vehicle 的速度由规则判断
+
   .. list-table::
     :header-rows: 1
     * - 参数
@@ -33,7 +34,9 @@ Vehicle（机动车）可用于在 `SUMO` 中仿真机动车，例如：自动�
       - vehicle向左侧变道，改变vehicle的速度, vehicle速度减少2，但高于最低限速（2）
     * - change_lane_left (str)
       - vehicle向右侧变道，改变vehicle的速度, vehicle速度减少2，但高于最低限速（2）
+
 2. **lane_continuous_speed**: 改变车道，并且可以连续控制速度
+
   .. list-table::
     :header-rows: 1
     * - 参数 target_speed (float)
@@ -49,6 +52,7 @@ Vehicle（机动车）可用于在 `SUMO` 中仿真机动车，例如：自动�
       - change_lane_right
       - 向右侧变道
 
+
   .. note::
     1. vehicle分为可自动驾驶车（ego 车）和正常车辆，正常车辆只能获得观测信息不可控制，ego车可控。
     2. 在 `lane_continuous_speed` 中虽然给定target_speed，但仿真时控制器可能会给出更高或更低的速度
@@ -59,7 +63,7 @@ Vehicle 控制例子
 下面具体看一个 Vehicle 的控制的例子（完整代码见 `TransSimHub Vehicle Lane Control <https://github.com/Traffic-Alpha/TransSimHub/blob/main/examples/vehicles/vehicle_action/vehicle_lane.py>`_）。
 下面是初始化 vehicle 的参数， 载入的车流文件中包含每一个 vehicle 的动作类型，初始位置，速度等。
 
-.. code-block:: xml
+.. code-block:: python
 
     <vehicle id="gsndj_s4__0.0" type="car_2" depart="9.22" departLane="random">
         <route edges="gsndj_s4 gsndj_s5"/>
