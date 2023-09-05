@@ -71,13 +71,15 @@ Vehicle 控制例子
  .. code-block:: python
 
     from tshub.vehicle.vehicle_builder import VehicleBuilder
-    scene_vehicles = VehicleBuilder(sumo=conn, action_type='lane')
+    scene_vehicles = VehicleBuilder(sumo=conn, action_type='lane')  
+
 
 接着我们通过 `get_objects_infos` 来得到 `vehicle` 的属性：
 
 .. code-block:: python
 
     data = scene_vehicles.get_objects_infos()
+
 
 返回的属性如下所示，可以看到包含每一个 vehicle 的位置，速度等：
 
@@ -100,11 +102,15 @@ Vehicle 控制例子
         "next_tls": []
     }
   }
+
+
   这里我们设置的动作类型是 `lane` ，也就是只能控制vehicle的换道， 下面是控制的例子：
+  
   .. code-block:: python
 
     gsndj_s4__0.0    Lane Change: 0  Target Speed: None
-    
+
     scene_vehicles.control_objects(actions)
 
+  
   如果我们将 `if_sumo_visualization` 设置为 `True`，可以看到仿真画面：
