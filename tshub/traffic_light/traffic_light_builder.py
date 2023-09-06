@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-08-30 15:16:02
+@LastEditTime: 2023-09-05 15:24:44
 '''
 import traci
 import numpy as np
@@ -52,6 +52,7 @@ class TrafficLightBuilder(BaseBuilder):
             traffic_light = TrafficLightInfo.create_traffic_light(
                 id=_tls_id,
                 action_type=self.action_type,
+                this_phase_index=0,
                 delta_time=self.delta_time,
                 last_step_mean_speed=zeros.tolist(), 
                 jam_length_vehicle=zeros.tolist(), 
