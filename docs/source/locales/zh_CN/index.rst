@@ -7,3 +7,4 @@ TransSimHub 中文文档
 
     introduction/index
     installation/index
+    object/index

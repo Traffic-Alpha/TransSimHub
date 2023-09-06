@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-01 16:00:46
+ * @LastEditTime: 2023-09-06 13:59:19
 -->
 # Change Log
 
@@ -18,107 +18,17 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Removed
 ### Security
 
-<!-- v0.1 -->
-## [v0.1] - 2023-08-23
-
-### Added
-
-- Initialized the project.
-- Vehicle module:
-  - Added `vehicle_builder.py` file: Provides methods to retrieve information and control all vehicles in the scene.
-  - Added `vehicle.py` file: Defines the `VehicleInfo` class that represents information about a vehicle.
-- Aircraft module:
-  - Added `aircraft.py` file: Defines the `AircraftInfo` class that represents information about an aircraft.
-  - Added `aircraft_builder.py` file: Provides methods to create and control aircraft.
-
-
-<!-- v0.2 -->
-## [v0.2] - 2023-08-25
-
-### Added
-
-- Added `generate_detectors.py` file in the `sumo_tools` module
-  - `base_detectors.py`: Defines the information retrieval from intersections and the `generate_detector` method.
-  - `e1_detectors.py`: Generates e1 detectors placed at a default distance of 2m from the traffic lights.
-  - `e2_detectors.py`: Generates e2 detectors with a default length of 100m.
-  - `e3_detectors.py`: Generates e3 detectors that cover turns.
-- Added `sumo_infos` in the `sumo_tools` module to extract connections of traffic light signals.
-
-### Changed
-
-- Modified `init_log.py` in the `utils` section to store logs in a separate folder.
-- Modified `get_abs_path.py` in the `utils` section to include the SIM identifier in the logs.
-
-
-<!-- v0.3 -->
-## [v0.3] - 2023-08-28
-
-### Added
-
-- Added traffic light module
-  - `traffic_light_action_type.py`: Defines two types of traffic light control: "Choose Next Phase" and "Next or Not".
-  - `traffic_light.py`: Defines the basic properties and methods of each traffic light.
-  - `traffic_light_builder.py`: Initializes all traffic lights in a scene and defines interfaces for accessing information and control.
-  - `choose_next_phase.py`: Defines the control method "Choose Next Phase".
-  - `next_or_not.py`: Defines the control method "Next or Not".
-
-### Changed
-
-- Modified the vehicle module to no longer create multiple classes for the same vehicle.
-  - Added `update_vehicle_feature`, which updates the current information of the vehicle at each step.
-  - Added and improved different vehicle action types, including `lane` and `lane with continuous speed`.
-  - Added attributes to the vehicle, including `action type` and `lane index`.
-
-<!-- v0.4 -->
-## [v0.4] - 2023-08-30
+<!-- v0.7 -->
+## [v0.7] - 2023-09-06
 
 ### Add
 
-- Added four different aircraft action types:
-  - `stationary.py`: The aircraft remains stationary at its initial position.
-  - `horizontal_movement.py`: The aircraft can only move horizontally, with eight possible heading angles.
-  - `vertical_movement.py`: The aircraft can only move vertically, with three possible heading values: up, stationary, and down.
-  - `combined_movement.py`: The aircraft can move both upward and downward simultaneously, combining azimuth and pitch angles. There are a total of 40 combinations.
+- Add "status description," "action design," and "program examples" to the following three objects:
+  - `aircraft`, `vehicle`, `traffic lights`
 
 ### Changed
 
-- Added `base_builder.py` to standardize the interface between different builders:
-  - `aircraft_builder.py`, `vehicle_builder.py`, `traffic_light_builder.py`
-- Provided examples for vehicle, aircraft, and traffic light under the new builder:
-  - `traffic_light_action`: `tls_choosenextphase.py` and `tls_nextornot.py`
-  - `aircraft_actions`: `aircraft_combined.py`, `aircraft_horizontal.py`, `aircraft_stationary.py`, and `aircraft_vertical.py`
-  - `vehicle_action`: `vehicle_lane.py` and `vehicle_lane_with_continuous_speed.py`
-
-### Fixed
-
-- In `traffic_light.py`, set `this_phase` to False before each update in `__update_this_phase()`. Previously, it would cause all `this_phase` values to be True.
-
-
-<!-- v0.5 -->
-## [v0.5] - 2023-08-31
-
-### Added
-
-- Added `tshub_env` module
-  - `base_sumo_env.py`: Initializes the SUMO simulation environment.
-  - `tshub_env.py`: Integrates "Veh" (vehicles), "Air" (aircraft), and "Traf" (traffic lights) for overall control and information retrieval.
-- Added `sumo_env` in `example`
-  - `single_junction`: Environment for a single junction.
-  - `three_junctions`: Environment for three junctions, including ego vehicle and background vehicles.
-
-### Changed
-
-- `aircraft_builder.py`: Separated SUMO initialization from `aircraft_inits` and now pass SUMO once during the builder process.
-- Updated a series of utility functions in `utils`
-  - `check_folder.py`: Checks if a folder exists and creates it if it doesn't.
-  - `format_dict.py`: Formats a dictionary for better display when printing.
-  - `nested_dict_conversion.py`: Converts nested dictionaries.
-  - `get_abs_path.py`: Converts relative paths to absolute paths.
-
-### Fixed
-
-- Modified the type of `new_position` in `base_aircraft_action.py` from tuple to list to resolve a TypeError: 'tuple' object does not support item assignment.
-
+- `traffic_light.py`: add `this_phase_index` in traffic light dataclass (int)
 
 <!-- v0.6 -->
 ## [v0.6] - 2023-09-01
@@ -148,6 +58,109 @@ Copy and pasting the git commit messages is **NOT** enough.
 
 - Updated `dict_to_str` to handle the format of np.array, as it cannot be directly converted. Added type checking and conversion to resolve TypeError: Object of type ndarray is not JSON serializable.
 - Fixed the highlighting functionality in `vehicle_builder.py` to avoid highlighting duplicate vehicles.
+
+
+<!-- v0.5 -->
+## [v0.5] - 2023-08-31
+
+### Added
+
+- Added `tshub_env` module
+  - `base_sumo_env.py`: Initializes the SUMO simulation environment.
+  - `tshub_env.py`: Integrates "Veh" (vehicles), "Air" (aircraft), and "Traf" (traffic lights) for overall control and information retrieval.
+- Added `sumo_env` in `example`
+  - `single_junction`: Environment for a single junction.
+  - `three_junctions`: Environment for three junctions, including ego vehicle and background vehicles.
+
+### Changed
+
+- `aircraft_builder.py`: Separated SUMO initialization from `aircraft_inits` and now pass SUMO once during the builder process.
+- Updated a series of utility functions in `utils`
+  - `check_folder.py`: Checks if a folder exists and creates it if it doesn't.
+  - `format_dict.py`: Formats a dictionary for better display when printing.
+  - `nested_dict_conversion.py`: Converts nested dictionaries.
+  - `get_abs_path.py`: Converts relative paths to absolute paths.
+
+### Fixed
+
+- Modified the type of `new_position` in `base_aircraft_action.py` from tuple to list to resolve a TypeError: 'tuple' object does not support item assignment.
+
+
+<!-- v0.4 -->
+## [v0.4] - 2023-08-30
+
+### Add
+
+- Added four different aircraft action types:
+  - `stationary.py`: The aircraft remains stationary at its initial position.
+  - `horizontal_movement.py`: The aircraft can only move horizontally, with eight possible heading angles.
+  - `vertical_movement.py`: The aircraft can only move vertically, with three possible heading values: up, stationary, and down.
+  - `combined_movement.py`: The aircraft can move both upward and downward simultaneously, combining azimuth and pitch angles. There are a total of 40 combinations.
+
+### Changed
+
+- Added `base_builder.py` to standardize the interface between different builders:
+  - `aircraft_builder.py`, `vehicle_builder.py`, `traffic_light_builder.py`
+- Provided examples for vehicle, aircraft, and traffic light under the new builder:
+  - `traffic_light_action`: `tls_choosenextphase.py` and `tls_nextornot.py`
+  - `aircraft_actions`: `aircraft_combined.py`, `aircraft_horizontal.py`, `aircraft_stationary.py`, and `aircraft_vertical.py`
+  - `vehicle_action`: `vehicle_lane.py` and `vehicle_lane_with_continuous_speed.py`
+
+### Fixed
+
+- In `traffic_light.py`, set `this_phase` to False before each update in `__update_this_phase()`. Previously, it would cause all `this_phase` values to be True.
+
+
+<!-- v0.3 -->
+## [v0.3] - 2023-08-28
+
+### Added
+
+- Added traffic light module
+  - `traffic_light_action_type.py`: Defines two types of traffic light control: "Choose Next Phase" and "Next or Not".
+  - `traffic_light.py`: Defines the basic properties and methods of each traffic light.
+  - `traffic_light_builder.py`: Initializes all traffic lights in a scene and defines interfaces for accessing information and control.
+  - `choose_next_phase.py`: Defines the control method "Choose Next Phase".
+  - `next_or_not.py`: Defines the control method "Next or Not".
+
+### Changed
+
+- Modified the vehicle module to no longer create multiple classes for the same vehicle.
+  - Added `update_vehicle_feature`, which updates the current information of the vehicle at each step.
+  - Added and improved different vehicle action types, including `lane` and `lane with continuous speed`.
+  - Added attributes to the vehicle, including `action type` and `lane index`.
+
+
+<!-- v0.2 -->
+## [v0.2] - 2023-08-25
+
+### Added
+
+- Added `generate_detectors.py` file in the `sumo_tools` module
+  - `base_detectors.py`: Defines the information retrieval from intersections and the `generate_detector` method.
+  - `e1_detectors.py`: Generates e1 detectors placed at a default distance of 2m from the traffic lights.
+  - `e2_detectors.py`: Generates e2 detectors with a default length of 100m.
+  - `e3_detectors.py`: Generates e3 detectors that cover turns.
+- Added `sumo_infos` in the `sumo_tools` module to extract connections of traffic light signals.
+
+### Changed
+
+- Modified `init_log.py` in the `utils` section to store logs in a separate folder.
+- Modified `get_abs_path.py` in the `utils` section to include the SIM identifier in the logs.
+
+
+<!-- v0.1 -->
+## [v0.1] - 2023-08-23
+
+### Added
+
+- Initialized the project.
+- Vehicle module:
+  - Added `vehicle_builder.py` file: Provides methods to retrieve information and control all vehicles in the scene.
+  - Added `vehicle.py` file: Defines the `VehicleInfo` class that represents information about a vehicle.
+- Aircraft module:
+  - Added `aircraft.py` file: Defines the `AircraftInfo` class that represents information about an aircraft.
+  - Added `aircraft_builder.py` file: Provides methods to create and control aircraft.
 
 <!-- v0.6 -->
 <!-- 添加 uml 框架图 -->
