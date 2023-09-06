@@ -3,7 +3,7 @@
 
 Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例如无人机，载人飞行器等。
 关于 Aircraft 的代码例子 `TransSimHub Aircraft Example <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/aircraft>`_。
-下面介绍 Aircraft 的 状态（`state`）， 动作类型（ `action type`）和使用例子:
+下面介绍 Aircraft 的状态（ `state`）， 动作类型（ `action type`）和使用例子:
 
 
 状态定义
@@ -16,6 +16,7 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 - **方向角 heading** (tuple[float, float, float]): 飞行器的飞行角度
 - **通信能力 communication_range** (float): 飞行器的通信能力
 - **地面覆盖范围 ground_cover_radius** (float): 根据 aircraft 的高度和通信能力，计算出以 aircraft 的投影点为中心，地面的覆盖半径
+
 
 动作定义
 ----------
@@ -78,6 +79,68 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
     * - 
       - 俯仰角 ELEVATIONS = [-90, -45, 0, 45, 90]
 
+
+.. note::
+
+  下面是水平角与俯仰角的所有组合，共有 40 种：
+
+  .. list-table:: The Combination of the Azimuths and Elevations
+    :header-rows: 1
+
+    * - Azimuths \ Elevations
+      - -90
+      - -45
+      - 0
+      - 45
+      - 90
+    * - 0
+      - (0, -90) - Index 1
+      - (0, -45) - Index 2
+      - (0, 0) - Index 3
+      - (0, 45) - Index 4
+      - (0, 90) - Index 5
+    * - 45
+      - (45, -90) - Index 6
+      - (45, -45) - Index 7
+      - (45, 0) - Index 8
+      - (45, 45) - Index 9
+      - (45, 90) - Index 10
+    * - 90
+      - (90, -90) - Index 11
+      - (90, -45) - Index 12
+      - (90, 0) - Index 13
+      - (90, 45) - Index 14
+      - (90, 90) - Index 15
+    * - 135
+      - (135, -90) - Index 16
+      - (135, -45) - Index 17
+      - (135, 0) - Index 18
+      - (135, 45) - Index 19
+      - (135, 90) - Index 20
+    * - 180
+      - (180, -90) - Index 21
+      - (180, -45) - Index 22
+      - (180, 0) - Index 23
+      - (180, 45) - Index 24
+      - (180, 90) - Index 25
+    * - 225
+      - (225, -90) - Index 26
+      - (225, -45) - Index 27
+      - (225, 0) - Index 28
+      - (225, 45) - Index 29
+      - (225, 90) - Index 30
+    * - 270
+      - (270, -90) - Index 31
+      - (270, -45) - Index 32
+      - (270, 0) - Index 33
+      - (270, 45) - Index 34
+      - (270, 90) - Index 35
+    * - 315
+      - (315, -90) - Index 36
+      - (315, -45) - Index 37
+      - (315, 0) - Index 38
+      - (315, 45) - Index 39
+      - (315, 90) - Index 40
 
 
 Aircraft 控制例子
