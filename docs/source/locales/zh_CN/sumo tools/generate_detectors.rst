@@ -1,7 +1,7 @@
 探测器生成
 ===========================
 
-探测器 ( `detector` ) 在路口可以用于状态观测
+探测器 ( `detector` ) 在路口可以用于状态观， 这个工具可以生成路网中所需要的探测器， 完整代码请见 `TransSimHub Generate Detectors <https://github.com/Traffic-Alpha/TransSimHub/tree/main//tshub/sumo_tools/detectors>`_
 
 参数介绍
 ------------------
@@ -115,6 +115,7 @@
 生成探测器文件如下
 
 .. code-block:: python
+
     <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--J1---E4---E4_0---E0_0--r" lane=":J1_0_0" pos="3"/>
     <e1Detector file="e1_internal.output.xml" freq="60" friendlyPos="x" id="e1det_internal--J1---E4---E4_0--E9_0--s" lane=":J1_1_0" pos="3"/>
     ...
