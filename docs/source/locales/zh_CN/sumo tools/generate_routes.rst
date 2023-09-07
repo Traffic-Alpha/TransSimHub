@@ -80,7 +80,7 @@
 路网生成例子
 -----------------------
 
-下面具体看一个路网生成的例子， （ 完整代码见 `Generate Route Example <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/vehicles>`_）
+下面具体看一个路网生成的例子， （ 完整代码见 `Generate Route Example <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/sumo_tools/generate_routes.py>`_）
 
 首先要指定路网 （ `NET` ） 文件
 

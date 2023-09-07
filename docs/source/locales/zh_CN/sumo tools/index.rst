@@ -6,3 +6,4 @@ TSHub Objects
     :caption: Objects
 
      generate_routes
+     generate_detectors
