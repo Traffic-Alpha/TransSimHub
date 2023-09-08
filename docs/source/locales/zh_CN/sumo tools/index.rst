@@ -7,3 +7,4 @@ TSHub Objects
 
      generate_routes
      generate_detectors
+     sumo_infos
