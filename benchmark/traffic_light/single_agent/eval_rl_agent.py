@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 18:57:35
 @Description: 使用训练好的 RL Agent 进行测试
-@LastEditTime: 2023-09-08 19:43:21
+@LastEditTime: 2023-09-08 20:49:55
 '''
 '''
 @Author: WANG Maonan
@@ -11,7 +11,6 @@
 srun -J evaluate -p CPU -n 1 -c 1 -w st-node-158 python evaluate.py
 @LastEditTime: 2022-10-09 14:06:27
 '''
-import os
 import torch
 from loguru import logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -31,7 +30,7 @@ if __name__ == '__main__':
     sumo_cfg = path_convert("../../sumo_envs/J1/env/J1.sumocfg")
     params = {
         'tls_id':'J4',
-        'num_seconds':3600,
+        'num_seconds': 2600,
         'sumo_cfg':sumo_cfg,
         'use_gui':True,
         'log_file':path_convert('./log/'),
@@ -42,15 +41,18 @@ if __name__ == '__main__':
     env.norm_reward = False
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model_path = path_convert('./models/last_model.zip')
+    model_path = path_convert('./models/last_rl_model.zip')
     model = PPO.load(model_path, env=env, device=device)
 
     # 使用模型进行测试
     obs = env.reset()
     dones = False # 默认是 False
+    total_reward = 0
 
     while not dones:
         action, _state = model.predict(obs, deterministic=True)
         obs, rewards, dones, infos = env.step(action)
+        total_reward += rewards
         
     env.close()
+    print(f'累积奖励为, {total_reward}.')

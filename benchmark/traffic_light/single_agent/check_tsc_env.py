@@ -2,16 +2,13 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 15:57:34
 @Description: 测试 TSC Env 环境
-@LastEditTime: 2023-09-08 20:10:03
+@LastEditTime: 2023-09-13 16:33:41
 '''
 import numpy as np
 from loguru import logger
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.utils.init_log import set_logger
 from stable_baselines3.common.env_checker import check_env
-
-from utils.tsc_env import TSCEnvironment
-from utils.tsc_wrapper import TSCEnvWrapper
 from utils.make_tsc_env import make_env
 
 path_convert = get_abs_path(__file__)

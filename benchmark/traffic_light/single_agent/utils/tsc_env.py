@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-04 20:43:53
 @Description: 信号灯控制环境
-@LastEditTime: 2023-09-08 19:41:37
+@LastEditTime: 2023-09-13 16:15:50
 '''
 import gymnasium as gym
 
@@ -16,7 +16,7 @@ class TSCEnvironment(gym.Env):
         self.tsc_env = TshubEnvironment(
             sumo_cfg=sumo_cfg,
             is_aircraft_builder_initialized=False, 
-            is_vehicle_builder_initialized=False, 
+            is_vehicle_builder_initialized=True, # 用于获得 vehicle 的 waiting time 来计算 reward
             is_traffic_light_builder_initialized=True,
             tls_ids=tls_ids, 
             num_seconds=num_seconds,

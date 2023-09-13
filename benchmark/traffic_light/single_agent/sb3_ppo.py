@@ -4,7 +4,7 @@
 @Description: 基于 Stabe Baseline3 来控制单路口
 + State Design: Last step occupancy for each movement
 + Action Design: Choose Next Phase 
-@LastEditTime: 2023-09-08 20:30:21
+@LastEditTime: 2023-09-13 17:23:51
 '''
 import os
 import torch
@@ -46,18 +46,18 @@ if __name__ == '__main__':
         'use_gui':False,
         'log_file':log_path,
     }
-    env = SubprocVecEnv([make_env(env_index=f'{i}', **params) for i in range(5)])
+    env = SubprocVecEnv([make_env(env_index=f'{i}', **params) for i in range(6)])
     env = VecNormalize(env, norm_obs=False, norm_reward=True)
 
     # #########
     # Callback
     # #########
     checkpoint_callback = CheckpointCallback(
-        save_freq=5000, # 多少个 step, 需要根据与环境的交互来决定
+        save_freq=10000, # 多少个 step, 需要根据与环境的交互来决定
         save_path=model_path,
     )
     vec_normalize_callback = VecNormalizeCallback(
-        save_freq=5000,
+        save_freq=10000,
         save_path=model_path,
     ) # 保存环境参数
     callback_list = CallbackList([checkpoint_callback, vec_normalize_callback])
@@ -74,20 +74,20 @@ if __name__ == '__main__':
                 "MlpPolicy", 
                 env, 
                 batch_size=64,
-                n_steps=1500, n_epochs=5,
-                learning_rate=linear_schedule(7e-4),
+                n_steps=300, n_epochs=5, # 每次间隔 n_epoch 去评估一次
+                learning_rate=linear_schedule(1e-3),
                 verbose=True, 
                 policy_kwargs=policy_kwargs, 
                 tensorboard_log=tensorboard_path, 
                 device=device
             )
-    model.learn(total_timesteps=1e6, tb_log_name='J1', callback=callback_list)
+    model.learn(total_timesteps=3e5, tb_log_name='J1', callback=callback_list)
     
     # #################
     # 保存 model 和 env
     # #################
     env.save(f'{model_path}/last_vec_normalize.pkl')
-    model.save(f'{model_path}/last_model.zip')
+    model.save(f'{model_path}/last_rl_model.zip')
     print('训练结束, 达到最大步数.')
 
     env.close()

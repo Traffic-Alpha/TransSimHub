@@ -2,16 +2,11 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 19:45:37
 @Description: 基于规则的方法, 每次选择排队最大的相位
-@LastEditTime: 2023-09-08 20:29:28
+@LastEditTime: 2023-09-08 20:44:54
 '''
-import numpy as np
 from loguru import logger
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.utils.init_log import set_logger
-from stable_baselines3.common.env_checker import check_env
-
-from utils.tsc_env import TSCEnvironment
-from utils.tsc_wrapper import TSCEnvWrapper
 from utils.make_tsc_env import make_env
 
 path_convert = get_abs_path(__file__)
