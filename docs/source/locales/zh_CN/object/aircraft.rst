@@ -7,7 +7,7 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 
 
 状态定义
-----------
+~~~~~~~~~~~~
 
 - **飞行器 id** (str): 场景中每一个 aircraft 的唯一 ID，用于区分不同的 aircraft
 - **动作类型 action_type** (str): aircraft 的动作类型，目前支持 `Stationary`, `HorizontalMovement`, `CombinedMovement` 和 `CombinedMovement`
@@ -19,7 +19,7 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 
 
 动作定义
-----------
+~~~~~~~~~~~~
 
 1. **Stationary**: 在固定位置保持不动。
 2. **HorizontalMovement**: 在固定的高度，只能在水平方向移动。
@@ -144,7 +144,7 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 
 
 Aircraft 控制例子
------------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 下面具体看一个 Aircraft 的控制的例子（完整代码见 `TransSimHub Aircraft Horizontal Control <https://github.com/Traffic-Alpha/TransSimHub/blob/main/examples/aircraft/aircraft_actions/aircraft_horizontal.py>`_）。
 下面是初始化 aircraft 的参数。我们指定每一个 aircraft 的动作类型，初始位置，速度等。
@@ -237,3 +237,4 @@ Aircraft 控制例子
 
 .. image:: ../../../_static/object/aircraft_action.gif
    :alt: aircraft_sumo_example
+   :align: center

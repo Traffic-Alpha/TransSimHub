@@ -7,7 +7,7 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 
 
 状态定义
------------
+~~~~~~~~~~~~~
 
 - **机动车 id** (str): 场景中每一个 vehicle 的唯一 ID，用于区分不同的 vehicle
 - **动作类型 action_type** (str): vehicle 的动作控制类型, 目前支持 `lane` 和 `lane_continuous_speed`
@@ -21,7 +21,7 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 
 
 动作类型
------------
+~~~~~~~~~~~~~~
 
 1. **lane**：四个离散的动作，同时改变车辆的速度和变道：
 
@@ -68,7 +68,7 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 
 
 车辆控制例子
------------------------
+~~~~~~~~~~~~~~~~~~
 
 下面具体看一个车辆的控制的例子（完整代码见 `TransSimHub Vehicle Lane Control <https://github.com/Traffic-Alpha/TransSimHub/blob/main/examples/vehicles/vehicle_action/vehicle_ego.py>`_）。
 我们在 `route` 中定义了两种不同类型的车辆，如下所示：
@@ -164,3 +164,4 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 
 .. image:: ../../../_static/object/vehicle_example.gif
    :alt: vehicle_sumo_example
+   :align: center
