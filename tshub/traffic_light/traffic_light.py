@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-09-05 15:22:52
+@LastEditTime: 2023-09-13 16:04:42
 '''
 from __future__ import annotations
 
@@ -23,6 +23,7 @@ class TrafficLightInfo:
     action_type: str
     delta_time:int
     this_phase_index:int
+    last_step_vehicle_id_list:List[str]
     last_step_mean_speed: List[float]
     jam_length_vehicle: List[float]
     jam_length_meters: List[float]
@@ -62,7 +63,7 @@ class TrafficLightInfo:
     @classmethod
     def create_traffic_light(
             cls, id, action_type, delta_time, this_phase_index,
-            last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
+            last_step_vehicle_id_list, last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
             this_phase, last_phase, next_phase, 
             sumo) -> TrafficLightInfo:
         """
@@ -70,7 +71,7 @@ class TrafficLightInfo:
         """
         logger.info(f'SIM: Init Traffic Light: {id}.')
         return cls(id, action_type, delta_time, this_phase_index,
-                   last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
+                   last_step_vehicle_id_list, last_step_mean_speed, jam_length_vehicle, jam_length_meters, last_step_occupancy,
                    this_phase, last_phase, next_phase, sumo)
     
     def __update_this_phase(self, phase_index:int) -> None:
@@ -101,6 +102,7 @@ class TrafficLightInfo:
                 self.jam_length_vehicle[i] = tls_data[key]['jam_length_vehicle']
                 self.jam_length_meters[i] = tls_data[key]['jam_length_meters']
                 self.last_step_occupancy[i] = tls_data[key]['last_step_occupancy']
+                self.last_step_vehicle_id_list[i] = tls_data[key]['last_step_vehicle_id_list']
         # 更新 phase 的信息
         self.__update_this_phase(self.tls_action.phase_index)
         # 当前的 traffic light 是否可以执行动作

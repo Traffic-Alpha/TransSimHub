@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-09-05 15:24:44
+@LastEditTime: 2023-09-13 16:03:37
 '''
 import traci
 import numpy as np
@@ -11,7 +11,7 @@ from typing import Dict, List
 
 from .traffic_light import TrafficLightInfo
 from .traffic_light_feature_convert import TSCKeyMeaningsConverter
-from ..utils.nested_dict_conversion import defaultdict2dict
+from ..utils.nested_dict_conversion import defaultdict2dict, create_nested_defaultdict
 from ..tshub_env.base_builder import BaseBuilder
 
 class TrafficLightBuilder(BaseBuilder):
@@ -37,6 +37,7 @@ class TrafficLightBuilder(BaseBuilder):
         for e2_id in self.sumo.lanearea.getIDList():
             self.sumo.lanearea.subscribe(e2_id, 
                     [
+                        traci.constants.LAST_STEP_VEHICLE_ID_LIST, # 18
                         traci.constants.LAST_STEP_MEAN_SPEED, # 17
                         traci.constants.JAM_LENGTH_VEHICLE, # 24
                         traci.constants.JAM_LENGTH_METERS, # 25
@@ -54,6 +55,7 @@ class TrafficLightBuilder(BaseBuilder):
                 action_type=self.action_type,
                 this_phase_index=0,
                 delta_time=self.delta_time,
+                last_step_vehicle_id_list=[[] for _ in range(12)],
                 last_step_mean_speed=zeros.tolist(), 
                 jam_length_vehicle=zeros.tolist(), 
                 jam_length_meters=zeros.tolist(),
@@ -99,7 +101,7 @@ class TrafficLightBuilder(BaseBuilder):
                     ...
                 }
         """
-        output = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        output = create_nested_defaultdict()
         count = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         
         for key, value in raw_data.items():
@@ -112,14 +114,25 @@ class TrafficLightBuilder(BaseBuilder):
             
             # 处理每一个 lane 对应的 {17: 14.374141326903933, 24: 7, 25: 1, 19: 0.4} 的信息
             for k, v in value.items():
-                _meaning_key = self.tsc_convert.get_meaning(k)
-                output[junction_id][edge_direction][_meaning_key] += v
+                _meaning_key = self.tsc_convert.get_meaning(k) # key 名称转换
+                _is_init = (output[junction_id][edge_direction][_meaning_key] == defaultdict()) # 需要初始化的状态
+                if isinstance(v, (int, float)):
+                    if _is_init:
+                        output[junction_id][edge_direction][_meaning_key] = v
+                    else:
+                        output[junction_id][edge_direction][_meaning_key] += v
+                else: # 如果是 tuple
+                    if _is_init:
+                        output[junction_id][edge_direction][_meaning_key] = list(v)
+                    else:
+                        output[junction_id][edge_direction][_meaning_key] += list(v)
                 count[junction_id][edge_direction][_meaning_key] += 1
         
         for junction_id, edges in output.items():
             for edge_direction, values in edges.items():
                 for k in values:
-                    values[k] /= count[junction_id][edge_direction][k]
+                    if k != 'last_step_vehicle_id_list':
+                        values[k] /= count[junction_id][edge_direction][k]
         
         return defaultdict2dict(output)
 
