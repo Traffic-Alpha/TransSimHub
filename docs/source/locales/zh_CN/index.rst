@@ -7,4 +7,5 @@ TransSimHub 中文文档
 
     introduction/index
     installation/index
+    sumo_tools/index
     object/index

@@ -6,7 +6,7 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
 下面介绍 Traffic Light 的状态（ `state`）， 动作类型（ `action type`）和使用例子:
 
 信号灯状态定义
-------------------
+~~~~~~~~~~~~~~~~
 
 - **信号灯 ID 列表 tls_ids** (List[str])：场景中信号灯 ID 列表，每个信号灯拥有唯一 ID，用于区分不同的信号灯
 - **动作类型 action_type** (str)：信号灯支持的动作类型，目前支持 `choose_next_phase`  和 `next_or_not`
@@ -25,6 +25,7 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
 对于信号灯所控制路口的交通状态，我们使用探测器来获得。
 探测器用于获得路口的情况，包括车流、平均占有率等。
 
+- **车辆的 ID 列表 last_step_vehicle_id_list** List[str]：上一次观测中，在探测器上所有的车辆的 ID 列表
 - **上次观测平均速度 last_step_mean_speed** (List[float])：上一次观测中，经过探测器的车的平均速度，-1 表示没有车
 - **排队车数量 jam_length_vehicle** (List[float])：当前观测中，排队车的数量
 - **排队车长度 jam_length_meters** (List[float])：排队车的长度
@@ -32,7 +33,7 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
 
 
 动作定义
------------
+~~~~~~~~~~~~
 
 - **选择下一个相位 ChooseNextPhase**: 从信号灯的相位列表中选择一个作为下一个相位。
   
@@ -61,13 +62,14 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
   
 
 信号灯控制例子
------------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 下面具体看一个信号灯的控制的例子（完整代码见 `TransSimHub Traffic Light Control <https://github.com/Traffic-Alpha/TransSimHub/tree/main/examples/traffic_light/traffic_light_action>`_）。
 下面是我们要控制的信号灯，共包含 4 个绿灯相位：
 
 .. image:: ../../../_static/object/single_junction.png
    :alt: traffic_light_example
+   :align: center
 
 
 接着我们在场景中初始化信号灯。
@@ -100,6 +102,26 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
         "id": "htddj_gsndj",
         "action_type": "choose_next_phase",
         "delta_time": 5,
+        "last_step_vehicle_id_list": [
+          [
+            "-E5__0__background.0",
+            "-E3__0__ego.1"
+          ],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [],
+          [
+            "E0__0__background.2",
+            "E0__0__ego.0"
+          ],
+          [],
+          [],
+        ]
         "last_step_mean_speed": [
             0.0,
             0.0,
@@ -278,3 +300,4 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
 
 .. image:: ../../../_static/object/traffic_light_example.gif
    :alt: traffic_light_sumo_example
+   :align: center

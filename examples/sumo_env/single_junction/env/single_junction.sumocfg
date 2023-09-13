@@ -3,6 +3,6 @@
    <input>
       <net-file value="single_junction.net.xml"/>
       <route-files value="straight.rou.xml"/>
-      <additional-files value="../detectors/e1_internal.add.xml, ../detectors/e2.add.xml"/>
+      <additional-files value="../detectors/e1_internal.add.xml, ../detectors/e2.add.xml, ../add/tls.add.xml"/>
    </input>
 </configuration>
