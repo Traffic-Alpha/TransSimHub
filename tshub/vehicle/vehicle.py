@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-09-01 14:44:34
+@LastEditTime: 2023-09-13 16:32:16
 '''
 import traci
 from typing import Dict, Any
@@ -87,14 +87,14 @@ class VehicleInfo:
         return feature_mapping.get(feature, -1)
     
     def update_features(self, vehicle_info:Dict[int, Any]) -> None:
-        self.position=vehicle_info[VehicleInfo.get_feature_index('position')]
-        self.speed=vehicle_info[VehicleInfo.get_feature_index('speed')]
-        self.road_id=vehicle_info[VehicleInfo.get_feature_index('road_id')]
-        self.lane_id=vehicle_info[VehicleInfo.get_feature_index('lane_id')]
-        self.lane_index=vehicle_info[VehicleInfo.get_feature_index('lane_index')]
-        self.edges=vehicle_info[VehicleInfo.get_feature_index('edges')]
-        self.waiting_time=vehicle_info[VehicleInfo.get_feature_index('waiting_time')]
-        self.next_tls=vehicle_info[VehicleInfo.get_feature_index('next_tls')]
+        self.position=vehicle_info.get(VehicleInfo.get_feature_index('position'), None)
+        self.speed=vehicle_info.get(VehicleInfo.get_feature_index('speed'), None)
+        self.road_id=vehicle_info.get(VehicleInfo.get_feature_index('road_id'), None)
+        self.lane_id=vehicle_info.get(VehicleInfo.get_feature_index('lane_id'), None)
+        self.lane_index=vehicle_info.get(VehicleInfo.get_feature_index('lane_index'), None)
+        self.edges=vehicle_info.get(VehicleInfo.get_feature_index('edges'), None)
+        self.waiting_time=vehicle_info.get(VehicleInfo.get_feature_index('waiting_time'), None)
+        self.next_tls=vehicle_info.get(VehicleInfo.get_feature_index('next_tls'), None)
 
     def get_features(self):
         output_dict = {}
