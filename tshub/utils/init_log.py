@@ -5,7 +5,7 @@
 1. INFO 级别的日志打印在控制台;
 2. 仿真相关的日志存储在 SIM 开头的文件
 3. 算法相关的日志存储在 Traing 开头的文件
-@LastEditTime: 2023-08-31 19:02:39
+@LastEditTime: 2023-09-08 18:50:45
 '''
 import os
 from loguru import logger
@@ -36,7 +36,7 @@ def training_filter(record) -> bool:
     return False
 
 
-def set_logger(log_path):
+def set_logger(log_path, log_level="DEBUG"):
     now = datetime.strftime(datetime.now(),'%Y-%m-%d_%H_%M_%S')
     log_path = os.path.join(log_path, now)
     if not os.path.exists(log_path):
@@ -46,7 +46,7 @@ def set_logger(log_path):
         os.path.join(log_path, './SIM-{time}.log'), 
         format="{time} | {level:<6} | {name}:{function}:{line} - {message}", 
         filter=simulation_filter, 
-        level="DEBUG", 
+        level=log_level, 
         rotation="7 MB"
     )
 
@@ -54,6 +54,6 @@ def set_logger(log_path):
         os.path.join(log_path, './Traing-{time}.log'), 
         format="{time} | {level:<6} | {name}:{function}:{line} - {message}", 
         filter=training_filter, 
-        level="DEBUG", 
+        level=log_level, 
         rotation="7 MB"
     )
