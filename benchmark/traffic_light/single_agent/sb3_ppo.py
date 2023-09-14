@@ -4,7 +4,8 @@
 @Description: 基于 Stabe Baseline3 来控制单路口
 + State Design: Last step occupancy for each movement
 + Action Design: Choose Next Phase 
-@LastEditTime: 2023-09-13 17:23:51
++ Reward Design: Total Waiting Time
+@LastEditTime: 2023-09-14 14:09:10
 '''
 import os
 import torch

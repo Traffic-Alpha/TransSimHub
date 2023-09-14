@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 15:53:08
 @Description: Aircraft 垂直方向移动
-@LastEditTime: 2023-08-30 18:20:47
+@LastEditTime: 2023-09-14 16:26:06
 '''
 import traci
 import sumolib
@@ -25,10 +25,12 @@ conn = traci.getConnection('0')
 
 aircraft_inits = {
     'a1': {
+        "aircraft_type": "drone",
         "action_type": "vertical_movement", 
         "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None},
     'a2': {
+        "aircraft_type": "drone",
         "action_type": "vertical_movement", 
         "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None
