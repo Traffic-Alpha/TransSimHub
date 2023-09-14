@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:01
 @Description: Aircraft Object
-@LastEditTime: 2023-09-14 16:19:30
+@LastEditTime: 2023-09-14 17:05:55
 '''
 import traci
 import math
@@ -115,6 +115,7 @@ class AircraftInfo:
             # Update circle position
             circle_points = self.get_circle_points() # 得到圆的坐标
             self.sumo.polygon.setShape(self.id, circle_points)
+            self.sumo.polygon.setLineWidth(self.id, 3)
 
     @classmethod
     def create(cls, 
