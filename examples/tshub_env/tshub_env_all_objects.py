@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 17:02:20
 @Description: 从 tshub 中获得 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的状态
-@LastEditTime: 2023-09-13 16:33:04
+@LastEditTime: 2023-09-14 16:27:51
 '''
 import numpy as np
 from loguru import logger
@@ -18,11 +18,13 @@ set_logger(path_convert('./'))
 sumo_cfg = path_convert("../sumo_env/single_junction/env/single_junction.sumocfg")
 aircraft_inits = {
     'a1': {
+        "aircraft_type": "drone",
         "action_type": "horizontal_movement", 
         "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None
     },
     'a2': {
+        "aircraft_type": "drone",
         "action_type": "horizontal_movement", 
         "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None

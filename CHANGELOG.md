@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-06 13:59:19
+ * @LastEditTime: 2023-09-14 17:26:12
 -->
 # Change Log
 
@@ -19,16 +19,35 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Security
 
 <!-- v0.7 -->
-## [v0.7] - 2023-09-06
+## [v0.7] - 2023-09-15
 
 ### Add
 
 - Add "status description," "action design," and "program examples" to the following three objects:
   - `aircraft`, `vehicle`, `traffic lights`
+- Add Chinese documentation:
+  - TransSimHub scene creation, including signal light output, detector generation, and traffic flow generation
+  - TransSimHub Object, introducing the three basic components of `TransSimHub`: aircraft, vehicle, and traffic lights
+  - Add examples of scene combinations, integrating the usage of all three components: signal light control scene, aircraft control scene
+  - Add an example of using RL to control traffic lights
 
 ### Changed
 
-- `traffic_light.py`: add `this_phase_index` in traffic light dataclass (int)
+- `traffic_light.py`:
+  - Add additional attributes:
+    - Add `this_phase_index` in the traffic light data class (int)
+    - Add `last_step_vehicle_id_list` in the traffic light data class (List(str)). Through the vehicle ID, we can calculate the waiting time at the intersection.
+- `aircraft.py`:
+  - Add the `aircraft type` attribute to handle different types of aircraft differently.
+  - Set `setLineWidth` to width 3 to optimize the visualization effect of aircraft.
+- `traffic_light_builder.py`:
+  - Modify `process_detector_data` to support processing list data types and merge them.
+
+### Fixed
+
+- Resolve the issue where `vehicle` cannot retrieve `next_tls` when using `libsumo` [vehicle.py](https://github.com/Traffic-Alpha/TransSimHub/blob/main/tshub/vehicle/vehicle.py#L97).
+- In the `aircraft example`, fix the issue where `get_aircraft_state.py` does not pass `sumo` and cannot obtain `aircraft info`.
+
 
 <!-- v0.6 -->
 ## [v0.6] - 2023-09-01
