@@ -2,9 +2,9 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 15:49:30
 @Description: 处理 ACEnvironment
-+ state wrapper: 获得每个 aircraft 在覆盖范围内车辆的信息
++ state wrapper: 获得每个 aircraft 在覆盖范围内车辆的信息, 只有 drone 与车辆进行通信
 + reward wrapper: aircraft 覆盖车辆个数
-@LastEditTime: 2023-09-14 17:09:16
+@LastEditTime: 2023-09-14 17:19:50
 '''
 import numpy as np
 import gymnasium as gym
@@ -37,19 +37,21 @@ class ACEnvWrapper(gym.Wrapper):
         new_state = dict()
         veh = state['vehicle']
         aircraft = state['aircraft']
-        for aircraft_id, drone_info in aircraft.items():
+        for aircraft_id, aircraft_info in aircraft.items():
             vehicle_state = {}
-            ground_cover_radius = drone_info['ground_cover_radius']
+            ground_cover_radius = aircraft_info['ground_cover_radius']
+            aircraft_type = aircraft_info['aircraft_type']
             
-            for vehicle_id, vehicle_info in veh.items():
-                vehicle_position = vehicle_info['position']
-                distance = ((vehicle_position[0] - drone_info['position'][0]) ** 2 +
-                            (vehicle_position[1] - drone_info['position'][1]) ** 2) ** 0.5
+            if aircraft_type == 'drone': # 只统计 drone 类型
+                for vehicle_id, vehicle_info in veh.items():
+                    vehicle_position = vehicle_info['position']
+                    distance = ((vehicle_position[0] - aircraft_info['position'][0]) ** 2 +
+                                (vehicle_position[1] - aircraft_info['position'][1]) ** 2) ** 0.5
+                    
+                    if distance <= ground_cover_radius:
+                        vehicle_state[vehicle_id] = vehicle_info
                 
-                if distance <= ground_cover_radius:
-                    vehicle_state[vehicle_id] = (vehicle_info)
-            
-            new_state[aircraft_id] = vehicle_state
+                new_state[aircraft_id] = vehicle_state
         return new_state
     
     def reward_wrapper(self, states) -> float:
