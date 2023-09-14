@@ -1,5 +1,5 @@
-TSHub Objects
-=================
+TransSimHub Objects
+=======================
 
 .. toctree:: 
     :maxdepth: 2

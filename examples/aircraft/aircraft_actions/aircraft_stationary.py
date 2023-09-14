@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 12:03:53
 @Description: Aircraft 静止
-@LastEditTime: 2023-08-30 18:20:32
+@LastEditTime: 2023-09-14 16:25:55
 '''
 import traci
 import sumolib
@@ -24,10 +24,12 @@ conn = traci.getConnection('0')
 
 aircraft_inits = {
     'a1': {
+        "aircraft_type": "drone",
         "action_type": "stationary", 
         "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None},
     'a2': {
+        "aircraft_type": "drone",
         "action_type": "stationary", 
         "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
         "if_sumo_visualization":True, "img_file":None

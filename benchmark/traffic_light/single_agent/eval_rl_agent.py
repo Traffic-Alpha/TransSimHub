@@ -2,14 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 18:57:35
 @Description: 使用训练好的 RL Agent 进行测试
-@LastEditTime: 2023-09-08 20:49:55
-'''
-'''
-@Author: WANG Maonan
-@Date: 2022-08-17 13:16:46
-@Description: 测试 Cycle Adjustment 的结果（一个周期调整一次, 当作离散的动作）
-srun -J evaluate -p CPU -n 1 -c 1 -w st-node-158 python evaluate.py
-@LastEditTime: 2022-10-09 14:06:27
+@LastEditTime: 2023-09-14 14:08:03
 '''
 import torch
 from loguru import logger

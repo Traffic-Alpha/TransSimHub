@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:01
 @Description: Aircraft Object
-@LastEditTime: 2023-08-30 15:56:51
+@LastEditTime: 2023-09-14 17:05:55
 '''
 import traci
 import math
@@ -20,6 +20,7 @@ from ..utils.get_abs_path import get_abs_path
 @dataclass
 class AircraftInfo:
     id: str
+    aircraft_type: str
     action_type: str # aircraft 的动作类型
     position: tuple[float, float, float]
     speed: tuple[float, float, float]
@@ -114,10 +115,12 @@ class AircraftInfo:
             # Update circle position
             circle_points = self.get_circle_points() # 得到圆的坐标
             self.sumo.polygon.setShape(self.id, circle_points)
+            self.sumo.polygon.setLineWidth(self.id, 3)
 
     @classmethod
     def create(cls, 
             id:str, 
+            aircraft_type:str, 
             action_type:str,
             position: Tuple[float, float, float], 
             speed: float, 
@@ -155,7 +158,8 @@ class AircraftInfo:
         """
         logger.info(f'SIM: Init Aircraft: {id}.')
         aircraft = cls(
-            id, action_type, position, speed, heading, communication_range, 0.0, 
+            id, aircraft_type, 
+            action_type, position, speed, heading, communication_range, 0.0, 
             if_sumo_visualization, img_file, sumo
         )
         aircraft.update_ground_cover_radius()

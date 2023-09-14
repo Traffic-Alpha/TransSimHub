@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-@LastEditTime: 2023-08-30 18:16:06
+@LastEditTime: 2023-09-14 16:20:53
 '''
 import traci
 from typing import Dict, Tuple
@@ -39,7 +39,7 @@ class AircraftBuilder(BaseBuilder):
             self.create_objects(id=_aircraft_id, sumo=sumo, **_aircraft_parameter)
 
     def create_objects(
-            self, id:str, 
+            self, id:str, aircraft_type:str,
             action_type:str, 
             position: Tuple[float, float, float], 
             speed: float, 
@@ -63,7 +63,7 @@ class AircraftBuilder(BaseBuilder):
             None
         """
         aircraft = AircraftInfo.create(
-            id, action_type, 
+            id, aircraft_type, action_type, 
             position, speed, heading, communication_range,
             if_sumo_visualization, img_file, sumo
         )
