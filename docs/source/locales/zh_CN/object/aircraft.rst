@@ -10,6 +10,7 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 ~~~~~~~~~~~~
 
 - **飞行器 id** (str): 场景中每一个 aircraft 的唯一 ID，用于区分不同的 aircraft
+- **飞行器类型 aircraft_type** (str): 定义每一个 aircraft 的类型，例如无人机，空艇等，可以在执行 action 的时候对不同类型的 aircraft 执行不同的动作
 - **动作类型 action_type** (str): aircraft 的动作类型，目前支持 `Stationary`, `HorizontalMovement`, `CombinedMovement` 和 `CombinedMovement`
 - **位置 position** (tuple[float, float, float]):飞行器现在所在的位置
 - **速度 speed** (float): 飞行器飞行的速度
@@ -153,10 +154,12 @@ Aircraft 控制例子
 
     aircraft_inits = {
         'a1': {
+            "aircraft_type": "drone",
             "action_type": "horizontal_movement", 
             "position":(1500,1110,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
             "if_sumo_visualization":True, "img_file":None},
         'a2': {
+            "aircraft_type": "drone",
             "action_type": "horizontal_movement", 
             "position":(1900,800,100), "speed":10, "heading":(1,1,0), "communication_range":200, 
             "if_sumo_visualization":True, "img_file":None
@@ -184,6 +187,7 @@ Aircraft 控制例子
     2023-09-04T16:00:08.929810+0800 | INFO   | SIM: {
         "a1": {
             "id": "a1",
+            "aircraft_type": "drone",
             "action_type": "horizontal_movement",
             "position": [
                 1496.4644660940673,
@@ -203,6 +207,7 @@ Aircraft 控制例子
         },
         "a2": {
             "id": "a2",
+            "aircraft_type": "drone",
             "action_type": "horizontal_movement",
             "position": [
                 1903.5355339059327,
