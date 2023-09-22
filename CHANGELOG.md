@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-14 17:26:12
+ * @LastEditTime: 2023-09-22 13:59:26
 -->
 # Change Log
 
@@ -19,7 +19,7 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Security
 
 <!-- v0.7 -->
-## [v0.7] - 2023-09-15
+## [v0.7] - 2023-09-22
 
 ### Add
 
