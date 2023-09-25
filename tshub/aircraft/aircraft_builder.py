@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-@LastEditTime: 2023-09-14 16:20:53
+@LastEditTime: 2023-09-25 14:13:32
 '''
 import traci
 from typing import Dict, Tuple
@@ -25,12 +25,14 @@ class AircraftBuilder(BaseBuilder):
                     'a1': {
                         "action_type": "horizontal_movement", 
                         "position":(10,10,10), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "img_file":None
+                        "if_sumo_visualization":True, "img_file":None,
+                        "custom_update_cover_radius":custom_update_cover_radius # 使用自定义的计算
                     },
                     'a2': {
                         "action_type": "horizontal_movement", 
                         "position":(10,10,100), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "img_file":None
+                        "if_sumo_visualization":True, "img_file":None,
+                        "custom_update_cover_radius":None
                     }
                 }
         """
@@ -46,7 +48,9 @@ class AircraftBuilder(BaseBuilder):
             heading: Tuple[float, float, float], 
             communication_range: float,
             if_sumo_visualization: bool = False,
+            color: Tuple[int,int,int] = tuple([255, 0, 0]),
             img_file: str = None,
+            custom_update_cover_radius = None,
             sumo = None,
         ) -> None:
         """
@@ -65,7 +69,9 @@ class AircraftBuilder(BaseBuilder):
         aircraft = AircraftInfo.create(
             id, aircraft_type, action_type, 
             position, speed, heading, communication_range,
-            if_sumo_visualization, img_file, sumo
+            if_sumo_visualization, color, 
+            img_file, custom_update_cover_radius,
+            sumo,
         )
         self.aircraft_dict[id] = aircraft
 

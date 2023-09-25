@@ -2,12 +2,12 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:01
 @Description: Aircraft Object
-@LastEditTime: 2023-09-14 17:05:55
+@LastEditTime: 2023-09-25 14:13:00
 '''
 import traci
 import math
 from dataclasses import dataclass, fields
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Callable
 from loguru import logger
 
 from .aircraft_action_type import aircraft_action_type
@@ -26,9 +26,11 @@ class AircraftInfo:
     speed: tuple[float, float, float]
     heading: tuple[float, float, float]
     communication_range: float
-    ground_cover_radius: float
+    cover_radius: float
     if_sumo_visualization: bool = False
+    color: Tuple[int,int,int] = tuple([255, 0, 0])
     img_file: str = None
+    custom_update_cover_radius: Callable[[], None] = None
     sumo: traci.connection.Connection = None
 
     def __post_init__(self) -> None:
@@ -48,21 +50,39 @@ class AircraftInfo:
         
         # 初始化 aircraft
         self.current_file_path = get_abs_path(__file__)
-        self.update_ground_cover_radius() # 更新地面覆盖半径
+        if self.custom_update_cover_radius is None:
+            self.custom_update_cover_radius = AircraftInfo.update_cover_radius
+        self.cover_radius = self.custom_update_cover_radius(self.position, self.communication_range) # 更新地面覆盖半径
         self.check_sumo_visualization() # 检查是否需要可视化
 
-    def update_ground_cover_radius(self) -> None:
+    @staticmethod
+    def update_cover_radius(position, communication_range) -> float:
         """
-        根据当前位置的高度更新地面覆盖半径。
+        根据当前位置的高度更新地面覆盖半径。支持自定义计算的方式
             1. 获取 position[2](height) 和 communication_range 的值。
             2. 计算地面覆盖半径：radius = sqrt(communication_range**2 - height**2)
+        
+               * <----- aircraft
+               |\
+               | \
+               |  \ communication_range
+               |   \
+        height |    \
+               |     \
+               |      \
+               |       \
+               |        \
+               - - - - - -
+               cover_radius (ground)
+
         """
-        height = self.position[2]
-        if height > self.communication_range:
-            self.ground_cover_radius = 0.0
-            logger.warning(f'SIM: Aircraft 的高度 {height} 超过了通讯范围 {self.communication_range}.')
+        height = position[2]
+        if height > communication_range:
+            cover_radius = 0.0
+            logger.warning(f'SIM: Aircraft 的高度 {height} 超过了通讯范围 {communication_range}.')
         else:
-            self.ground_cover_radius = math.sqrt(self.communication_range**2 - height**2)
+            cover_radius = math.sqrt(communication_range**2 - height**2)
+        return cover_radius
 
     def check_sumo_visualization(self) -> None:
         """
@@ -76,10 +96,10 @@ class AircraftInfo:
                 if self.img_file is None:
                     self.img_file = self.current_file_path('./aircraft.png')
                 self.sumo.poi.add(
-                    self.id, x, y, (135, 206, 250, 255), imgFile=self.img_file, width=10, height=10, layer=50
+                    self.id, x, y, (255, 255, 255, 255), imgFile=self.img_file, width=10, height=10, layer=50
                 )
                 circle_points = self.get_circle_points()
-                self.sumo.polygon.add(self.id, circle_points, (255, 0, 0, 100), layer=50)
+                self.sumo.polygon.add(self.id, circle_points, (*self.color, 100), layer=50)
                 
     def get_circle_points(self, n: int=30) -> list:
         """
@@ -92,7 +112,7 @@ class AircraftInfo:
         list：包含圆上每个点的坐标的列表。
         """
         x, y = self.position[0], self.position[1]
-        r = self.ground_cover_radius
+        r = self.cover_radius
 
         points = []
         angle_increment = 2 * math.pi / n
@@ -127,27 +147,18 @@ class AircraftInfo:
             heading: Tuple[float, float, float], 
             communication_range: float,
             if_sumo_visualization: bool = False,
+            color: Tuple[int,int,int] = tuple([255, 0, 0]),
             img_file: str = None,
+            custom_update_cover_radius=None,
             sumo = None,
         ):
         """
-        创建 AircraftInfo 实例。同时计算出地面的覆盖半径。
+        创建 AircraftInfo 实例。
         
-               * <----- aircraft
-               |\
-               | \
-               |  \ communication_range
-               |   \
-        height |    \
-               |     \
-               |      \
-               |       \
-               |        \
-               - - - - - -
-               ground_cover_radius
-
         Args:
             id (str): aircraft ID。
+            aircraft_type (str): aircraft 的类型，不同类型通信范围可以不一样。
+            action_type (str): aircraft 的动作类型，例如可以是悬停，或者水平移动，垂直移动，或是同时水平和垂直移动。
             position (Tuple[float, float, float]): aircraft 的位置坐标。
             speed (float): aircraft 的速度。
             heading (Tuple[float, float, float]): aircraft 的航向。
@@ -160,9 +171,10 @@ class AircraftInfo:
         aircraft = cls(
             id, aircraft_type, 
             action_type, position, speed, heading, communication_range, 0.0, 
-            if_sumo_visualization, img_file, sumo
+            if_sumo_visualization, color,
+            img_file, custom_update_cover_radius, sumo
         )
-        aircraft.update_ground_cover_radius()
+        aircraft.cover_radius = aircraft.custom_update_cover_radius(aircraft.position, aircraft.communication_range)
         return aircraft
     
     def update_features(self, position:Tuple[float, float, float], speed:float, heading:Tuple[float, float, float]) -> None:
@@ -175,7 +187,7 @@ class AircraftInfo:
         for field in fields(self):
             field_name = field.name
             field_value = getattr(self, field_name)
-            if field_name != 'sumo':
+            if (field_name != 'sumo') and (field_name != 'custom_update_cover_radius'):
                 output_dict[field_name] = field_value
         return output_dict
 
@@ -186,5 +198,5 @@ class AircraftInfo:
             speed=speed, heading_index=heading_index
         )
         self.update_features(new_position, speed, heading)
-        self.update_ground_cover_radius() # 更新地面可视化范围
+        self.cover_radius = self.custom_update_cover_radius(self.position, self.communication_range) # 更新地面可视化范围
         self.update_sumo_visualization() # 更新可视化结果
