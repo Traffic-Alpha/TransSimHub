@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 20:13:10
 @Description: This module provides the AircraftBuilder class for creating and controlling aircraft.
-@LastEditTime: 2023-09-25 14:13:32
+@LastEditTime: 2023-09-25 14:17:33
 '''
 import traci
 from typing import Dict, Tuple
@@ -25,13 +25,13 @@ class AircraftBuilder(BaseBuilder):
                     'a1': {
                         "action_type": "horizontal_movement", 
                         "position":(10,10,10), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "img_file":None,
+                        "if_sumo_visualization":True, "img_file":None, "color":(0,255,0),
                         "custom_update_cover_radius":custom_update_cover_radius # 使用自定义的计算
                     },
                     'a2': {
                         "action_type": "horizontal_movement", 
                         "position":(10,10,100), "speed":10, "heading":(1,1,0), "communication_range":100, 
-                        "if_sumo_visualization":True, "img_file":None,
+                        "if_sumo_visualization":True, "img_file":None, "color":(0,255,0),
                         "custom_update_cover_radius":None
                     }
                 }
