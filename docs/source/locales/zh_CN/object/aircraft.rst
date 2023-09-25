@@ -16,8 +16,9 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
 - **速度 speed** (float): 飞行器飞行的速度
 - **方向角 heading** (tuple[float, float, float]): 飞行器的飞行角度
 - **通信能力 communication_range** (float): 飞行器的通信能力
-- **地面覆盖范围 ground_cover_radius** (float): 根据 aircraft 的高度和通信能力，计算出以 aircraft 的投影点为中心，地面的覆盖半径
-
+- **覆盖范围 cover_radius** (float): 根据 aircraft 的高度和通信能力，计算出以 aircraft 的覆盖范围。这里计算的式子可以参考状态 `custom_update_cover_radius`
+- **自定义覆盖范围计算 custom_update_cover_radius** (Callable): 自定义覆盖范围的计算，默认计算方式为投影点为中心，地面的覆盖半径
+- **颜色 color** (tuple[int, int, int]): 自定义飞行器可视化时的圈的颜色
 
 动作定义
 ~~~~~~~~~~~~
@@ -60,9 +61,9 @@ Aircraft（飞行器） 可以用于在 `SUMO` 中仿真不同的飞行器，例
       - 改变飞行器的速度
     * - Heading (int)
       - 这里输入是 heading index，共有三种情况:
+        0. 平稳
         1. 向上
         2. 向下
-        3. 平稳
 
 4. **CombinedMovement**: 可以同时改变高度和水平方向移动，但是动作空间是离散的。
 
@@ -201,7 +202,7 @@ Aircraft 控制例子
                 0
             ],
             "communication_range": 200,
-            "ground_cover_radius": 173.20508075688772,
+            "cover_radius": 173.20508075688772,
             "if_sumo_visualization": true,
             "img_file": "/home/wmn/TransSimHub/tshub/aircraft/./aircraft.png"
         },
@@ -221,7 +222,7 @@ Aircraft 控制例子
                 0
             ],
             "communication_range": 200,
-            "ground_cover_radius": 173.20508075688772,
+            "cover_radius": 173.20508075688772,
             "if_sumo_visualization": true,
             "img_file": "/home/wmn/TransSimHub/tshub/aircraft/./aircraft.png"
         }

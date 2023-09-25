@@ -1,0 +1,6 @@
+ <configuration>
+     <input>
+         <net-file value="berlin.net.xml"/>
+         <additional-files value="berlin.poly.xml"/>
+     </input>
+ </configuration>
