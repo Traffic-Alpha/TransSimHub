@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-22 13:59:26
+ * @LastEditTime: 2023-09-25 16:06:50
 -->
 # Change Log
 
@@ -17,6 +17,38 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v0.8 -->
+## [v0.8] - 2023-09-25
+
+### Add
+
+- 添加对 `map` 的支持，可以获得地图中不同多边形的属性
+  - 添加 `polygon.py`，定义 `polygon` 的属性
+  - 添加 `map_builder.py`，用于初始化场景中的静态信息, 根据 `*.poly.xml` 和 `*.osm` 文件构建场景内所有 `polygon` 的类型和形状
+- 添加关于 `map` 的 `example` 中的例子
+  - 给出获取 `map` 中 `polygon` 的属性，`get_poly_info.py`
+- 新增了 osm 到 sumo net 的转换的工具函数, `osm_build.py`
+- 新增了环境创建的文档，从 `osm` 到实验所使用的地图
+  - 在 [openstreetmap](https://www.openstreetmap.org/) 中导出所需要的区域
+  - 运行 `osm_build.py` 来构建 `*.net.xml` 和 `*.poly.xml`, 这部分见 `example` 中的 `sumo_tools` 中的 `osm_build.py` 的例子
+  - [Option] 添加背景图片
+  - 运行 `generate_detectors.py` 来创建探测器
+  - 运行 `generate_routes.py` 来创建流量
+- 可以一个工具对 osm 建筑来进行可视化
+- 修改了 tshub，使其支持静态信息 map
+
+### Changed
+
+- `aircraft.py` 中添加 `custom_update_cover_radius`，支持用户自定义更新 `cover_radius`, 根据 `position` 和 `communication_range` 来更新 `cover_radius`
+  - `aircraft.py` 中更新默认的 `update_cover_radius`, 支持参数的输入和 `cover_radius` 的返回
+  - `aircraft_builder.py` 中更新 `aricraft` 创建的方式
+  - 在 `example` 中添加 `aircraft_custom_update_cover_radius.py` 的例子，说明如何自定义 `custom_update_cover_radius`
+- `aircraft.py` 中添加 `color`，用户可以自定义覆盖范围半径的圆圈
+
+### Fixed
+
+- `aircraft.py` 中 polygon 的添加将其修改为白色，从而不会使得原始图片颜色发生改变。
 
 <!-- v0.7 -->
 ## [v0.7] - 2023-09-22
