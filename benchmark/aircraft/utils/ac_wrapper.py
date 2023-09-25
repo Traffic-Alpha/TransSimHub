@@ -4,7 +4,7 @@
 @Description: 处理 ACEnvironment
 + state wrapper: 获得每个 aircraft 在覆盖范围内车辆的信息, 只有 drone 与车辆进行通信
 + reward wrapper: aircraft 覆盖车辆个数
-@LastEditTime: 2023-09-14 17:19:50
+@LastEditTime: 2023-09-25 14:03:14
 '''
 import numpy as np
 import gymnasium as gym
@@ -39,7 +39,7 @@ class ACEnvWrapper(gym.Wrapper):
         aircraft = state['aircraft']
         for aircraft_id, aircraft_info in aircraft.items():
             vehicle_state = {}
-            ground_cover_radius = aircraft_info['ground_cover_radius']
+            cover_radius = aircraft_info['cover_radius']
             aircraft_type = aircraft_info['aircraft_type']
             
             if aircraft_type == 'drone': # 只统计 drone 类型
@@ -48,7 +48,7 @@ class ACEnvWrapper(gym.Wrapper):
                     distance = ((vehicle_position[0] - aircraft_info['position'][0]) ** 2 +
                                 (vehicle_position[1] - aircraft_info['position'][1]) ** 2) ** 0.5
                     
-                    if distance <= ground_cover_radius:
+                    if distance <= cover_radius:
                         vehicle_state[vehicle_id] = vehicle_info
                 
                 new_state[aircraft_id] = vehicle_state
