@@ -2,9 +2,12 @@
 @Author: WANG Maonan
 @Date: 2023-09-25 15:01:48
 @Description: convert osm to *.net.xml and *.poly.xml
-+ netconvert, https://sumo.dlr.de/docs/Networks/Import/OpenStreetMap.html
++ netconvert, 
+    - https://sumo.dlr.de/docs/Networks/Import/OpenStreetMap.html
+    - https://sumo.dlr.de/docs/netconvert.html
+    - https://sumo.dlr.de/docs/netgenerate.html
 + polyconvert, https://sumo.dlr.de/docs/polyconvert.html
-@LastEditTime: 2023-09-25 16:04:09
+@LastEditTime: 2023-09-26 20:16:24
 '''
 import sumolib
 import subprocess
@@ -14,13 +17,23 @@ from ..utils.get_abs_path import get_abs_path
 
 current_file_path = get_abs_path(__file__)
 
-DEFAULT_NETCONVERT_OPTS = ('--geometry.remove,--roundabouts.guess,--ramps.guess,--junctions.join,'
-                           '--tls.guess-signals,--tls.discard-simple,--tls.join,--output.original-names,'
-                           '--junctions.corner-detail,5,--output.street-names')
+DEFAULT_NETCONVERT_OPTS = (
+    '--default.lanenumber,3,'
+    '--geometry.remove,'
+    '--roundabouts.guess,'
+    '--ramps.guess,'
+    '--junctions.join,'
+    '--tls.discard-simple,--tls.join,'
+    '--tls.guess,--tls.guess-signals,--tls.guess.threshold,12,--tls.green.time,30,--tls.layout,incoming,'
+    '--no-turnarounds,true,'
+    '--junctions.corner-detail,5,'
+    '--output.street-names,true,'
+    '--output.original-names'
+)
 
 
 
-def scenario_build(osm_file:str, output_directory:str):
+def scenario_build(osm_file:str, output_directory:str, netconvert_typemap:str=None, poly_typemap:str=None):
     osm_file = Path(osm_file)
     output_directory = Path(output_directory)
     file_name = osm_file.stem # osm 文件的名字
@@ -31,34 +44,52 @@ def scenario_build(osm_file:str, output_directory:str):
     net_file = output_directory/f"{file_name}.net.xml"
     poly_file = output_directory/f"{file_name}.poly.xml"
 
-    # ###########
-    # netconvert
-    # ###########
-    logger.info(f'开始将 osm 转换为 *.mnet.xml.')
-    cfg = output_directory/f'{file_name}.netcfg' # 配置文件
+    # ##################
+    # netconvert config
+    # ##################
+    logger.info(f'SIM: 开始设置 netconvert 的参数.')
+    net_cfg = output_directory/f'{file_name}.netgcfg' # 配置文件
+    if netconvert_typemap is None:
+        netconvert_typemap = current_file_path('./net.typ.xml')
     netconvert_opts = [netconvert]
+    netconvert_opts += ["-t", netconvert_typemap]
     netconvert_opts += DEFAULT_NETCONVERT_OPTS.strip().split(',')
     netconvert_opts += ["--keep-edges.by-vclass", "passenger"]
     netconvert_opts += ['--osm-files', osm_file] # 输入的 osm 文件
-    netconvert_opts += ['-o', net_file] # 输出的 net file 文件
-    subprocess.call(netconvert_opts + ["--save-configuration", cfg], cwd=output_directory)
-    logger.info(f'转换的配置文件为, {cfg}.')
-    subprocess.call([netconvert, "-c", cfg], cwd=output_directory)
-    logger.info(f'{net_file} 转换成功.')
+    netconvert_opts += ['-o', net_file] # 输出的 net file 文件        
+    netconvert_opts += ['--save-configuration', net_cfg]
     
-    # ###########
-    # polyconvert
-    # ###########
-    logger.info(f'开始将 osm 转换为 *.poly.xml.')
-    poly_typemap = current_file_path("./poly.typ.xml")
-    cfg = output_directory/f'{file_name}.polycfg' # 配置文件
+    # ###################
+    # polyconvert config
+    # ###################
+    logger.info(f'SIM: 开始设置 polyconvert 的参数.')
+    if poly_typemap is None:
+        poly_typemap = current_file_path("./poly.typ.xml")
+    poly_cfg = output_directory/f'{file_name}.polygcfg' # 配置文件
     polyconvert_opts = [polyconvert]
     polyconvert_opts += ['--type-file', poly_typemap] # 保留的 poly type 类型
     polyconvert_opts += ['--osm-files', osm_file] # 输入的 osm 文件
     polyconvert_opts += ['--discard', 'true'] # 去掉 unknown 的 polygon
     polyconvert_opts += ["-n", net_file, "-o", poly_file]
-    subprocess.call(polyconvert_opts + ["--save-configuration", cfg], cwd=output_directory)
-    logger.info(f'转换的配置文件为, {cfg}.')
-    subprocess.call([polyconvert, "-c", cfg], cwd=output_directory)
-    logger.info(f'{poly_file} 转换成功.')
+    polyconvert_opts += ['--save-configuration', poly_cfg]
 
+    # #########
+    # commands
+    # #########
+    commands = [
+        netconvert_opts,
+        [netconvert, "-c", net_cfg],
+        polyconvert_opts,
+        [polyconvert, "-c", poly_cfg]
+    ]
+    for command in commands:
+        try:
+            output = subprocess.check_output(command, cwd=output_directory, stderr=subprocess.STDOUT)
+            output_str = output.decode()
+            if "Error" in output_str:
+                raise subprocess.CalledProcessError(returncode=1, cmd=command, output=output)
+            logger.info(f'SIM: 命令 {command} 执行成功.')
+        except subprocess.CalledProcessError as e:
+            logger.info(f'SIM: !!!命令 {command} 执行失败!!!')
+            logger.info(f'SIM: 错误信息为: {e.output.decode()}')
+            raise Exception("SIM: 调用失败，存在错误返回")

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:47:02
 @Description: 使用 matplotlib 绘制 Polygon 的形状
-@LastEditTime: 2023-09-22 14:54:13
+@LastEditTime: 2023-09-26 20:22:11
 '''
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
@@ -16,15 +16,14 @@ from tshub.utils.init_log import set_logger
 path_convert = get_abs_path(__file__)
 set_logger(path_convert('./'))
 
-poly_file = path_convert("../sumo_env/osm_building/berlin.poly.xml")
-osm_file = path_convert("../sumo_env/osm_building/berlin.osm")
+poly_file = path_convert("../sumo_env/osm_berlin/env/berlin.poly.xml")
+osm_file = path_convert("../sumo_env/osm_berlin/berlin.osm")
 
 map_builder = MapBuilder(
     poly_file=poly_file,
     osm_file=osm_file
 )
 map_infos = map_builder.get_objects_infos()
-
 
 
 # 绘制图像
@@ -39,11 +38,8 @@ fig, ax = plt.subplots()
 # 遍历每个多边形
 for polygon_id, polygon_data in map_infos.items():
     # 提取顶点坐标和高度信息
-    shape = polygon_data["shape"]
+    vertices = polygon_data["shape"]
     building_levels = int(polygon_data["building_levels"])
-
-    # 解析顶点坐标
-    vertices = [list(map(float, point.split(","))) for point in shape.split()]
 
     # 创建多边形对象
     polygon = Polygon(vertices, closed=True)
@@ -72,4 +68,3 @@ plt.colorbar(sm)
 
 # 显示图形
 plt.show()
-

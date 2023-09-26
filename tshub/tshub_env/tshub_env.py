@@ -2,13 +2,14 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2023-08-30 18:21:14
+@LastEditTime: 2023-09-25 21:08:53
 '''
 import os
 import sys
 from typing import Dict, List, Any, Literal
 
 from .base_sumo_env import BaseSumoEnvironment
+from ..map.map_builder import MapBuilder
 from ..aircraft.aircraft_builder import AircraftBuilder
 from ..traffic_light.traffic_light_builder import TrafficLightBuilder
 from ..vehicle.vehicle_builder import VehicleBuilder
@@ -42,9 +43,11 @@ class TshubEnvironment(BaseSumoEnvironment):
 
     def __init__(self, 
                  sumo_cfg: str, 
+                 is_map_builder_initialized:bool = False,
                  is_vehicle_builder_initialized:bool = True, 
                  is_aircraft_builder_initialized:bool = True, 
                  is_traffic_light_builder_initialized:bool = True,
+                 poly_file:str = None, osm_file:str = None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
                  vehicle_action_type:str = 'lane', tls_action_type:str = 'next_or_not',
                  net_file: str = None, route_file: str = None, 
@@ -64,16 +67,31 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.label = str(TshubEnvironment.CONNECTION_LABEL)
         TshubEnvironment.CONNECTION_LABEL += 1 # 多次初始化 label 是不同的
 
+        self.is_map_builder_initialized = is_map_builder_initialized
         self.is_vehicle_builder_initialized = is_vehicle_builder_initialized
         self.is_aircraft_builder_initialized = is_aircraft_builder_initialized
         self.is_traffic_light_builder_initialized = is_traffic_light_builder_initialized
 
+        # Map Builder Input
+        self.poly_file = poly_file
+        self.osm_file = osm_file
+        # Traffic Light Builder Input
         self.tls_ids = tls_ids
-        self.aircraft_inits = aircraft_inits
-        self.vehicle_action_type = vehicle_action_type
         self.tls_action_type = tls_action_type
+        # Aircraft Builder Input
+        self.aircraft_inits = aircraft_inits
+        # Vehicle Builder Input
+        self.vehicle_action_type = vehicle_action_type
 
     def __init_builder(self) -> None:
+        map_builder = (
+            MapBuilder(poly_file=self.poly_file, osm_file=self.osm_file)
+            if self.is_map_builder_initialized
+            else None
+        )
+        if map_builder is not None:
+            self.map_infos = map_builder.get_objects_infos() # Statistic Map Info
+
         vehicle_builder = (
             VehicleBuilder(sumo=self.sumo, action_type=self.vehicle_action_type)
             if self.is_vehicle_builder_initialized
@@ -128,6 +146,8 @@ class TshubEnvironment(BaseSumoEnvironment):
             for _object_type, _object_builder in self.scene_objects.items()
             if _object_builder is not None
         }
+        if self.is_map_builder_initialized:
+            env_state['map'] = self.map_infos
         return env_state
 
     def __computer_reward(self) -> Literal[0]:

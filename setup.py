@@ -16,7 +16,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 setup(
     name='tshub',
-    version=0.6,
+    version=0.8,
     description='TransSimHub is a lightweight Python library for simulating and controlling transportation systems.',
     author='Traffic-Alpha',
     license='Apache License, Version 2.0',

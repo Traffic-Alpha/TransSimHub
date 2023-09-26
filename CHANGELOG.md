@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-09-25 16:06:50
+ * @LastEditTime: 2023-09-26 20:27:11
 -->
 # Change Log
 
@@ -19,36 +19,38 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Security
 
 <!-- v0.8 -->
-## [v0.8] - 2023-09-25
+## [v0.8] - 2023-09-26
 
 ### Add
 
-- 添加对 `map` 的支持，可以获得地图中不同多边形的属性
-  - 添加 `polygon.py`，定义 `polygon` 的属性
-  - 添加 `map_builder.py`，用于初始化场景中的静态信息, 根据 `*.poly.xml` 和 `*.osm` 文件构建场景内所有 `polygon` 的类型和形状
-- 添加关于 `map` 的 `example` 中的例子
-  - 给出获取 `map` 中 `polygon` 的属性，`get_poly_info.py`
-- 新增了 osm 到 sumo net 的转换的工具函数, `osm_build.py`
-- 新增了环境创建的文档，从 `osm` 到实验所使用的地图
-  - 在 [openstreetmap](https://www.openstreetmap.org/) 中导出所需要的区域
-  - 运行 `osm_build.py` 来构建 `*.net.xml` 和 `*.poly.xml`, 这部分见 `example` 中的 `sumo_tools` 中的 `osm_build.py` 的例子
-  - [Option] 添加背景图片
-  - 运行 `generate_detectors.py` 来创建探测器
-  - 运行 `generate_routes.py` 来创建流量
-- 可以一个工具对 osm 建筑来进行可视化
-- 修改了 tshub，使其支持静态信息 map
+- Added support for `map` to retrieve properties of different polygons
+  - Added `polygon.py` to define the properties of a polygon
+  - Added `map_builder.py` to initialize static information in the scene, constructing types and shapes of all polygons based on `*.poly.xml` and `*.osm` files
+- Added examples about `map`
+  - Created `get_poly_info.py` to retrieve properties of polygons in the map
+  - Developed `plot_poly_shape.py` to visualize information in the map
+- Introduced a utility function `osm_build.py` to convert from `osm` to `sumo net`
+- Documented the process of creating the environment from `osm` to the map used in experiments
+  - Export the required area from [openstreetmap](https://www.openstreetmap.org/)
+  - Run `osm_build.py` to generate `*.net.xml` and `*.poly.xml`, as demonstrated in the `osm_build.py` example in the `sumo_tools` directory of the `example` folder
+  - [Optionally] Add background images
+  - Run `generate_detectors.py` to create detectors
+  - Run `generate_routes.py` to generate traffic flows
+- Modified `tshub` to support the static information `map builder`
+  - Added an example `tshub_env_map.py` to demonstrate how to access environment information in `env`
+
 
 ### Changed
 
-- `aircraft.py` 中添加 `custom_update_cover_radius`，支持用户自定义更新 `cover_radius`, 根据 `position` 和 `communication_range` 来更新 `cover_radius`
-  - `aircraft.py` 中更新默认的 `update_cover_radius`, 支持参数的输入和 `cover_radius` 的返回
-  - `aircraft_builder.py` 中更新 `aricraft` 创建的方式
-  - 在 `example` 中添加 `aircraft_custom_update_cover_radius.py` 的例子，说明如何自定义 `custom_update_cover_radius`
-- `aircraft.py` 中添加 `color`，用户可以自定义覆盖范围半径的圆圈
+- Added `custom_update_cover_radius` to `aircraft.py` to allow users to customize the update of `cover_radius` based on `position` and `communication_range`
+  - Updated the default `update_cover_radius` in `aircraft.py` to support parameter input and return `cover_radius`
+  - Updated the creation of `aircraft` in `aircraft_builder.py`
+  - Added an example `aircraft_custom_update_cover_radius.py` in the `example` folder to illustrate how to customize `custom_update_cover_radius`
+- Added `color` to `aircraft.py` to allow users to customize the color of the coverage radius circle
 
 ### Fixed
 
-- `aircraft.py` 中 polygon 的添加将其修改为白色，从而不会使得原始图片颜色发生改变。
+- Modified the addition of polygons in `aircraft.py` to ensure they are displayed in white color without altering the original image colors.
 
 <!-- v0.7 -->
 ## [v0.7] - 2023-09-22
