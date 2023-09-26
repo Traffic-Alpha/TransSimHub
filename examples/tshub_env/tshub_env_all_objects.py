@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 17:02:20
 @Description: 从 tshub 中获得 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的状态
-@LastEditTime: 2023-09-25 14:01:40
+@LastEditTime: 2023-09-25 21:10:55
 '''
 import math
 import numpy as np
@@ -47,12 +47,13 @@ aircraft_inits = {
 
 tshub_env = TshubEnvironment(
     sumo_cfg=sumo_cfg,
+    is_map_builder_initialized=False,
     is_aircraft_builder_initialized=True, 
     is_vehicle_builder_initialized=True, 
     is_traffic_light_builder_initialized=True,
     tls_ids=['htddj_gsndj'], aircraft_inits=aircraft_inits,
     vehicle_action_type='lane', tls_action_type='next_or_not',
-    use_gui=True,
+    use_gui=True, num_seconds=2000
 )
 
 obs = tshub_env.reset()

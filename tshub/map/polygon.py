@@ -2,7 +2,8 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:16:02
 @Description: 地图中 Polygon 的属性
-@LastEditTime: 2023-09-25 21:04:43
++ building:levels: https://wiki.openstreetmap.org/wiki/Key:building:levels
+@LastEditTime: 2023-09-26 18:01:45
 '''
 from dataclasses import dataclass, fields
 from typing import Tuple, Dict, Any

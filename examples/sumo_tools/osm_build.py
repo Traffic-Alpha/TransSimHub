@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-25 15:15:19
 @Description: 测试 osm_build 的功能
-@LastEditTime: 2023-09-25 17:12:34
+@LastEditTime: 2023-09-26 14:53:08
 '''
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.utils.init_log import set_logger
@@ -14,7 +14,7 @@ set_logger(current_file_path('./'))
 
 if __name__ == '__main__':
     osm_file = current_file_path("../sumo_env/osm_berlin/berlin.osm")
-    output_directory = current_file_path("../sumo_env/osm_berlin/env")
+    output_directory = current_file_path("../sumo_env/osm_berlin/env/")
     scenario_build(
         osm_file=osm_file,
         output_directory=output_directory
