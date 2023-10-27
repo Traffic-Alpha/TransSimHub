@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-09-13 16:04:42
+@LastEditTime: 2023-10-27 23:46:18
 '''
 from __future__ import annotations
 
@@ -32,6 +32,7 @@ class TrafficLightInfo:
     last_phase: List[bool]
     next_phase: List[bool]
     sumo: traci.connection.Connection # 与 sumo 的 connection
+    fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
     movement_lane_numbers: List[int] = None, # 每一个 movement 包含的车道数
     movement_ids: List[str] = None # 存储 movement id (fromEdge, toEdge)
@@ -43,6 +44,7 @@ class TrafficLightInfo:
         1. 选择控制方案;
         2. 获得 movement 的基本信息
         3. 获得 movement 和 phase 之间的关系
+        4. 获得 fromEdge 和 toEdge 之间的关系
         """
         _action = tls_action_type(self.action_type)
         if _action == tls_action_type.ChooseNextPhase:
@@ -57,6 +59,7 @@ class TrafficLightInfo:
         self.movement_directions = self.tls_action.movement_directions
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers
         self.phase2movements = self.tls_action.phase2movements
+        self.fromEdge_toEdge = self.tls_action.fromEdge_toEdge
 
         logger.debug(f'SIM: Phase to Movement: \n{dict_to_str(self.phase2movements)}')
 
@@ -84,10 +87,7 @@ class TrafficLightInfo:
         self.this_phase = np.zeros(12).astype(bool).tolist()
         if phase_index in self.phase2movements:
             movements = self.phase2movements[phase_index]
-            for movement in movements:
-                from_edge = movement.split('--')[0]
-                direction = movement.split('--')[1]
-                movement_id = f'{from_edge}_{direction}'
+            for movement_id in movements:
                 movement_index = self.movement_ids.index(movement_id)
                 self.this_phase[movement_index] = True
 
