@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 14:22:45
 @Description: 计算 tsc env 中的 state 和 reward
-@LastEditTime: 2023-10-31 23:21:14
+@LastEditTime: 2023-11-01 17:54:43
 '''
 import time
 import numpy as np
@@ -64,7 +64,7 @@ class OccupancyList:
 class TSCEnvWrapper(gym.Wrapper):
     """TSC Env Wrapper for single junction with tls_id
     """
-    def __init__(self, env: Env, max_states:int=5, filepath:str=None, env_id:int=1) -> None:
+    def __init__(self, env: Env, max_states:int=5, filepath:str=None) -> None:
         super().__init__(env)
         self.tls_ids = self.env.tls_ids # 多路口的 ids
         self.states = {
@@ -87,11 +87,11 @@ class TSCEnvWrapper(gym.Wrapper):
         # #######
         # Writer
         # #######
-        logger.info(f'SIM: Log Path, {filepath}')
+        logger.info(f'RL: Log Path, {filepath}')
         self.t_start = time.time()
         self.results_writer = ResultsWriter(
                 filepath,
-                header={"t_start": self.t_start, "env_id": str(env_id)},
+                header={"t_start": self.t_start},
         )
         self.rewards_writer = list()
         

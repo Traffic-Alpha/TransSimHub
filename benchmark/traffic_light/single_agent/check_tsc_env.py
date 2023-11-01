@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 15:57:34
 @Description: 测试 TSC Env 环境
-@LastEditTime: 2023-09-13 16:33:41
+@LastEditTime: 2023-11-01 17:06:21
 '''
 import numpy as np
 from loguru import logger
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         tls_id='J4',
         num_seconds=3600,
         sumo_cfg=sumo_cfg, 
-        use_gui=False,
+        use_gui=True,
         log_file=log_path,
         env_index=0,
     )

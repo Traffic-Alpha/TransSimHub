@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 23:01:03
 @Description: 检查同时开启多个仿真环境
-@LastEditTime: 2023-10-31 20:08:33
+@LastEditTime: 2023-11-01 12:32:10
 '''
 from loguru import logger
 
@@ -19,9 +19,10 @@ if __name__ == '__main__':
     tsc_env = make_parallel_env(
         num_envs=4,
         sumo_cfg=sumo_cfg,
-        num_seconds=1600,
+        num_seconds=1300,
         tls_ids=['J1', 'J2', 'J3'],
         use_gui=False,
+        prefix='check_parallel',
         log_file=log_path
     )
 

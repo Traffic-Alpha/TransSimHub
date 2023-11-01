@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 22:46:51
 @Description: 多智能体的环境测试
-@LastEditTime: 2023-10-31 19:14:46
+@LastEditTime: 2023-11-01 12:18:56
 '''
 from loguru import logger
 
@@ -17,12 +17,14 @@ set_logger(path_convert('./'))
 
 if __name__ == '__main__':
     sumo_cfg = path_convert("../../sumo_envs/multi_junctions_tsc/env/three_junctions.sumocfg")
-    log_path = path_convert('./log/')
+    log_path = path_convert('./log/rl_env')
     tsc_env = make_multi_envs(
         sumo_cfg=sumo_cfg,
         num_seconds=1600,
         tls_ids=['J1', 'J2', 'J3'],
-        use_gui=True
+        use_gui=True,
+        log_file=log_path,
+        device='cpu'
     )
 
     # Simulation with environment

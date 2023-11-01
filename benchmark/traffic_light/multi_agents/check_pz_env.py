@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-31 18:59:34
 @Description: 检查 TSC PZ Env 环境, 尝试多次 reset
-@LastEditTime: 2023-10-31 19:08:34
+@LastEditTime: 2023-11-01 12:45:04
 '''
 import numpy as np
 from loguru import logger
@@ -21,7 +21,8 @@ set_logger(path_convert('./'))
 
 def make_multi_envs(
         tls_ids:List[str], sumo_cfg:str, 
-        num_seconds:int, use_gui:bool
+        num_seconds:int, use_gui:bool,
+        filepath:str
     ):
     tsc_env = TSCEnvironment(
         sumo_cfg=sumo_cfg,
@@ -30,18 +31,20 @@ def make_multi_envs(
         tls_action_type='choose_next_phase',
         use_gui=use_gui
     )
-    tsc_env = TSCEnvWrapper(tsc_env)
+    tsc_env = TSCEnvWrapper(tsc_env, filepath=filepath)
     tsc_env = TSCEnvironmentPZ(tsc_env)
 
     return tsc_env
 
 if __name__ == '__main__':
     sumo_cfg = path_convert("../../sumo_envs/multi_junctions_tsc/env/three_junctions.sumocfg")
+    log_path = path_convert('./log/tsc_pz_env')
     env = make_multi_envs(
         tls_ids=["J1", "J2", "J3"],
         sumo_cfg=sumo_cfg,
         num_seconds=1600,
-        use_gui=False
+        use_gui=True,
+        filepath=log_path
     )
 
     for _ in range(3):
