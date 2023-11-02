@@ -221,6 +221,7 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
             false,
             false
         ],
+        # [fromEdge, toEdge, fromLane, toLane]
         "fromEdge_toEdge": {
             "29257863#2--r": [
                 "29257863#2",
