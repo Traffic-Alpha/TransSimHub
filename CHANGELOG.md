@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-11-02 14:42:31
+ * @LastEditTime: 2023-11-02 14:55:01
 -->
 # Change Log
 
@@ -25,16 +25,16 @@ Copy and pasting the git commit messages is **NOT** enough.
 
 - Added environment for vehicle control
   - Introduced [Vehicle Speed Scenario](./benchmark/sumo_envs/veh_speed/), which is accomplished by controlling vehicle speed.
-- Added [plot_reward_curves.py](./tshub/utils/plot_reward_curves.py) in utils, for plotting Reward Curve with Standard Deviation from log files.
+- Added [plot_reward_curves.py](./tshub/utils/plot_reward_curves.py) in utils, for plotting reward curve with standard deviation from log files.
 - Added examples of multi-agents for traffic signal control.
-  - Introduced environment [Multi-Traffic Signal Control](./benchmark/sumo_envs/multi_junctions_tsc/), which includes 3 traffic signals.
-  - Added multi-agent environment in `TsHub`, see [Multi-Agent TSC Env](./benchmark/traffic_light/multi_agents/env_utils/).
-  - Provided examples of `MAPPO` algorithm, controlling multiple traffic signals and converging. Detailed algorithm can be found at [MAPPO Traffic Signal Control](./benchmark/traffic_light/multi_agents/mappo_models/).
+  - Introduced environment [Multi-Traffic Signal Control](./benchmark/sumo_envs/multi_junctions_tsc/), which includes $3$ traffic signals.
+  - Added multi-traffic signal control environment in `TsHub`, see [Multi-Agent TSC Env](./benchmark/traffic_light/multi_agents/env_utils/).
+  - Provided examples of `MAPPO` algorithm, controlling multiple traffic signals. Detailed algorithm can be found at [MAPPO Traffic Signal Control](./benchmark/traffic_light/multi_agents/mappo_models/).
 - Added introduction to traffic signal control based on reinforcement learning, [RL for TSC](./benchmark/traffic_light/).
 
 ### Changed
 
-- Unified the connection method of `from_edge` and `direction` to f"{from_edge}--{direction}".
+- Unified the connection method of `from_edge` and `direction` to `f"{from_edge}--{direction}"`.
 - Updated doc description about the new state of traffic light, `fromEdge_toEdge`.
 - Updated the rule-based method in single agent to adapt to the new connection method of `from_edge` and `direction`.
 
