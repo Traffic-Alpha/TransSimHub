@@ -16,6 +16,7 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
 - **当前相位 this_phase** (List[bool]): 观测时信号灯的相位，转换为对应控制的 `movement`
 - **上一次相位 last_phase** (List[bool]): 信号灯在上一次观测时的相位
 - **下一次相位 next_phase** (List[bool]): 信号灯的相位列表中，下一次切换需要执行的相位（ `next_or_not` 动作中需要预定义相位顺序）
+- **进口和出口对应关系 fromEdge_toEdge** Dict[str, List[str]]: 信号灯控制的路口处，入口 Edge 和出口 Edge 之间的对应关系
 - **通行方向 movement_directions** (Dict[str, str])：交通路口中每一个 movement 的方向
 - **车道数 movement_lane_numbers** (List[int])：交通路口中每个通行方向包含的车道数
 - **运动方向ID movement_ids** (List[str])：存储每个 movement ID，格式是来自那条路去那条路 (fromEdge, toEdge)
@@ -220,6 +221,80 @@ Traffic Signal Lights（信号灯）可以用于在 `SUMO` 中仿真交通路口
             false,
             false
         ],
+        "fromEdge_toEdge": {
+            "29257863#2--r": [
+                "29257863#2",
+                "gsndj_n6",
+                "29257863#2_0",
+                "gsndj_n6_0"
+            ],
+            "29257863#2--s": [
+                "29257863#2",
+                "29257863#5",
+                "29257863#2_2",
+                "29257863#5_2"
+            ],
+            "29257863#2--l": [
+                "29257863#2",
+                "gsndj_s5",
+                "29257863#2_4",
+                "gsndj_s5_2"
+            ],
+            "gsndj_n7--r": [
+                "gsndj_n7",
+                "161701303#10",
+                "gsndj_n7_0",
+                "161701303#10_0"
+            ],
+            "gsndj_n7--s": [
+                "gsndj_n7",
+                "gsndj_n6",
+                "gsndj_n7_2",
+                "gsndj_n6_2"
+            ],
+            "gsndj_n7--l": [
+                "gsndj_n7",
+                "29257863#5",
+                "gsndj_n7_3",
+                "29257863#5_2"
+            ],
+            "161701303#7.248--r": [
+                "161701303#7.248",
+                "gsndj_s5",
+                "161701303#7.248_0",
+                "gsndj_s5_0"
+            ],
+            "161701303#7.248--s": [
+                "161701303#7.248",
+                "161701303#10",
+                "161701303#7.248_2",
+                "161701303#10_2"
+            ],
+            "161701303#7.248--l": [
+                "161701303#7.248",
+                "gsndj_n6",
+                "161701303#7.248_3",
+                "gsndj_n6_2"
+            ],
+            "gsndj_s4--r": [
+                "gsndj_s4",
+                "29257863#5",
+                "gsndj_s4_0",
+                "29257863#5_0"
+            ],
+            "gsndj_s4--s": [
+                "gsndj_s4",
+                "gsndj_s5",
+                "gsndj_s4_2",
+                "gsndj_s5_1"
+            ],
+            "gsndj_s4--l": [
+                "gsndj_s4",
+                "161701303#10",
+                "gsndj_s4_3",
+                "161701303#10_3"
+            ]
+        },
         "movement_directions": {
             "29257863#2_r": "r",
             "29257863#2_s": "s",

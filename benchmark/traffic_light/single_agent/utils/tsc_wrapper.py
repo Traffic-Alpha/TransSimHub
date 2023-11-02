@@ -4,7 +4,7 @@
 @Description: 处理 TSCHub ENV 中的 state, reward
 + state: 5 个时刻的每一个 movement 的 queue length
 + reward: 路口总的 waiting time
-@LastEditTime: 2023-09-13 17:01:02
+@LastEditTime: 2023-11-01 17:06:04
 '''
 import numpy as np
 import gymnasium as gym
@@ -43,7 +43,7 @@ class TSCEnvWrapper(gym.Wrapper):
     def __init__(self, env: Env, tls_id:str, max_states:int=5) -> None:
         super().__init__(env)
         self.tls_id = tls_id # 单路口的 id
-        self.states = deque([self._get_initial_state()] * max_states, maxlen=max_states)
+        self.states = deque([self._get_initial_state()] * max_states, maxlen=max_states) # 队列
         self.movement_ids = None
         self.phase2movements = None
         self.occupancy = OccupancyList()
@@ -65,7 +65,7 @@ class TSCEnvWrapper(gym.Wrapper):
             low=np.zeros((5,12)),
             high=np.ones((5,12)),
             shape=(5,12)
-        )
+        ) # self.states 是一个时间序列
         return obs_space
     
     # Wrapper
@@ -90,7 +90,7 @@ class TSCEnvWrapper(gym.Wrapper):
         movement_occ = {key: value for key, value in zip(self.movement_ids, occupancy)}
         phase_occ = {}
         for phase_index, phase_movements in self.phase2movements.items():
-            phase_occ[phase_index] = sum([movement_occ['_'.join(phase.split('--'))] for phase in phase_movements])
+            phase_occ[phase_index] = sum([movement_occ[phase] for phase in phase_movements])
         
         infos['phase_occ'] = phase_occ
         return infos

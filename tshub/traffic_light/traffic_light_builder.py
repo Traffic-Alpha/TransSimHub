@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-09-13 16:03:37
+@LastEditTime: 2023-10-30 16:53:32
 '''
 import traci
 import numpy as np
@@ -110,7 +110,7 @@ class TrafficLightBuilder(BaseBuilder):
             edge_id = parts[2]
             direction = parts[4]
             
-            edge_direction = f'{edge_id}_{direction}'
+            edge_direction = f'{edge_id}--{direction}'
             
             # 处理每一个 lane 对应的 {17: 14.374141326903933, 24: 7, 25: 1, 19: 0.4} 的信息
             for k, v in value.items():
@@ -121,12 +121,12 @@ class TrafficLightBuilder(BaseBuilder):
                         output[junction_id][edge_direction][_meaning_key] = v
                     else:
                         output[junction_id][edge_direction][_meaning_key] += v
-                else: # 如果是 tuple
+                else: # 如果是 tuple or list
                     if _is_init:
                         output[junction_id][edge_direction][_meaning_key] = list(v)
                     else:
                         output[junction_id][edge_direction][_meaning_key] += list(v)
-                count[junction_id][edge_direction][_meaning_key] += 1
+                count[junction_id][edge_direction][_meaning_key] += 1 # 多个车道的情况
         
         for junction_id, edges in output.items():
             for edge_direction, values in edges.items():

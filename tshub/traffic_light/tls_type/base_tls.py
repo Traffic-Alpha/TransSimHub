@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-@LastEditTime: 2023-08-28 15:46:24
+@LastEditTime: 2023-10-27 23:49:30
 '''
 from abc import ABC, abstractmethod
 from ...sumo_tools.sumo_infos.tls_connections import tls_connection
@@ -19,6 +19,9 @@ class BaseTLS(ABC):
         # 获得路口连接
         tls_info = tls_connection(self.sumo)
         self.tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
+
+        # 初始化路口
+        self.fromEdge_toEdge = self.generate_fromEdge_toEdge_dict()
 
         # 信号灯 movement 和 phase 的基本信息
         self.movement_ids = set()
@@ -121,9 +124,9 @@ class BaseTLS(ABC):
         logic.phases = self.all_phases
         self.sumo.trafficlight.setProgramLogic(self.id, logic) # 设置信号灯
     
-    # ##########
-    # 信号灯信息
-    # ##########
+    # #################
+    # 信号灯信息（工具函数）
+    # #################
     def get_green_durations(self):
         """获得信号灯的所有绿灯相位的时间长度, 只有 G 就是绿灯相位, 作为 obs 的一部分
         只有 g 不算是绿灯相位(右转可以一直是绿灯)
@@ -177,7 +180,7 @@ class BaseTLS(ABC):
             if None in item:
                 continue
             from_edge, _, _, _, _, direction, _ = item
-            movement_id = f"{from_edge}_{direction}"
+            movement_id = f"{from_edge}--{direction}"
             self.movement_ids.add(movement_id)
             self.movement_directions[movement_id] = direction
             self.movement_lane_numbers[movement_id] = self.movement_lane_numbers.get(movement_id, 0) + 1
@@ -212,3 +215,33 @@ class BaseTLS(ABC):
                 _filtered_movement_list = [item for item in _movement_list if item != 'None--None']
                 self.phase2movements[phase_id] = list(set(_filtered_movement_list))
                 phase_id += 1
+    
+    def generate_fromEdge_toEdge_dict(self):
+        """这个函数将 tls connection 处理为方向对应出口的信息，输入的格式如下所示：
+            [
+                [fromEdge, toEdge, fromLane, toLane, internalLane, direction, fromLane_length], 
+                ...
+            ]
+        最后输出的格式如下：
+            {
+                f"{fromEdge}--{direction}": [fromEdge, toEdge, fromLane, toLane]
+            }
+        """
+
+        output_dict = {}  # Initialize an empty dictionary to store the output
+
+        # Iterate over each inner list in the input list
+        for inner_list in self.tls_connections:
+            fromEdge, toEdge, fromLane, toLane, internalLane, direction, fromLane_length = inner_list  # Unpack the inner list
+
+            # Create a key using 'fromEdge' and 'direction'
+            key = f"{fromEdge}--{direction}"
+
+            # Create a value list using 'fromEdge', 'toEdge', 'fromLane', and 'toLane'
+            value = [fromEdge, toEdge, fromLane, toLane]
+
+            # Add the key-value pair to the output dictionary
+            if key != 'None--None':
+                output_dict[key] = value
+
+        return output_dict

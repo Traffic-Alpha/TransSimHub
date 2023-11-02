@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 18:57:35
 @Description: 使用训练好的 RL Agent 进行测试
-@LastEditTime: 2023-09-14 14:08:03
+@LastEditTime: 2023-11-01 17:31:04
 '''
 import torch
 from loguru import logger
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     sumo_cfg = path_convert("../../sumo_envs/J1/env/J1.sumocfg")
     params = {
         'tls_id':'J4',
-        'num_seconds': 2600,
+        'num_seconds': 2000,
         'sumo_cfg':sumo_cfg,
         'use_gui':True,
         'log_file':path_convert('./log/'),
