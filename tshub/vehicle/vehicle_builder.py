@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-09-01 14:56:17
+@LastEditTime: 2023-11-03 17:45:29
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -15,11 +15,12 @@ class VehicleBuilder(BaseBuilder):
     Provides methods to retrieve information and control all vehicles in the scene.
     """
 
-    def __init__(self, sumo, action_type) -> None:
+    def __init__(self, sumo, action_type, hightlight:bool=False) -> None:
         self.sumo = sumo  # sumo connection]
         self.action_type = action_type # lane, lane_continuous_speed
         self.vehicles: Dict[str, VehicleInfo] = {}
         self.controled_vehicles = [] # 被控制过的车辆
+        self.hightlight = hightlight
 
     def create_objects(self, vehicle_id: str) -> None:
         """初始化车辆
@@ -96,7 +97,7 @@ class VehicleBuilder(BaseBuilder):
         return vehicle_features
 
 
-    def control_objects(self, actions, hightlight:bool=True):
+    def control_objects(self, actions):
         """
         Control all vehicles in the scene based on the provided actions.
         Args:
@@ -107,7 +108,7 @@ class VehicleBuilder(BaseBuilder):
             lane_change, target_speed = action
             self._log_vehicle_info(vehicle_id, lane_change, target_speed)
             self.vehicles[vehicle_id].control_vehicle(lane_change, target_speed)
-            if hightlight and (vehicle_id not in self.controled_vehicles):
+            if self.hightlight and (vehicle_id not in self.controled_vehicles):
                 self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=-1)
                 self.controled_vehicles.append(vehicle_id)
 

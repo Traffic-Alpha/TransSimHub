@@ -44,12 +44,12 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
       - change_lane_left (str)
       - vehicle 向右侧变道，改变 vehicle 的速度, vehicle 速度减少 2 m/s，但高于最低限速 2 m/s
 
-2. **lane_continuous_speed**: 改变车道，并且可以连续控制速度
+2. **lane_continuous_speed**: 改变车道，并且可以连续控制速度。当 `speed` 设置为 -1 的时候，车辆保持当前速度不变。这个动作退化为只进行变道的调整。
 
   .. list-table::
     :header-rows: 1 
 
-    * - 参数（变道，速度）
+    * - 参数（速度，变道）
       - 变道 index
       - 描述
     * - (speed, 0)
