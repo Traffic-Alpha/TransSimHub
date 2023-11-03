@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-27 20:16:14
 @Description: 检查车辆环境
-@LastEditTime: 2023-10-27 21:06:44
+@LastEditTime: 2023-11-03 18:09:12
 '''
 import math
 import numpy as np
@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     ac_env = VehEnvironment(
         sumo_cfg=sumo_cfg,
-        num_seconds=1200, # 秒
-        vehicle_action_type='lane',
+        num_seconds=350, # 秒
+        vehicle_action_type='lane_continuous_speed',
         use_gui=True
     )
     ac_env_wrapper = VehEnvWrapper(env=ac_env)
@@ -33,7 +33,11 @@ if __name__ == '__main__':
     done = False
     ac_env_wrapper.reset()
     while not done:
-        action = dict()
+        action = {
+            'ego_0': (0, 1),
+            'ego_1': (0, 3),
+            'ego_2': (0, 12),
+        }
         states, rewards, truncated, done, infos = ac_env_wrapper.step(action=action)
         logger.info(f'SIM: State: \n{dict_to_str(states)} \nReward:\n {rewards}')
     ac_env.close()

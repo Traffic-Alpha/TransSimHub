@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 18:24:56
 @Description: 变车道+连续速度控制
-@LastEditTime: 2023-08-29 17:22:53
+@LastEditTime: 2023-11-03 17:34:13
 '''
 import enum
 from .base_vehicle_action import VehicleAction
@@ -25,4 +25,5 @@ class LaneWithContinuousSpeedAction(VehicleAction):
             self.change_lane(-1, current_lane=current_lane_index, current_edge=current_road_id)
         elif lane_change == LaneChangeActionType.change_lane_right:
             self.change_lane(1, current_lane=current_lane_index, current_edge=current_road_id)
-        self.sumo.vehicle.slowDown(self.veh_id, target_speed, duration=1)
+        if target_speed != -1: # If we set target speed to -1, then speed of the vehicle will not change
+            self.sumo.vehicle.slowDown(self.veh_id, target_speed, duration=1)

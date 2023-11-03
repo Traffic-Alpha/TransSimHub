@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2023-09-25 21:08:53
+@LastEditTime: 2023-11-03 17:46:51
 '''
 import os
 import sys
@@ -49,7 +49,8 @@ class TshubEnvironment(BaseSumoEnvironment):
                  is_traffic_light_builder_initialized:bool = True,
                  poly_file:str = None, osm_file:str = None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
-                 vehicle_action_type:str = 'lane', tls_action_type:str = 'next_or_not',
+                 vehicle_action_type:str = 'lane', hightlight:bool = False,
+                 tls_action_type:str = 'next_or_not',
                  net_file: str = None, route_file: str = None, 
                  trip_info: str = None, statistic_output: str = None, summary: str = None, queue_output: str = None, 
                  tls_state_add: List = None, use_gui: bool = False, is_libsumo: bool = False, 
@@ -82,6 +83,7 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.aircraft_inits = aircraft_inits
         # Vehicle Builder Input
         self.vehicle_action_type = vehicle_action_type
+        self.hightlight = hightlight
 
     def __init_builder(self) -> None:
         map_builder = (
@@ -93,7 +95,7 @@ class TshubEnvironment(BaseSumoEnvironment):
             self.map_infos = map_builder.get_objects_infos() # Statistic Map Info
 
         vehicle_builder = (
-            VehicleBuilder(sumo=self.sumo, action_type=self.vehicle_action_type)
+            VehicleBuilder(sumo=self.sumo, action_type=self.vehicle_action_type, hightlight=self.hightlight)
             if self.is_vehicle_builder_initialized
             else None
         )
