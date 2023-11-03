@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-11-02 23:08:46
+ * @LastEditTime: 2023-11-03 18:22:47
 -->
 # Change Log
 
@@ -17,6 +17,20 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v0.9.1 -->
+## [v1.0] - 2023-11-03
+
+### Changed
+
+- Updated `LaneWithContinuousSpeedAction` to maintain original speed when target speed is set to -1.
+- Modifications to the vehicle speed scenario:
+  - All vehicles are now unable to change lanes directly. We have mitigated the queueing at bottle-necks by adjusting speeds.
+  - Regenerated road network and traffic flow files. See [Vehicle Speed Scenario](./benchmark/sumo_envs/veh_speed/).
+  - Updated [veh_wrapper.py](./benchmark/vehicle/utils/veh_wrapper.py) by adding `__get_actions` and `__update_actions` methods. These methods generate default actions for all vehicles (speed=-1, lane=0), meaning no lane changes or speed alterations. Subsequent parameters only modify the `speed` of the `ego` vehicle.
+- Moved the `highlight` parameter from `control_objects` in `vehicle_builder.py` to `init`, unifying the `control_objects` method across different `objects`.
+- Added `highlight` parameter in `tshub.py`.
+
 
 <!-- v0.9 -->
 ## [v0.9] - 2023-11-02
