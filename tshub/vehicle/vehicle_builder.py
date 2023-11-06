@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2023-11-03 17:45:29
+@LastEditTime: 2023-11-06 21:08:09
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -36,6 +36,9 @@ class VehicleBuilder(BaseBuilder):
             lane_index=self.sumo.vehicle.getLaneIndex(vehicle_id),
             edges=[],
             waiting_time=0,
+            accumulated_waiting_time=0, # 累积等待时间
+            distance=0, # 行驶距离
+            leader=(), # 前车信息
             next_tls=[],
             sumo=self.sumo
         )
