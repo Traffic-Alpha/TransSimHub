@@ -1,7 +1,7 @@
 .. _install:
 
 TransSimHub 安装
-======================
+=====================
 
 通过 GitHub 安装
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -13,7 +13,7 @@ TransSimHub 安装
    .. code-block:: bash
 
       git clone https://github.com/Traffic-Alpha/TransSimHub.git
-      cd TransSimHub.git
+      cd TransSimHub
 
 2. 使用pip安装：
 

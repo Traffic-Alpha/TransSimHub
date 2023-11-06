@@ -1,7 +1,7 @@
 .. _install:
 
 TransSimHub Installation
-==========================
+============================
 
 Install via GitHub
 --------------------------
@@ -13,7 +13,7 @@ You can install `TransSimHub` by cloning the GitHub repository. Follow these ste
    .. code-block:: bash
 
       git clone https://github.com/Traffic-Alpha/TransSimHub.git
-      cd TransSimHub.git
+      cd TransSimHub
 
 2. Install using pip:
 
