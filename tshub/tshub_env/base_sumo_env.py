@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2023-09-01 15:09:30
+@LastEditTime: 2023-11-12 14:16:15
 '''
 import sumolib
 from typing import List
@@ -87,7 +87,11 @@ class BaseSumoEnvironment(ABC):
         self.sumo = None # self.sumo=traic
     
     def _start_simulation(self):
-        """开始仿真
+        """开始仿真, 有四种情况来开启仿真
+        1. 只指定 sumocfg 文件
+        2. 指定 sumocfg 和 route 文件, (新的 route 可以覆盖 sumocfg 的设置)
+        3. 制定 sumocfg 和 net 文件, (新的 net 可以覆盖 sumocfg 的设置)
+        4. 直接指定 net 和 route, 不使用 sumocfg
         """
         if (self._net == None) and (self._route == None):
             # 使用 sumocfg 来启动 (没有指定 route 和 net)
@@ -104,6 +108,16 @@ class BaseSumoEnvironment(ABC):
             sumo_cmd = [self._sumo_binary,
                         '-c', self._sumo_cfg,
                         '-r', self._route,
+                        '--no-step-log', 'true',
+                        '--no-warnings', 'true',
+                        '--max-depart-delay', str(self.max_depart_delay), 
+                        '--waiting-time-memory', '10000',
+                        '--time-to-teleport', str(self.time_to_teleport)] 
+        elif (self._net != None) and (self._route == None): # 指定了 net 文件
+            logger.info(f'SIM: 指定了 net 文件, {self._net}')
+            sumo_cmd = [self._sumo_binary,
+                        '-c', self._sumo_cfg,
+                        '-n', self._net,
                         '--no-step-log', 'true',
                         '--no-warnings', 'true',
                         '--max-depart-delay', str(self.max_depart_delay), 
