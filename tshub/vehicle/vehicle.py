@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-11-06 21:08:53
+@LastEditTime: 2023-11-12 15:40:20
 '''
 import traci
 from typing import Dict, Any
@@ -22,6 +22,9 @@ class VehicleInfo:
     id: str  # The ID of the vehicle
     action_type:str # 车辆的动作控制类型
     vehicle_type:str # 车辆类型, ego or other
+    length: float # the length of the vehicles [m]
+    width: float # the width of this vehicle [m]
+    heading: float # the angle of the named vehicle within the last step [°]
     position: Tuple[float]  # The position of the vehicle
     speed: float  # The current speed of the vehicle
     road_id: str  # The ID of the road the vehicle is on
@@ -51,13 +54,14 @@ class VehicleInfo:
                     traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
                     traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS,
                     traci.constants.VAR_ACCUMULATED_WAITING_TIME, 
-                    traci.constants.VAR_DISTANCE,     
+                    traci.constants.VAR_DISTANCE, traci.constants.VAR_ANGLE
                 ]
             )
         self.sumo.vehicle.subscribeLeader(self.id, dist=0) # vehicle id together with the distance
 
     @classmethod
     def create_vehicle(cls, id: str, action_type:str, vehicle_type:str,
+                       length:float, width: float, heading: float,
                        sumo:traci.connection.Connection,
                        position: Tuple[float], speed: float,
                        road_id: str, lane_id: str, 
@@ -67,6 +71,7 @@ class VehicleInfo:
                        next_tls: List[str]):
         logger.info(f'SIM: Init Vehicle: {vehicle_type}: {id}')
         return cls(id=id, action_type=action_type, vehicle_type=vehicle_type,
+                   length=length, width=width, heading=heading,
                    sumo=sumo, position=position, speed=speed,   
                    road_id=road_id, lane_id=lane_id, lane_index=lane_index,
                    edges=edges, waiting_time=waiting_time,
@@ -95,12 +100,14 @@ class VehicleInfo:
             'next_tls': 112,
             'accumulated_waiting_time': 135,
             'distance': 132,
+            'heading': 67,
             'leader': 104,
         }
         return feature_mapping.get(feature, -1)
     
     def update_features(self, vehicle_info:Dict[int, Any]) -> None:
         self.position=vehicle_info.get(VehicleInfo.get_feature_index('position'), None)
+        self.heading=vehicle_info.get(VehicleInfo.get_feature_index('heading'), None)
         self.speed=vehicle_info.get(VehicleInfo.get_feature_index('speed'), None)
         self.road_id=vehicle_info.get(VehicleInfo.get_feature_index('road_id'), None)
         self.lane_id=vehicle_info.get(VehicleInfo.get_feature_index('lane_id'), None)
