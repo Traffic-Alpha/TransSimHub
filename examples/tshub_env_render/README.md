@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-11-13 23:37:33
  * @Description: visualization in TsHub
- * @LastEditTime: 2023-11-14 00:13:25
+ * @LastEditTime: 2023-11-14 00:24:39
 -->
 # Visualization for TransSimHub
 
@@ -32,10 +32,21 @@ fig = tshub_env.render(
 
 ## 全局渲染
 
-<div class="row" style="text-align:center">
-    <img src="./assets/rgb_global.gif" style="width: 45%;" />
-    <img src="./assets/sumogui_global.gif" style="width: 45%;" />
-</div>
+<center>
+
+<table style="text-align:center">
+  <tr>
+    <td><img src="/path/to/image1.png" width="300"/></td>
+    <td><img src="/path/to/image2.png" width="300"/></td>
+  </tr>
+  <tr>
+    <td align="center">Image 1 Caption</td>
+    <td align="center">Image 2 Caption</td>
+  </tr>
+</table>
+
+</center>
+
 
 ## 局部路口渲染
 
