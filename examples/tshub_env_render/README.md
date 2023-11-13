@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-11-13 23:37:33
  * @Description: visualization in TsHub
- * @LastEditTime: 2023-11-14 00:25:45
+ * @LastEditTime: 2023-11-14 00:29:10
 -->
 # Visualization for TransSimHub
 
@@ -34,8 +34,8 @@ fig = tshub_env.render(
 
 <table>
   <tr>
-    <td><img src="./assets/rgb_global.gif" width="600"/></td>
-    <td><img src="./assets/sumogui_global.gif" width="600"/></td>
+    <td><img src="./assets/rgb_global.gif" width="450"/></td>
+    <td><img src="./assets/sumogui_global.gif" width="450"/></td>
   </tr>
   <tr>
     <td align="center">Image 1 Caption</td>
@@ -48,8 +48,8 @@ fig = tshub_env.render(
 
 <table>
   <tr>
-    <td><img src="./assets/rgb_node.gif" width="600"/></td>
-    <td><img src="./assets/sumogui_node.gif" width="600"/></td>
+    <td><img src="./assets/rgb_node.gif" width="450"/></td>
+    <td><img src="./assets/sumogui_node.gif" width="450"/></td>
   </tr>
   <tr>
     <td align="center">Image 1 Caption</td>
@@ -63,8 +63,8 @@ fig = tshub_env.render(
 
 <table>
   <tr>
-    <td><img src="./assets/rgb_vehicle.gif" width="600"/></td>
-    <td><img src="./assets/sumogui_vehicle.gif" width="600"/></td>
+    <td><img src="./assets/rgb_vehicle.gif" width="450"/></td>
+    <td><img src="./assets/sumogui_vehicle.gif" width="450"/></td>
   </tr>
   <tr>
     <td align="center">Image 1 Caption</td>
