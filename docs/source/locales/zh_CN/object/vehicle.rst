@@ -11,6 +11,9 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 
 - **机动车 id** (str): 场景中每一个 vehicle 的唯一 ID，用于区分不同的 vehicle
 - **动作类型 action_type** (str): vehicle 的动作控制类型, 目前支持 `lane` 和 `lane_continuous_speed`
+- **车辆长度 length** (float): 车辆的长度，单位是米（m）
+- **车辆宽度 width** (float): 车辆的宽度，单位是（m）
+- **车辆的朝向角 heading** (float): 车辆的朝向角，单位是度（°）
 - **位置 position** (Tuple[float]): vehicle 所在的位置 (x,y)
 - **速度 speed** (float): vehicle 当前车速
 - **路 road_id** (str): vehicle 行驶道路的 ID
@@ -113,25 +116,29 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
  .. code-block:: python
 
   {
-    "gsndj_s4__0.0": {
-        "id": "gsndj_s4__0.0",
+    "161701303#7.248__19.15": {
+        "id": "161701303#7.248__19.15",
         "action_type": "lane",
+        "vehicle_type": "car_2",
+        "length": 5.0,
+        "width": 1.8,
+        "heading": 308.9851317457285,
         "position": [
-            1217.0713040366447,
-            1370.0102791296881
+            1212.2327162353015,
+            1395.6948476207442
         ],
-        "speed": 0,
-        "road_id": "gsndj_s4",
-        "lane_id": "gsndj_s4_2",
+        "speed": 25.327109738498727,
+        "road_id": "gsndj_n6",
+        "lane_id": "gsndj_n6_2",
         "lane_index": 2,
-        "edges": [],
-        "waiting_time": 0,
-        "accumulated_waiting_time": 18.0,
-        "distance": 1122.5802917752023,
-        "leader": [
-            "29257863#2__19.13",
-            81.95232096332472
+        "edges": [
+            "161701303#7.248",
+            "gsndj_n6"
         ],
+        "waiting_time": 0.0,
+        "accumulated_waiting_time": 18.0,
+        "distance": 1285.6647294903642,
+        "leader": null,
         "next_tls": []
     }
   }

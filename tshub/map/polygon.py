@@ -1,9 +1,9 @@
 '''
 @Author: WANG Maonan
 @Date: 2023-09-22 14:16:02
-@Description: 地图中 Polygon 的属性
+@Description: 地图中 Polygon 的属性. Edge, Node and Buildings are all Polygon
 + building:levels: https://wiki.openstreetmap.org/wiki/Key:building:levels
-@LastEditTime: 2023-09-26 18:01:45
+@LastEditTime: 2023-11-12 14:50:34
 '''
 from dataclasses import dataclass, fields
 from typing import Tuple, Dict, Any
@@ -21,7 +21,10 @@ class PolygonInfo:
                polygon_type: str,
                shape: str,
                building_levels: int):
-        shape_tuple = tuple([tuple(map(float, point.split(","))) for point in shape.split()])
+        if isinstance(shape, str):
+            shape_tuple = tuple([tuple(map(float, point.split(","))) for point in shape.split()])
+        else:
+            shape_tuple = shape
         polygon = cls(
             id, polygon_type,
             shape_tuple, building_levels
