@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2023-11-12 14:16:15
+@LastEditTime: 2023-11-12 14:52:03
 '''
 import sumolib
 from typing import List
@@ -210,4 +210,4 @@ class BaseSumoEnvironment(ABC):
         pass
     
     def render(self, mode=None) -> None:
-        pass
+        raise NotImplementedError

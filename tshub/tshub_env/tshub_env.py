@@ -2,10 +2,11 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2023-11-03 17:46:51
+@LastEditTime: 2023-11-13 23:35:42
 '''
 import os
 import sys
+from loguru import logger
 from typing import Dict, List, Any, Literal
 
 from .base_sumo_env import BaseSumoEnvironment
@@ -13,6 +14,8 @@ from ..map.map_builder import MapBuilder
 from ..aircraft.aircraft_builder import AircraftBuilder
 from ..traffic_light.traffic_light_builder import TrafficLightBuilder
 from ..vehicle.vehicle_builder import VehicleBuilder
+from ..visualization.visualize_map import render_map
+from ..visualization.filter_objects import filter_object
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -85,9 +88,12 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.vehicle_action_type = vehicle_action_type
         self.hightlight = hightlight
 
+        # For render
+        self.render_count = 0
+
     def __init_builder(self) -> None:
         map_builder = (
-            MapBuilder(poly_file=self.poly_file, osm_file=self.osm_file)
+            MapBuilder(net_file=self._net, poly_file=self.poly_file, osm_file=self.osm_file)
             if self.is_map_builder_initialized
             else None
         )
@@ -123,6 +129,9 @@ class TshubEnvironment(BaseSumoEnvironment):
         self._start_simulation() # 开启仿真
         self.__init_builder() # 初始化场景内的 builder
         obs = self.__computer_observation()
+
+        self.obs = obs.copy() # copy obs for render
+
         return obs
     
     def step(self, actions):
@@ -138,6 +147,9 @@ class TshubEnvironment(BaseSumoEnvironment):
         reward = self.__computer_reward()
         info = self.__compute_info()
         done = self._computer_done()
+
+        self.obs = obs.copy() # copy obs for render
+        
         return obs, reward, info, done
 
     def __computer_observation(self) -> Dict[str, Any]:
@@ -149,7 +161,7 @@ class TshubEnvironment(BaseSumoEnvironment):
             if _object_builder is not None
         }
         if self.is_map_builder_initialized:
-            env_state['map'] = self.map_infos
+            env_state.update(self.map_infos)
         return env_state
 
     def __computer_reward(self) -> Literal[0]:
@@ -163,3 +175,65 @@ class TshubEnvironment(BaseSumoEnvironment):
         return {
             'step_time': self.sim_step, # 返回当前仿真的时间
         }
+    
+    def render(self, mode:str='rgb',
+               focus_id:str=None, focus_type:str=None, focus_distance:float=None, 
+               save_folder:str=None
+        ) -> None:
+        """对场景进行渲染
+
+        Args:
+            mode (str, optional): 渲染的模式，包含 rgb 和 sumo_gui. Defaults to rgb.
+            focus_id (str, optional): 追踪模式，设置追踪 object 的 ID. Defaults to None. 如果设置为 None，就是全局渲染
+            focus_type (str, optional): 追踪 object 的类型，包含 vehicle 和 node. Defaults to None.
+            focus_distance (float, optional): 追踪覆盖的范围. Defaults to None.
+            save_folder (str, optional): 当 mode='sumo_gui' 的时候，图像保存的文件夹。 
+        """
+        if not self.is_map_builder_initialized:
+            raise ValueError('需要初始化地图信息')
+        
+        # Step 1. Filter Object (找出符合要求的 object 坐标)
+        obs, x_range, y_range = filter_object(
+            self.obs, 
+            focus_id, focus_type, focus_distance
+        )
+
+        # Step 2. Render Image (rgb or sumo-gui)
+        if mode == 'rgb':
+            if (x_range is None) and (y_range is None):
+                fig = None # 如果追踪的物体不在, 则 fig 直接返回 None
+            else:
+                map_edges, map_nodes, vehicle_info = obs['edge'], obs['node'], obs['vehicle']
+                fig = render_map(
+                    focus_id,
+                    map_edges, map_nodes, vehicle_info, 
+                    x_range=x_range, y_range=y_range
+                ) # 如果在, 则渲染 focus_id 附近的内容
+            return fig
+        elif mode == 'sumo_gui':
+            assert self.use_gui == True, '需要开启 GUI 界面才可以使用 SUMO-GUI 进行渲染。'
+            assert save_folder is not None, '需要在 save_folder 设置文件保存的路径。'
+
+            if self.render_count == 0: # 第一次初始化时候需要创建新的 view
+                logger.warning(f'使用 SUMO-GUI 截图前确保窗口最大化。')
+                import time; time.sleep(5)
+                self.traci.gui.removeView('View #0')
+                self.traci.gui.addView('RenderView', schemeName="real world")
+            
+            if (x_range is None) and (y_range is None):
+                pass
+            elif self.render_count>0:
+                self.traci.gui.setBoundary(
+                    viewID='RenderView', 
+                    xmin=x_range[0], ymin=y_range[0], 
+                    xmax=x_range[1], ymax=y_range[1]
+                ) # 设置范围
+                self.traci.gui.screenshot(
+                    viewID='RenderView', 
+                    filename=f'{save_folder}/{self.render_count}.png', 
+                    width=600, height=600
+                )
+            self.render_count += 1
+            return None
+        else:
+            raise ValueError(f'mode can only be rgb and sumo_gui, now is {mode}.')
