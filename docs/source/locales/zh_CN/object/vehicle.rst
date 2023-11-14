@@ -25,7 +25,7 @@ Vehicle（机动车）模块用于在 `SUMO` 中仿真车辆，例如：自动�
 - **车辆的行驶距离 distance** (float): vehicle 的累积行驶距离
 - **前车信息 leader** (Tuple[str, float]): 当前车辆前车的信息，包含前车的 id 和距离
 
-=
+
 动作类型
 ~~~~~~~~~~~~~~
 
