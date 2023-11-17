@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-11-17 16:25:58 by Eclipse SUMO netedit Version 1.18.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/neteditConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="/home/wmn/TransSimHub/benchmark/sumo_envs/veh_rlhf/veh_rlhf.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/home/wmn/TransSimHub/benchmark/sumo_envs/veh_rlhf/veh_rlhf.net.xml"/>
+    </output>
+
+    <processing>
+        <offset.disable-normalization value="true"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+    </junctions>
+
+    <netedit>
+        <new-network value="false"/>
+    </netedit>
+
+</configuration>
+-->
+
+<net version="1.16" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="-83.77,49.90,415.17,53.82" origBoundary="10000000000.00,10000000000.00,-10000000000.00,-10000000000.00" projParameter="!"/>
+
+    <edge id="E0" from="J0" to="J1" priority="-1">
+        <lane id="E0_0" index="0" speed="13.89" length="498.95" shape="-83.71,41.90 415.23,45.82"/>
+        <lane id="E0_1" index="1" speed="13.89" length="498.95" shape="-83.73,45.10 415.21,49.02"/>
+        <lane id="E0_2" index="2" speed="13.89" length="498.95" shape="-83.76,48.30 415.18,52.22"/>
+    </edge>
+
+    <junction id="J0" type="dead_end" x="-83.77" y="49.90" incLanes="" intLanes="" shape="-83.77,49.90 -83.69,40.30"/>
+    <junction id="J1" type="dead_end" x="415.17" y="53.82" incLanes="E0_0 E0_1 E0_2" intLanes="" shape="415.25,44.22 415.17,53.82"/>
+
+</net>
