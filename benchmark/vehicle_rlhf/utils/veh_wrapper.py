@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-27 20:19:13
 @Description: 处理 vehicle 的特征
-@LastEditTime: 2023-11-03 18:08:33
+@LastEditTime: 2023-11-20 16:13:30
 '''
 import numpy as np
 import gymnasium as gym
@@ -89,3 +89,6 @@ class VehEnvWrapper(gym.Wrapper):
     
     def close(self) -> None:
         return super().close()
+    
+    def render(self, mode, focus_id, focus_type, focus_distance, save_folder):
+        return self.env.render(mode, focus_id, focus_type, focus_distance, save_folder)
