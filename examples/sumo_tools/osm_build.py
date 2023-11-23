@@ -1,8 +1,8 @@
 '''
 @Author: WANG Maonan
 @Date: 2023-09-25 15:15:19
-@Description: 测试 osm_build 的功能
-@LastEditTime: 2023-09-26 14:53:08
+@Description: 测试 osm_build 的功能, 快速从 OSM 中创建场景
+@LastEditTime: 2023-11-23 23:27:32
 '''
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.utils.init_log import set_logger
