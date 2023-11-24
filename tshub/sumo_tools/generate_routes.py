@@ -5,7 +5,7 @@
 1. 可以设置 ego 车的渗透率, 这里是一个参数可以设置, 车辆类型可以设置车辆的 type
 2. 设置车辆的初始速度是 9m/s - 32km/s, 这里是一个参数可以设置
 3. 给出的是这个时间段内的来车的速度, vehicle/second
-@LastEditTime: 2023-09-01 14:12:08
+@LastEditTime: 2023-11-23 23:06:48
 '''
 import os
 import sumolib
@@ -18,6 +18,7 @@ from loguru import logger
 from ..utils.check_folder import check_folder
 from .generate_route.generate_trip import GenerateTrip
 from .generate_route.generate_turn_def import GenerateTurnDef
+from .generate_route.generate_person import GeneratePersonTrip
 from .interpolation.values_interpolation import InterpolationValues
 from .interpolation.repeat_values import repeat_values
 
@@ -40,11 +41,16 @@ def generate_route(sumo_net:str,
                     edge_flow_per_minute:Dict[str, List[float]],
                     edge_turndef:Dict[str, List[float]],
                     veh_type:Dict[str, Dict[str, float]],
-                    output_trip:str='testflow.trip.xml',
-                    output_turndef:str='testflow.turndefs.xml',
-                    output_route:str='testflow.rou.xml',
+                    walk_flow_per_minute:Dict[str, List[float]]=None,
+                    output_trip:str='_testflow.trip.xml',
+                    output_turndef:str='_testflow.turndefs.xml',
+                    output_route:str='vehicle.rou.xml',
+                    person_trip_file:str='_person.trip.xml',
+                    output_person_file:str='pedestrian.rou.xml',
+                    walkfactor:float=0.7,
                     interpolate_flow:bool=False,
                     interpolate_turndef:bool=False,
+                    interpolate_walkflow:bool=False,
                     random_flow:bool=True,
                     seed:int=777
                     ) -> None:
@@ -72,12 +78,21 @@ def generate_route(sumo_net:str,
                 'car_2': {'length':5, 'tau':1, 'color':'155, 89, 182', 'probability':0.3},
                 ...
             }
-        output_trip (str, optional): 生成的 .trip.xml 文件的路径. Defaults to 'testflow.trip.xml'.
-        output_turndef (str, optional): 生成的 .turndef.xml 文件的路径. Defaults to 'testflow.turndefs.xml'.
-        output_route (str, optional): 生成的 .rou.xml 文件的路径. Defaults to 'testflow.rou.xml'.
+        walk_flow_per_minute (Dict[str, List[float]]): 每分钟 fromEdge-toEdge 的行人数量. 如果是 None 的时候, 就不生成行人的 route 文件
+            {
+                'E1__E2': [10, 20, 30], 
+                'E1__-E3': [40, 50, 60]
+            }
+        output_trip (str, optional): 生成的 .trip.xml 文件的路径. Defaults to '_testflow.trip.xml'.
+        output_turndef (str, optional): 生成的 .turndef.xml 文件的路径. Defaults to '_testflow.turndefs.xml'.
+        output_route (str, optional): 生成的 .rou.xml 文件的路径. Defaults to 'vehicle.rou.xml'.
+        person_trip_file (str, optional): 为 person 生成的 .trip.xml 文件的路径. Defaults to '_person.trip.xml'.
+        output_person_file (str, optional): 为 person 生成的 .rou.xml 文件的路径. Defaults to 'pedestrian.rou.xml'.
         interpolate_flow (bool, optional): 是否对 flow 进行平滑. Defaults to False.
         interpolate_turndef (bool, optional): 是否对 turndef 进行平滑. Defaults to False.
+        interpolate_walkflow (bool, optional): 是否对 walk flow 进行平滑. Defaults to False.
         random_flow (bool, optional): 控制车流出现的时间是否随机. Defaults to True.
+        walkfactor (float, optional): pedestrian maximum speed during intermodal routing;. Defaults to 0.7.
         seed (int, optional): 随机数种子, 控制使用 JTRROUTER 生成的 route 是一样的. Defaults to 777.
 
     Raises:
@@ -86,6 +101,25 @@ def generate_route(sumo_net:str,
     # 对 flow 或是 turndef 进行平滑
     intervals, flow_info = interpolate_values(edge_flow_per_minute, interval, interpolate_flow)
     intervals, turndefs_info = interpolate_values(edge_turndef, interval, interpolate_turndef)
+    intervals, walk_flow_info = interpolate_values(walk_flow_per_minute, interval, interpolate_walkflow)
+
+    # --- 生成 person 文件 ---
+    if walk_flow_per_minute is None:
+        logger.info('SIM: 不生成行人的 Route 文件.')
+    else:
+        generate_person_flow = GeneratePersonTrip(
+            net_file=sumo_net,
+            intervals=intervals,
+            walk_flow_per_minute=walk_flow_info,
+            seed=seed,
+            walkfactor=walkfactor,
+            person_trip_file=person_trip_file,
+            output_file=output_person_file
+        )
+        generate_person_flow.generate_person_route()
+
+
+    # --- 生成 vehicle 文件 ---
 
     # 生成 .trip.xml 文件
     generate_trip = GenerateTrip(
@@ -106,7 +140,7 @@ def generate_route(sumo_net:str,
     # 检查 .rou.xml 文件是否存在
     folder_path, _ = os.path.split(output_route)
     check_folder(folder_path)
-
+    
     # 根据 trip 和 turndef 文件生成 route 文件
     JTRROUTER = sumolib.checkBinary('jtrrouter')  # 返回地址
     temp_file = TemporaryFile()

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2023-11-13 23:35:42
+@LastEditTime: 2023-11-24 18:20:05
 '''
 import os
 import sys
@@ -14,6 +14,7 @@ from ..map.map_builder import MapBuilder
 from ..aircraft.aircraft_builder import AircraftBuilder
 from ..traffic_light.traffic_light_builder import TrafficLightBuilder
 from ..vehicle.vehicle_builder import VehicleBuilder
+from ..person.person_builder import PersonBuilder
 from ..visualization.visualize_map import render_map
 from ..visualization.filter_objects import filter_object
 
@@ -50,6 +51,7 @@ class TshubEnvironment(BaseSumoEnvironment):
                  is_vehicle_builder_initialized:bool = True, 
                  is_aircraft_builder_initialized:bool = True, 
                  is_traffic_light_builder_initialized:bool = True,
+                 is_person_builder_initialized:bool = True,
                  poly_file:str = None, osm_file:str = None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
                  vehicle_action_type:str = 'lane', hightlight:bool = False,
@@ -75,6 +77,7 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.is_vehicle_builder_initialized = is_vehicle_builder_initialized
         self.is_aircraft_builder_initialized = is_aircraft_builder_initialized
         self.is_traffic_light_builder_initialized = is_traffic_light_builder_initialized
+        self.is_person_builder_initialized = is_person_builder_initialized
 
         # Map Builder Input
         self.poly_file = poly_file
@@ -88,7 +91,7 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.vehicle_action_type = vehicle_action_type
         self.hightlight = hightlight
 
-        # For render
+        # For SUMI-GUI render
         self.render_count = 0
 
     def __init_builder(self) -> None:
@@ -115,11 +118,17 @@ class TshubEnvironment(BaseSumoEnvironment):
             if self.is_traffic_light_builder_initialized
             else None
         )
+        person_builder = (
+            PersonBuilder(sumo=self.sumo)
+            if self.is_person_builder_initialized
+            else None
+        )
 
         self.scene_objects = {
             'vehicle': vehicle_builder,
             'aircraft': aircraft_builder,
-            'tls': tls_builder
+            'tls': tls_builder,
+            'person': person_builder,
         }
 
     def reset(self) -> Dict[str, Any]:
@@ -161,7 +170,7 @@ class TshubEnvironment(BaseSumoEnvironment):
             if _object_builder is not None
         }
         if self.is_map_builder_initialized:
-            env_state.update(self.map_infos)
+            env_state.update(self.map_infos) # 这里使用 update 是因为
         return env_state
 
     def __computer_reward(self) -> Literal[0]:

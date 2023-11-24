@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 16:35:24
 @Description: 自动生成不同类型的探测器
-@LastEditTime: 2023-08-24 17:40:09
+@LastEditTime: 2023-11-24 00:06:24
 '''
 import os
 import logging
@@ -24,6 +24,7 @@ def generate_init_detector(file_name):
         file.write('<additional> \n')
         file.write('</additional> \n')
 
+
 class generate_detector(object):
     def __init__(self, sumo) -> None:
         self.sumo = sumo
@@ -34,7 +35,7 @@ class generate_detector(object):
                                     result_folder:str, 
                                     tls_list:List, 
                                     detectors_dict:Dict[str, Dict[str, float]]={'e1':dict(), 'e1_internal':dict(), 'e2':{'detector_length':100}, 'e3':dict()}):
-        """生成多种探测器
+        """生成多种探测器, 这里我们不希望给人行道生成探测器
 
         Args:
             result_folder (str): 探测器要保存的文件夹
