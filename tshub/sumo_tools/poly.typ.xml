@@ -1,4 +1,0 @@
-<polygonTypes>
-  <polygonType id="shop"                    name="shop"        color=".93,.78,1.0" layer="-1"/>
-  <polygonType id="building"                name="building"    color="1.0,.90,.90" layer="-1"/>
-</polygonTypes>

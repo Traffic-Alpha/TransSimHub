@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2021-11-03 15:08:30
 @Description: 在指定交叉路口上的 internal lane 放置探测器; 信号灯 id: (e1det_internal, _tls_id, fromEdge_id, fromLane_id, direction)
-@LastEditTime: 2023-08-24 17:03:11
+@LastEditTime: 2023-11-23 23:59:16
 '''
 from loguru import logger
 from typing import Dict, List
@@ -63,14 +63,15 @@ class e1_internal_detector(detector_base):
 
                 e1_id = 'e1det_internal--{}--{}--{}--{}--{}'.format(_tls_id, fromEdge_id, fromLane_id, toLane_id, direction)
 
-                # xml 的信息
-                detector_xml = detectors_xml.addChild("e1Detector")
-                detector_xml.setAttribute("file", self.results_file)
-                detector_xml.setAttribute("freq", str(self.freq))
-                detector_xml.setAttribute("friendlyPos", "x")
-                detector_xml.setAttribute("id", e1_id)
-                detector_xml.setAttribute("lane", str(internalLane_id))
-                detector_xml.setAttribute("pos", str(final_detector_position))
+                if internalLane_id is not "": # remove emepty lane
+                    # xml 的信息
+                    detector_xml = detectors_xml.addChild("e1Detector")
+                    detector_xml.setAttribute("file", self.results_file)
+                    detector_xml.setAttribute("freq", str(self.freq))
+                    detector_xml.setAttribute("friendlyPos", "x")
+                    detector_xml.setAttribute("id", e1_id)
+                    detector_xml.setAttribute("lane", str(internalLane_id))
+                    detector_xml.setAttribute("pos", str(final_detector_position))
 
         detector_file = open(self.output_file, 'w') # 将 e1 internal 探测器写入文件
         detector_file.write(detectors_xml.toXML())
