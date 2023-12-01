@@ -1,8 +1,8 @@
 '''
 @Author: WANG Maonan
 @Date: 2023-11-13 21:25:42
-@Description: 将 fig 转换为 array
-@LastEditTime: 2023-11-13 21:29:34
+@Description: 将 fig 转换为 array, for render
+@LastEditTime: 2023-12-01 14:36:43
 '''
 import numpy as np
 
