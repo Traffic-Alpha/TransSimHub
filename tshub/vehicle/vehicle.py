@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-11-12 15:40:20
+@LastEditTime: 2023-12-16 21:59:29
 '''
 import traci
 from typing import Dict, Any
@@ -34,6 +34,9 @@ class VehicleInfo:
     waiting_time: float  # The waiting time of the vehicle
     accumulated_waiting_time: float # 累积等待时间
     distance: float # 车辆行驶距离
+    co2_emission: float # 车辆每一个 step 的 co2 的排放 (mg/s)
+    fuel_consumption: float # 车辆每一个 step 的油耗, mg/s
+    speed_without_traci: float # 如果不使用 sumo 控制车辆会行驶的速度 
     leader: Tuple[str, float] # 车辆的前车信息, (vehicle_id, distance)
     next_tls: List[str]  # The IDs of the next traffic lights the vehicle will encounter
     sumo: traci.connection.Connection
@@ -54,7 +57,9 @@ class VehicleInfo:
                     traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
                     traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS,
                     traci.constants.VAR_ACCUMULATED_WAITING_TIME, 
-                    traci.constants.VAR_DISTANCE, traci.constants.VAR_ANGLE
+                    traci.constants.VAR_DISTANCE, traci.constants.VAR_ANGLE,
+                    traci.constants.VAR_CO2EMISSION, traci.constants.VAR_FUELCONSUMPTION,
+                    traci.constants.VAR_SPEED_WITHOUT_TRACI
                 ]
             )
         self.sumo.vehicle.subscribeLeader(self.id, dist=0) # vehicle id together with the distance
@@ -67,8 +72,11 @@ class VehicleInfo:
                        road_id: str, lane_id: str, 
                        lane_index:int, edges: List[str], 
                        waiting_time: float, accumulated_waiting_time:float,
-                       distance:float, leader: Tuple[str, float],
-                       next_tls: List[str]):
+                       co2_emission: float, fuel_consumption: float,
+                       distance:float, speed_without_traci: float,
+                       leader: Tuple[str, float],
+                       next_tls: List[str]
+                    ):
         logger.info(f'SIM: Init Vehicle: {vehicle_type}: {id}')
         return cls(id=id, action_type=action_type, vehicle_type=vehicle_type,
                    length=length, width=width, heading=heading,
@@ -76,6 +84,8 @@ class VehicleInfo:
                    road_id=road_id, lane_id=lane_id, lane_index=lane_index,
                    edges=edges, waiting_time=waiting_time,
                    accumulated_waiting_time=accumulated_waiting_time,
+                   co2_emission=co2_emission, fuel_consumption=fuel_consumption,
+                   speed_without_traci=speed_without_traci,
                    distance=distance, leader=leader,
                    next_tls=next_tls
         )
@@ -101,6 +111,9 @@ class VehicleInfo:
             'accumulated_waiting_time': 135,
             'distance': 132,
             'heading': 67,
+            'co2_emission': 96,
+            'fuel_consumption': 101,
+            'speed_without_traci': 177,
             'leader': 104,
         }
         return feature_mapping.get(feature, -1)
@@ -118,6 +131,10 @@ class VehicleInfo:
         self.distance=vehicle_info.get(VehicleInfo.get_feature_index('distance'), None)
         self.leader=vehicle_info.get(VehicleInfo.get_feature_index('leader'), None)
         self.next_tls=vehicle_info.get(VehicleInfo.get_feature_index('next_tls'), None)
+        self.co2_emission=vehicle_info.get(VehicleInfo.get_feature_index('co2_emission'), None)
+        self.fuel_consumption=vehicle_info.get(VehicleInfo.get_feature_index('fuel_consumption'), None)
+        self.speed_without_traci=vehicle_info.get(VehicleInfo.get_feature_index('speed_without_traci'), None)
+        
 
     def get_features(self):
         output_dict = {}
