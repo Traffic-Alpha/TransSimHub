@@ -7,7 +7,7 @@
     -> 每一个车道的信息 (包括 bottleneck): (1) 平均速度; (2) 平均等待时间; (3) 平均 timeloss
 @ + Action: 每个 ego vehicle 三个离散的动作: (加速, 减速, 维持不变)
 @ + Reward: 对应 lane index 车辆离开时候的 travel time
-@LastEditTime: 2023-12-18 22:02:45
+@LastEditTime: 2023-12-18 23:21:25
 '''
 import time
 import numpy as np
@@ -56,6 +56,7 @@ class VehEnvWrapper(gym.Wrapper):
             0: 1, 1: 3, 2: 5,
             3: 7, 4: 9, 5: 11, 6: 13,
         } # 速度的选择
+        self.agent_mask = {ego_id:True for ego_id in self.ego_ids} # 还需要控制的车辆
         
         # #######
         # Writer
@@ -97,7 +98,7 @@ class VehEnvWrapper(gym.Wrapper):
             if veh_info['road_id'] in self.bottle_necks: # 如果在 bottle-neck 的车辆
                 veh_speed = calculate_speed(
                     congestion_level=congestion_level,
-                    speed=veh_info['speed']
+                    speed=10
                 )
                 self.actions[_veh_id] = (0, veh_speed)
             else: # 其他的车辆
@@ -170,12 +171,12 @@ class VehEnvWrapper(gym.Wrapper):
                 ego_lane_index = ego_info[-1]
                 travel_times = lane_index_travel_time.get(ego_lane_index, [])
                 mean_travel_time = np.mean(travel_times) if travel_times else 0
-                rewards[ego_id] = 0 if mean_travel_time==0 else 200 - mean_travel_time # 200 is the baseline mean travel time
+                rewards[ego_id] = 0 if mean_travel_time==0 else 50 - mean_travel_time # 200 is the baseline mean travel time
         else: # 最后一个时刻, 我们计算路网里面完整的 travel time
             travel_times = np.array([veh_info[0] for veh_info in self.vehicles_info.values()])
             mean_travel_time = np.mean(travel_times)
             ego_id = list(ego_statistics.keys())[0] # 找到最后的车辆的 id
-            rewards[ego_id] = 0 if mean_travel_time==0 else 200 - mean_travel_time # 200 is the baseline mean travel time
+            rewards[ego_id] = 0 if mean_travel_time==0 else 50 - mean_travel_time # 200 is the baseline mean travel time
 
         return rewards
     
@@ -199,6 +200,9 @@ class VehEnvWrapper(gym.Wrapper):
     def step(self, action: Dict[str, int]) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
         """这里我们假设 agent 数量不会动态的改变, 如果 ego vehicle 离开了 bottleneck, state 就全部是 0
         """
+        for ego_id, ego_live in self.agent_mask.items():
+            if not ego_live:
+                del action[ego_id] # 离开 bottleneck 的车辆不控制
         action = self.__update_actions(raw_action=action).copy()
         init_state, rewards, truncated, _dones, infos = super().step(action)
         feature_vectors, congestion_level, ego_statistics, reward_statistics = self.state_wrapper(state=init_state)
@@ -218,6 +222,7 @@ class VehEnvWrapper(gym.Wrapper):
             infos[_ego_id] = {'termination': done}
             if _ego_id not in feature_vectors:
                 feature_vectors[_ego_id] = [0.0]*57 # 如果 ego vehicle 离开环境, 则 state 全部是 0
+                self.agent_mask[_ego_id] = False
             if _ego_id not in rewards:
                 rewards[_ego_id] = 0
                 

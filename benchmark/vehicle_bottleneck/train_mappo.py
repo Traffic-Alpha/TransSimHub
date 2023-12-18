@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 22:46:25
 @Description: 使用 MAPPO 算法进行训练
-@LastEditTime: 2023-12-18 22:06:39
+@LastEditTime: 2023-12-18 23:48:02
 '''
 import tqdm
 import time
@@ -38,12 +38,12 @@ def train():  # noqa: F821
     # 超参数设置
     num_envs = 4 # 同时开启的环境个数
     n_agents = 3 # 环境 agent 的个数
-    max_steps = 1600 # 最大的步数, 需要保证一次仿真可以结束
+    max_steps = 300 # 最大的步数, 需要保证一次仿真可以结束 (这里一次仿真大概 150 steps)
     n_iters = 300
-    frames_per_batch = 10_000 # 60_000
+    frames_per_batch = 5_000
     memory_size = frames_per_batch
     total_frames = frames_per_batch*n_iters
-    minibatch_size = 2048 # 4096
+    minibatch_size = 512
     num_epochs = 25 # optimization steps per batch of data collected
     evaluation_interval = 7
 
@@ -245,10 +245,14 @@ def train():  # noqa: F821
                 )
                 evaluation_time = time.time() - evaluation_start
                 mean_reward = log_evaluation(logger, rollouts, env_test, evaluation_time, step=i)
+                print('Mean Reward', mean_reward)
                 if mean_reward.mean().detach().item() > best_reward:
                     best_reward = mean_reward
                     policy_gen.save_model(path_convert('./mappo_models/actor.pkl'))
                     value_gen.save_model(path_convert('./mappo_models/critic.pkl'))
+                else:
+                    policy_gen.save_model(path_convert('./mappo_models/last_actor.pkl'))
+                    value_gen.save_model(path_convert('./mappo_models/last_critic.pkl'))                    
 
         sampling_start = time.time()
 
