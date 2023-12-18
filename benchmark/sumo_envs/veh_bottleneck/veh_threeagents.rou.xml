@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-11-26 12:50:15 by Eclipse SUMO jtrrouter Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/jtrrouterConfiguration.xsd">
+
+    <input>
+        <net-file value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./veh4_2.net.xml"/>
+        <route-files value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./testflow4_2copy.trip.xml"/>
+        <turn-ratio-files value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./testflow4_2copy.turndefs.xml"/>
+    </input>
+
+    <output>
+        <output-file value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./veh4_2.roucopy.xml"/>
+    </output>
+
+    <processing>
+        <randomize-flows value="True"/>
+        <accept-all-destinations value="True"/>
+    </processing>
+
+    <defaults>
+        <departlane value="random"/>
+    </defaults>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+    <random_number>
+        <seed value="777"/>
+    </random_number>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="background" length="7.00" maxSpeed="10.00" color="155,89,182" tau="1.0" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0"/>
+    <vehicle id="E0__0__background.0" type="background" depart="0.84" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.1" type="background" depart="1.28" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.0" type="background" depart="3.16" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.0" type="background" depart="4.16" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.1" type="background" depart="5.68" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.0" type="background" depart="5.99" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.1" type="background" depart="6.54" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.1" type="background" depart="6.80" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.2" type="background" depart="7.11" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.2" type="background" depart="7.55" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+
+    <vehicle id="E0__0__background.2" type="background" depart="7.71" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.3" type="background" depart="7.95" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.2" type="background" depart="7.88" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.4" type="background" depart="10.82" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.3" type="background" depart="11.03" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.3" type="background" depart="12.32" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.3" type="background" depart="13.75" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.4" type="background" depart="15.68" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.4" type="background" depart="17.37" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.5" type="background" depart="19.28" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.4" type="background" depart="20.32" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.6" type="background" depart="23.35" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.5" type="background" depart="25.22" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.5" type="background" depart="25.90" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.6" type="background" depart="26.23" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.7" type="background" depart="26.40" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.5" type="background" depart="26.70" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.6" type="background" depart="26.95" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vType id="ego" length="7.00" maxSpeed="15.00" color="26,188,156" tau="1.0" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0"/>
+    <vehicle id="E0__0__ego.1" type="ego" depart="27.79" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.7" type="background" depart="28.29" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.7" type="background" depart="28.79" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.6" type="background" depart="30.89" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.7" type="background" depart="31.08" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.8" type="background" depart="33.66" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.8" type="background" depart="35.15" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.8" type="background" depart="37.85" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.9" type="background" depart="40.20" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.9" type="background" depart="41.30" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.8" type="background" depart="43.19" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.9" type="background" depart="44.46" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.10" type="background" depart="45.02" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.9" type="background" depart="46.02" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.10" type="background" depart="48.14" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.11" type="background" depart="48.23" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.10" type="background" depart="51.52" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__ego.2" type="ego" depart="52.13" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.10" type="background" depart="53.45" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.11" type="background" depart="54.94" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.12" type="background" depart="55.15" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.11" type="background" depart="55.78" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.12" type="background" depart="56.28" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.11" type="background" depart="56.78" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.12" type="background" depart="58.28" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.13" type="background" depart="59.78" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.12" type="background" depart="60.19" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.13" type="background" depart="60.79" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.14" type="background" depart="61.54" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.13" type="background" depart="61.72" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.14" type="background" depart="63.43" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.13" type="background" depart="63.47" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.15" type="background" depart="64.84" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.15" type="background" depart="66.31" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.14" type="background" depart="69.31" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.14" type="background" depart="70.17" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.15" type="background" depart="71.26" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.16" type="background" depart="72.29" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.16" type="background" depart="72.41" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__ego.3" type="ego" depart="73.64" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.17" type="background" depart="73.67" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.16" type="background" depart="74.01" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.15" type="background" depart="75.08" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.17" type="background" depart="75.59" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.18" type="background" depart="76.46" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.16" type="background" depart="76.73" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.17" type="background" depart="78.84" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.18" type="background" depart="80.50" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.17" type="background" depart="83.16" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.19" type="background" depart="85.80" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.18" type="background" depart="85.86" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.19" type="background" depart="87.35" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.18" type="background" depart="89.83" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.20" type="background" depart="91.85" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.19" type="background" depart="95.70" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.19" type="background" depart="97.85" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.21" type="background" depart="99.52" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.20" type="background" depart="102.11" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.20" type="background" depart="102.53" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.21" type="background" depart="102.87" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.20" type="background" depart="103.28" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.22" type="background" depart="103.32" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.21" type="background" depart="103.99" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.23" type="background" depart="104.98" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.21" type="background" depart="105.08" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.22" type="background" depart="105.90" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.24" type="background" depart="107.92" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.22" type="background" depart="110.44" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.23" type="background" depart="110.49" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.23" type="background" depart="111.42" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__2__background.24" type="background" depart="112.24" departLane="2">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__1__background.25" type="background" depart="113.47" departLane="1">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__0__background.23" type="background" depart="115.72" departLane="0">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+    <vehicle id="E0__3__background.24" type="background" depart="118.72" departLane="3">
+        <route edges="E0 E1 E2 E3"/>
+    </vehicle>
+</routes>
+

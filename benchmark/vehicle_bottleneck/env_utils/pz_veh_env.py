@@ -1,22 +1,21 @@
 '''
 @Author: WANG Maonan
-@Date: 2023-10-29 23:28:22
-@Description: Multi-Agent TSC Env Unsing Petting Zoo
-@LastEditTime: 2023-12-18 20:30:34
+@Date: 2023-12-16 22:48:21
+@Description: Bottleneck Environment for Petting Zoo
+@LastEditTime: 2023-12-18 19:57:00
 '''
 import functools
 
 from typing import Dict
 from pettingzoo import ParallelEnv
 
-class TSCEnvironmentPZ(ParallelEnv):
+class VehEnvironmentPZ(ParallelEnv):
     def __init__(self, env):
         super().__init__()
-        self.env = env # TSCEnvironment
+        self.env = env # VehEnvWrapper
         
-        # agent id == tls id
-        self.agents = self.env.tls_ids
-        self.possible_agents = self.env.tls_ids
+        self.agents = self.env.ego_ids
+        self.possible_agents = self.env.ego_ids
 
         # spaces
         self.action_spaces = self.env.action_space
@@ -53,8 +52,8 @@ class TSCEnvironmentPZ(ParallelEnv):
         self.num_moves = 0
         self.state = observations
 
-        for _tls_id in self.agents:
-            infos[_tls_id] = {f'{i}': 0 for i in range(2)}
+        for _ego_id in self.agents:
+            infos[_ego_id] = {'termination': False}
 
         return observations, infos
 
@@ -63,4 +62,5 @@ class TSCEnvironmentPZ(ParallelEnv):
         """
         self.num_moves += 1
         observations, rewards, terminations, truncations, infos = self.env.step(actions)
-        return observations, rewards, terminations, truncations, infos
+        self.agents = list(observations.keys()) # 表示存活的 agent
+        return observations, rewards, terminations, truncations, infos        

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 23:01:03
 @Description: 检查同时开启多个仿真环境
-@LastEditTime: 2023-11-01 12:32:10
+@LastEditTime: 2023-12-18 20:31:02
 '''
 from loguru import logger
 
@@ -17,11 +17,11 @@ if __name__ == '__main__':
     sumo_cfg = path_convert("../../sumo_envs/multi_junctions_tsc/env/three_junctions.sumocfg")
     log_path = path_convert('./log/')
     tsc_env = make_parallel_env(
-        num_envs=4,
+        num_envs=1,
         sumo_cfg=sumo_cfg,
         num_seconds=1300,
         tls_ids=['J1', 'J2', 'J3'],
-        use_gui=False,
+        use_gui=True,
         prefix='check_parallel',
         log_file=log_path
     )

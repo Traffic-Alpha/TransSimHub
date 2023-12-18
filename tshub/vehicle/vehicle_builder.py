@@ -41,6 +41,9 @@ class VehicleBuilder(BaseBuilder):
             waiting_time=0,
             accumulated_waiting_time=0, # 累积等待时间
             distance=0, # 行驶距离
+            co2_emission=0, 
+            fuel_consumption=0,
+            speed_without_traci=0,
             leader=(), # 前车信息
             next_tls=[],
             sumo=self.sumo
