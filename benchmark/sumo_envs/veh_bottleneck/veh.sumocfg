@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+   <input>
+      <net-file value="veh.net.xml"/>
+      <route-files value="veh_threeagents.rou.xml"/>
+   </input>
+</configuration>

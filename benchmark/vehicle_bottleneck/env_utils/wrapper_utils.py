@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-12-16 22:36:27
 @Description: Utils for veh env wrapper
-@LastEditTime: 2023-12-18 01:40:36
+@LastEditTime: 2023-12-18 16:01:46
 '''
 import numpy as np
 
@@ -19,10 +19,16 @@ def analyze_traffic(state, lane_ids):
         } for lane_id in lane_ids
     }
     ego_statistics = {}
+    reward_statistics = {}
 
     # Process the state data
-    for vehicle in state.values():
+    for vehicle_id, vehicle in state.items():
         lane_id = vehicle['lane_id']
+        lane_index = vehicle['lane_index']
+        
+        # 记录每一个 vehicle 的 lane_index
+        reward_statistics[vehicle_id] = lane_index
+
         if lane_id in lane_statistics:
             stats = lane_statistics[lane_id]
             stats['vehicle_count'] += 1
@@ -60,7 +66,7 @@ def analyze_traffic(state, lane_ids):
     # Convert the lane statistics to the desired output format
     lane_statistics = {lane_id: stats for lane_id, stats in lane_statistics.items()}
 
-    return lane_statistics, ego_statistics
+    return lane_statistics, ego_statistics, reward_statistics
 
 
 def check_prefix(a:str, B:List[str]) -> bool:
