@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-12-16 22:36:27
 @Description: Utils for veh env wrapper
-@LastEditTime: 2023-12-18 16:01:46
+@LastEditTime: 2023-12-19 22:41:26
 '''
 import numpy as np
 
@@ -19,15 +19,18 @@ def analyze_traffic(state, lane_ids):
         } for lane_id in lane_ids
     }
     ego_statistics = {}
-    reward_statistics = {}
+    reward_statistics = {} # 记录每一辆车所在的 edge, 后面用于统计车辆的 travel time
 
     # Process the state data
     for vehicle_id, vehicle in state.items():
         lane_id = vehicle['lane_id']
-        lane_index = vehicle['lane_index']
+        edge_id = vehicle['road_id']
+        distance = vehicle['distance']
+        speed = vehicle['speed']
         
-        # 记录每一个 vehicle 的 lane_index
-        reward_statistics[vehicle_id] = lane_index
+        if lane_id in lane_ids:
+            # 记录每一个 vehicle 的 (edge id, distance, speed), 用于统计 travel time 从而计算平均速度
+            reward_statistics[vehicle_id] = (edge_id, distance, speed)
 
         if lane_id in lane_statistics:
             stats = lane_statistics[lane_id]
@@ -38,10 +41,17 @@ def analyze_traffic(state, lane_ids):
 
         # Check for 'ego' vehicle type and store the required information
         if vehicle['vehicle_type'] == 'ego':
+            if vehicle['road_id'] in [':J1_0', ':J1_1', ':J1_2', ':J1_3']:
+                road_id = 'E1'
+            elif vehicle['road_id'] in [':J2_0', ':J2_1', ':J2_2', ':J2_3']:
+                road_id = 'E2'
+            else:
+                road_id = vehicle['road_id'] # TODO, 需要可以动态调整
+
             ego_statistics[vehicle['id']] = [
                 vehicle['speed'], 
                 vehicle['position'], 
-                vehicle['road_id'], 
+                road_id,
                 vehicle['lane_index']
             ]
 
@@ -92,7 +102,7 @@ def count_bottleneck_vehicles(lane_statistics, bottle_necks) -> int:
     return veh_num
 
 
-def calculate_congestion(vehicles:int, length:float, num_lane:int) -> float:
+def calculate_congestion(vehicles:int, length:float, num_lane:int, ratio:float=1) -> float:
     """计算 bottle neck 的占有率, 我们假设一辆车算上车间距是 10m, 那么一段路的。占有率是
         占有率 = 车辆数/(车道长度*车道数/10)
     于是可以根据占有率计算拥堵系数为:
@@ -106,7 +116,7 @@ def calculate_congestion(vehicles:int, length:float, num_lane:int) -> float:
     Returns:
         float: 拥堵系数 in (0,1)
     """
-    capacity_used = vehicles/(length*num_lane/10) # 占有率
+    capacity_used = ratio*vehicles/(length*num_lane/10) # 占有率
     congestion_level = min(capacity_used, 1)  # Ensuring congestion level does not exceed 100%
     return congestion_level
 

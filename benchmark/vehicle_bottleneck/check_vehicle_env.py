@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-27 20:16:14
 @Description: 检查车辆环境
-@LastEditTime: 2023-12-18 22:38:43
+@LastEditTime: 2023-12-19 22:01:50
 '''
 from loguru import logger
 from tshub.utils.init_log import set_logger
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     )
     ac_env_wrapper = VehEnvWrapper(
         env=ac_env, 
-        warmup_steps=100, 
+        warmup_steps=80, 
         ego_ids=[
             'E0__0__ego.1', 
             'E0__1__ego.2', 

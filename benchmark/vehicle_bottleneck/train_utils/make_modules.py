@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 23:15:18
 @Description: 创建 Actor 和 Critic Module
-@LastEditTime: 2023-12-18 19:57:19
+@LastEditTime: 2023-12-19 23:08:05
 '''
 import torch
 from torch import nn
@@ -27,7 +27,7 @@ class policy_module():
                 n_agent_outputs=env.action_spec.shape[-1],
                 n_agents=n_agents,
                 centralised=False,
-                share_params=True,
+                share_params=False,
                 device=device,
                 depth=2,
                 num_cells=256,
@@ -69,8 +69,8 @@ class critic_module():
             n_agent_inputs=env.observation_spec["agents", "observation"].shape[-1],
             n_agent_outputs=1,
             n_agents=n_agents,
-            centralised=True, # MAPPO if True, IPPO if False
-            share_params=True,
+            centralised=False, # MAPPO if True, IPPO if False
+            share_params=False, # MAPPO if True
             device=device,
             depth=2,
             num_cells=256,

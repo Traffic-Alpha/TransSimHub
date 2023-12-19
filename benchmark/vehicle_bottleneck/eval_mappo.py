@@ -1,14 +1,8 @@
 '''
 @Author: WANG Maonan
-@Date: 2023-12-18 23:14:33
-@Description: 
-@LastEditTime: 2023-12-18 23:15:57
-'''
-'''
-@Author: WANG Maonan
 @Date: 2023-10-29 22:47:54
 @Description: 测试训练好的 MAPPO 模型
-@LastEditTime: 2023-11-01 12:43:38
+@LastEditTime: 2023-12-19 21:18:35
 '''
 import torch
 
