@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-27 20:16:14
 @Description: 检查车辆环境
-@LastEditTime: 2023-12-18 22:14:53
+@LastEditTime: 2023-12-19 22:01:50
 '''
 from loguru import logger
 from tshub.utils.init_log import set_logger
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     )
     ac_env_wrapper = VehEnvWrapper(
         env=ac_env, 
-        warmup_steps=100, 
+        warmup_steps=80, 
         ego_ids=[
             'E0__0__ego.1', 
             'E0__1__ego.2', 
@@ -49,15 +49,15 @@ if __name__ == '__main__':
         filepath=log_path
     )
 
-    done = False
-    ac_env_wrapper.reset()
-    while not done:
-        # 获取环境中所有车辆的ID
-        # 为每个车辆生成一个动作
-        constant_speed = 1
-        action = {ego_id: constant_speed for ego_id in ac_env_wrapper.ego_ids}
-        states, rewards, truncated, dones, infos = ac_env_wrapper.step(action=action)
-        done = all([dones[_ego_id] for _ego_id in ac_env_wrapper.ego_ids])
-        logger.info(f'SIM: Reward: {rewards}')
+    for constant_speed in range(6): # 测试不同的速度
+        done = False
+        ac_env_wrapper.reset()
+        while not done:
+            # 获取环境中所有车辆的ID
+            # 为每个车辆生成一个动作
+            action = {ego_id: constant_speed for ego_id in ac_env_wrapper.ego_ids}
+            states, rewards, truncated, dones, infos = ac_env_wrapper.step(action=action)
+            done = all([dones[_ego_id] for _ego_id in ac_env_wrapper.ego_ids])
+            logger.info(f'SIM: Reward: {rewards}')
 
-    ac_env.close()
+    ac_env_wrapper.close()

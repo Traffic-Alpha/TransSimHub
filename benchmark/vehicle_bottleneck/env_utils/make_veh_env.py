@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-12-18 17:26:56
 @Description: Make Parallel Env
-@LastEditTime: 2023-12-18 21:39:44
+@LastEditTime: 2023-12-18 23:37:29
 '''
 from typing import List, Dict, Tuple
 from env_utils.veh_env import VehEnvironment
@@ -90,7 +90,8 @@ def make_parallel_env(
                 (lambda i=i: make_multi_envs(
                     sumo_cfg, ego_ids, edge_ids, edge_lane_num,
                     calc_features_lane_ids, bottle_necks, bottle_neck_positions, 
-                    warmup_steps, num_seconds, use_gui, log_file=log_file+f'/{i}', device=device
+                    warmup_steps, num_seconds, use_gui, log_file=log_file+f'/{prefix}_{i}', 
+                    device=device
                 ))
                 for i in range(num_envs)
             ],

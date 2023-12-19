@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 22:46:25
 @Description: 使用 MAPPO 算法进行训练
-@LastEditTime: 2023-12-18 22:06:39
+@LastEditTime: 2023-12-19 22:13:43
 '''
 import tqdm
 import time
@@ -36,15 +36,15 @@ def train():  # noqa: F821
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     
     # 超参数设置
-    num_envs = 4 # 同时开启的环境个数
+    num_envs = 6 # 同时开启的环境个数
     n_agents = 3 # 环境 agent 的个数
-    max_steps = 1600 # 最大的步数, 需要保证一次仿真可以结束
-    n_iters = 300
-    frames_per_batch = 10_000 # 60_000
+    max_steps = 2_000 # 最大的步数, 需要保证一次仿真可以结束
+    n_iters = 100
+    frames_per_batch = 10_000
     memory_size = frames_per_batch
     total_frames = frames_per_batch*n_iters
-    minibatch_size = 2048 # 4096
-    num_epochs = 25 # optimization steps per batch of data collected
+    minibatch_size = 1024
+    num_epochs = 10 # optimization steps per batch of data collected
     evaluation_interval = 7
 
     best_reward = -10000
@@ -249,6 +249,9 @@ def train():  # noqa: F821
                     best_reward = mean_reward
                     policy_gen.save_model(path_convert('./mappo_models/actor.pkl'))
                     value_gen.save_model(path_convert('./mappo_models/critic.pkl'))
+                else:
+                    policy_gen.save_model(path_convert('./mappo_models/last_actor.pkl'))
+                    value_gen.save_model(path_convert('./mappo_models/last_critic.pkl'))
 
         sampling_start = time.time()
 
