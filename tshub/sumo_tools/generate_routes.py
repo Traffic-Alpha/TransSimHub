@@ -5,7 +5,7 @@
 1. 可以设置 ego 车的渗透率, 这里是一个参数可以设置, 车辆类型可以设置车辆的 type
 2. 设置车辆的初始速度是 9m/s - 32km/s, 这里是一个参数可以设置
 3. 给出的是这个时间段内的来车的速度, vehicle/second
-@LastEditTime: 2023-11-23 23:06:48
+@LastEditTime: 2023-12-20 14:20:34
 '''
 import os
 import sumolib
@@ -101,12 +101,12 @@ def generate_route(sumo_net:str,
     # 对 flow 或是 turndef 进行平滑
     intervals, flow_info = interpolate_values(edge_flow_per_minute, interval, interpolate_flow)
     intervals, turndefs_info = interpolate_values(edge_turndef, interval, interpolate_turndef)
-    intervals, walk_flow_info = interpolate_values(walk_flow_per_minute, interval, interpolate_walkflow)
 
     # --- 生成 person 文件 ---
     if walk_flow_per_minute is None:
         logger.info('SIM: 不生成行人的 Route 文件.')
     else:
+        intervals, walk_flow_info = interpolate_values(walk_flow_per_minute, interval, interpolate_walkflow)
         generate_person_flow = GeneratePersonTrip(
             net_file=sumo_net,
             intervals=intervals,
