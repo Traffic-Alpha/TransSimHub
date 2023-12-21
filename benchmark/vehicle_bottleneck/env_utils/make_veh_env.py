@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-12-18 17:26:56
 @Description: Make Parallel Env
-@LastEditTime: 2023-12-18 23:37:29
+@LastEditTime: 2023-12-20 20:01:04
 '''
 from typing import List, Dict, Tuple
 from env_utils.veh_env import VehEnvironment
@@ -32,7 +32,7 @@ def make_multi_envs(
         sumo_cfg=sumo_cfg,
         num_seconds=num_seconds,
         vehicle_action_type='lane_continuous_speed',
-        use_gui=use_gui
+        use_gui=use_gui,
     )
     veh_env = VehEnvWrapper(
         env=veh_env, 

@@ -16,17 +16,13 @@ class CustomModel(BaseFeaturesExtractor):
         net_shape = observation_space.shape[-1] # 12
 
         self.embedding = nn.Sequential(
-            nn.Linear(net_shape, 32),
+            nn.Linear(net_shape, 128),
             nn.ReLU(),
         ) # 5*12 -> 5*32
-        
-        self.lstm = nn.LSTM(
-            input_size=32, hidden_size=64,
-            num_layers=1, batch_first=True
-        )
-        self.relu = nn.ReLU()
 
         self.output = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
             nn.Linear(64, 32),
             nn.ReLU(),
             nn.Linear(32, features_dim)
@@ -34,10 +30,6 @@ class CustomModel(BaseFeaturesExtractor):
 
     def forward(self, observations):
         embedding = self.embedding(observations)
-
-        output, (hn, cn) = self.lstm(embedding)
-        hn = hn.view(-1, 64)
-        hn = self.relu(hn)
         
-        output = self.output(hn)
+        output = self.output(embedding)
         return output
