@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2023-11-02 14:45:54
+@LastEditTime: 2023-12-30 00:04:17
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -16,7 +16,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 setup(
     name='tshub',
-    version=0.9,
+    version=0.95,
     description='TransSimHub is a lightweight Python library for simulating and controlling transportation systems.',
     author='Traffic-Alpha',
     license='Apache License, Version 2.0',

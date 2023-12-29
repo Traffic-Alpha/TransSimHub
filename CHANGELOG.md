@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2023-11-03 18:22:47
+ * @LastEditTime: 2023-12-30 00:35:40
 -->
 # Change Log
 
@@ -19,18 +19,58 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Security
 
 <!-- v0.9.1 -->
-## [v1.0] - 2023-11-03
+## [v0.9.5] - 2023-12-30 - Happy New Year 2024!
+
+Happy New Year 2024!
+
+### Added
+
+- Enhanced the `vehicle` environment with new attributes:
+  - `accumulated_waiting_time`: Accumulated waiting time of the vehicle.
+  - `distance`: Distance traveled by the vehicle.
+  - `leader`: Information about the vehicle ahead, including (vehicle id, distance).
+  - `width`, `length`, and `heading_angle`: Attributes for visualizing vehicles in the environment.
+- Introduced a pedestrian module:
+  - Modified the connection judgment in [tls_connections.py](./tshub/sumo_tools/sumo_infos/tls_connections.py#76), excluding pedestrian crossings.
+  - Added a testing environment for pedestrians.
+  - Included pedestrian state representation.
+- Added two new visualization modules in [ENV Render](./examples/tshub_env_render/). Below is a summary of the six rendering methods:
+
+```
+TransSimHub Rendering Modes
+|
+|-- Pixel-based State Output
+|   |
+|   |-- RGB Rendering Mode
+|   |   |
+|   |   |-- Global Rendering
+|   |   |-- Local Intersection Rendering
+|   |   |-- Follow Vehicle Rendering
+|   |
+|   |-- SUMO-GUI Rendering Mode
+|       |
+|       |-- Global Rendering
+|       |-- Local Intersection Rendering
+|       |-- Follow Vehicle Rendering
+```
 
 ### Changed
 
-- Updated `LaneWithContinuousSpeedAction` to maintain original speed when target speed is set to -1.
-- Modifications to the vehicle speed scenario:
-  - All vehicles are now unable to change lanes directly. We have mitigated the queueing at bottle-necks by adjusting speeds.
-  - Regenerated road network and traffic flow files. See [Vehicle Speed Scenario](./benchmark/sumo_envs/veh_speed/).
-  - Updated [veh_wrapper.py](./benchmark/vehicle/utils/veh_wrapper.py) by adding `__get_actions` and `__update_actions` methods. These methods generate default actions for all vehicles (speed=-1, lane=0), meaning no lane changes or speed alterations. Subsequent parameters only modify the `speed` of the `ego` vehicle.
-- Moved the `highlight` parameter from `control_objects` in `vehicle_builder.py` to `init`, unifying the `control_objects` method across different `objects`.
-- Added `highlight` parameter in `tshub.py`.
+- Complemented the `vehicle` section:
+  - In feature extraction, added CO2 emissions (mg/s), fuel consumption (mg/s), and speed without traci (returns the speed the vehicle would drive if no speed-influencing command such as `setSpeed` or `slowDown` was given).
+  - In control, `lane_change=-1` now uses SUMO's lane-changing strategy, and `speed=-1` uses SUMO's speed strategy.
+  - Updated corresponding documentation.
+- Updated `LaneWithContinuousSpeedAction` to maintain the original speed when the target speed is set to -1.
+- Modified the vehicle speed scenario:
+  - Prevented direct lane changes for all vehicles to mitigate queuing at bottlenecks by adjusting speeds.
+  - Regenerated road network and traffic flow files. Refer to [Vehicle Speed Scenario](./benchmark/sumo_envs/veh_speed/).
+  - Updated [veh_wrapper.py](./benchmark/vehicle/utils/veh_wrapper.py) with `__get_actions` and `__update_actions` methods to generate default actions for all vehicles (speed=-1, lane=0), meaning no lane changes or speed alterations. Subsequent parameters only affect the `speed` of the `ego` vehicle.
+- Moved the `highlight` parameter from `control_objects` in `vehicle_builder.py` to `init`, standardizing the `control_objects` method for different `objects`.
+- Added a `highlight` parameter in `tshub.py`.
 
+### Fixed
+
+- Corrected installation steps in the documentation, changed `cd TransSimHub.git` to `cd TransSimHub`.
 
 <!-- v0.9 -->
 ## [v0.9] - 2023-11-02
