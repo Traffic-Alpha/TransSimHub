@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 16:19:47
 @Description: 控制车辆, 同时控制换道和速度
-@LastEditTime: 2023-08-30 16:21:37
+@LastEditTime: 2024-01-13 19:19:47
 '''
 import traci
 import random

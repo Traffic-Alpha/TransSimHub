@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 18:24:56
 @Description: 变车道+连续速度控制
-@LastEditTime: 2023-12-16 21:16:04
+@LastEditTime: 2024-01-13 19:12:29
 '''
 import enum
 from loguru import logger
@@ -25,9 +25,9 @@ class LaneWithContinuousSpeedAction(VehicleAction):
         if lane_change == LaneChangeActionType.keep_lane:
             self.change_lane(0, current_lane=current_lane_index, current_edge=current_road_id)
         elif lane_change == LaneChangeActionType.change_lane_left:
-            self.change_lane(-1, current_lane=current_lane_index, current_edge=current_road_id)
-        elif lane_change == LaneChangeActionType.change_lane_right:
             self.change_lane(1, current_lane=current_lane_index, current_edge=current_road_id)
+        elif lane_change == LaneChangeActionType.change_lane_right:
+            self.change_lane(-1, current_lane=current_lane_index, current_edge=current_road_id)
         elif lane_change == LaneChangeActionType.default:
             logger.debug(f'SIM: SUMO Control Lane Change Automatic')
 
