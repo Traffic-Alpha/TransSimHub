@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 19:13:31
 @Description: 车辆控制基类
-@LastEditTime: 2023-11-22 13:15:16
+@LastEditTime: 2024-01-13 19:21:04
 '''
 from loguru import logger
 from abc import ABC, abstractmethod
@@ -23,5 +23,9 @@ class VehicleAction(ABC):
             logger.info(f'SIM: {self.veh_id} in connection edge {current_edge}.')
         else:
             target_lane = current_lane + lane_change
-            if target_lane >= 0 and target_lane < self.sumo.edge.getLaneNumber(current_edge):
+            lane_number = self.sumo.edge.getLaneNumber(current_edge) # 获得 edge 的 lane 的个数
+            if target_lane >= 0 and target_lane < lane_number:
                 self.sumo.vehicle.changeLane(self.veh_id, target_lane, duration=1)
+            else:
+                logger.info(f'SIM: Target Lane is: {target_lane}; Exceed to Lanes in this Edge: {lane_number}; Keep Current Lane: {current_lane}.')
+                self.sumo.vehicle.changeLane(self.veh_id, current_lane, duration=1)

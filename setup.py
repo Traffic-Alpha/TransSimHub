@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2023-12-30 00:04:17
+@LastEditTime: 2024-03-23 01:19:09
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -39,6 +39,7 @@ setup(
         ], # 场景生成
         'rl':[
             'stable-baselines3',
+            'tensorboard',
             'torchrl',
         ]
     },
