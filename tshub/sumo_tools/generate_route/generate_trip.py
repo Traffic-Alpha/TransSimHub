@@ -4,7 +4,7 @@
 @Description: 生成 trip 文件, 这里有两个步骤:
 1. generate_trip_xml, 按照要求给每个 edge 生成 trip
 2. edit_trip_xml, 对 trip 按照时间顺序排序
-@LastEditTime: 2023-09-01 14:31:45
+@LastEditTime: 2024-04-08 16:38:44
 '''
 import os
 import sumolib
@@ -95,15 +95,30 @@ class GenerateTrip(object):
             file.write("<routes> \n")
 
             # 在 trip.xml 中添加车辆信息
+            KNOWN_ATTRIBUTES = {'color', 'length', 'tau', 'speed'}
+            DEFAULTS = {'color': 'red', 'length': 7, 'tau': 1, 'speed': 17}
+            DOC_URL = "https://sumo.dlr.de/docs/Definition_of_Vehicles%2C_Vehicle_Types%2C_and_Routes.html#available_vtype_attributes"
             vehID_prob = {} # 每辆车的概率, {'veh_1':0.7, 'veh_2':0.3}
-            for vehicle_id, vehicle_info in self.veh_type.items(): 
-                vehicle_color = vehicle_info.get('color', 'red')  # 获得车辆的 rgb 颜色
-                vehicle_length = vehicle_info.get('length', 7)
-                vehicle_tau = vehicle_info.get('tau', 1)
-                vehicle_speed = vehicle_info.get('speed', 17) # 17m/s -> 61.2km/h, 城区限速
-                file.write('    <vType id="{}" length="{}" tau="{}" color="{}" maxSpeed="{}"/> \n'.format(
-                    vehicle_id, float(vehicle_length), float(vehicle_tau), vehicle_color, float(vehicle_speed))
-                )
+           
+            for vehicle_id, vehicle_info in self.veh_type.items():
+                attributes = [] # 添加车辆的属性
+                for key, value in vehicle_info.items():
+                    if key in KNOWN_ATTRIBUTES:
+                        # Format known attributes with their defaults if necessary
+                        value = float(value) if key in {'length', 'tau', 'speed'} else value
+                        attributes.append('{}="{}"'.format(key, value))
+                    else:
+                        # Log a warning for unknown attributes
+                        logger.warning(f"SIM: '{key}' is not a known attribute. Check the documentation for valid attributes. {DOC_URL}.")
+                        attributes.append('{}="{}"'.format(key, value))
+
+                # Fill in defaults for any missing known attributes
+                for attr, default in DEFAULTS.items():
+                    if attr not in vehicle_info:
+                        default_value = float(default) if attr in {'length', 'tau', 'speed'} else default
+                        attributes.append('{}="{}"'.format(attr, default_value))
+
+                file.write('    <vType id="{}" {} />\n'.format(vehicle_id, ' '.join(attributes)))
                 vehID_prob[vehicle_id] = vehicle_info.get('probability', 0.1) # 添加每种车辆出现的概率
             vehID_prob = normalize_dict(vehID_prob) # 概率归一化
 
