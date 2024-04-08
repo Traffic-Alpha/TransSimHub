@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-08 15:48:26
 @Description: 基于 Stabe Baseline3 来控制 ego vehicle
-@LastEditTime: 2023-12-21 17:41:26
+@LastEditTime: 2024-04-08 16:57:11
 '''
 import os
 import torch
@@ -20,7 +20,7 @@ from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
 
 path_convert = get_abs_path(__file__)
 logger.remove()
-set_logger(path_convert('./'), log_level="INFO")
+set_logger(path_convert('./'), file_log_level="INFO")
 
 if __name__ == '__main__':
     log_path = path_convert('./log/')

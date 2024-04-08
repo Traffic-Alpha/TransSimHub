@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 22:46:25
 @Description: 使用 MAPPO 算法进行训练
-@LastEditTime: 2023-11-01 12:31:26
+@LastEditTime: 2024-04-08 16:57:02
 '''
 import tqdm
 import time
@@ -29,7 +29,7 @@ from tshub.utils.init_log import set_logger
 
 path_convert = get_abs_path(__file__)
 logger.remove()
-set_logger(path_convert('./'), log_level="INFO")
+set_logger(path_convert('./'), file_log_level="INFO")
 
 
 def rendering_callback(env, td):

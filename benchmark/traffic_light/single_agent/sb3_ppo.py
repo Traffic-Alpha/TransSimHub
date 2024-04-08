@@ -5,7 +5,7 @@
 + State Design: Last step occupancy for each movement
 + Action Design: Choose Next Phase 
 + Reward Design: Total Waiting Time
-@LastEditTime: 2023-09-14 14:09:10
+@LastEditTime: 2024-04-08 16:57:07
 '''
 import os
 import torch
@@ -23,7 +23,7 @@ from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
 
 path_convert = get_abs_path(__file__)
 logger.remove()
-set_logger(path_convert('./'), log_level="INFO")
+set_logger(path_convert('./'), file_log_level="INFO")
 
 if __name__ == '__main__':
     log_path = path_convert('./log/')
