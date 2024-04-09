@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2023-12-16 21:59:29
+@LastEditTime: 2024-04-09 21:10:52
 '''
 import traci
 from typing import Dict, Any
@@ -30,6 +30,7 @@ class VehicleInfo:
     road_id: str  # The ID of the road the vehicle is on
     lane_id: str  # The ID of the lane the vehicle is on
     lane_index: int # 目前的车所在的车道 index
+    lane_position: float # The position of the vehicle along the lane (the distance from the front bumper to the start of the lane in [m])
     edges: List[str]  # The edges the vehicle has traversed
     waiting_time: float  # The waiting time of the vehicle
     accumulated_waiting_time: float # 累积等待时间
@@ -55,6 +56,7 @@ class VehicleInfo:
                     traci.constants.VAR_POSITION, traci.constants.VAR_SPEED,
                     traci.constants.VAR_ROAD_ID, traci.constants.VAR_LANE_ID,
                     traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
+                    traci.constants.VAR_LANEPOSITION,
                     traci.constants.VAR_WAITING_TIME, traci.constants.VAR_NEXT_TLS,
                     traci.constants.VAR_ACCUMULATED_WAITING_TIME, 
                     traci.constants.VAR_DISTANCE, traci.constants.VAR_ANGLE,
@@ -69,7 +71,7 @@ class VehicleInfo:
                        length:float, width: float, heading: float,
                        sumo:traci.connection.Connection,
                        position: Tuple[float], speed: float,
-                       road_id: str, lane_id: str, 
+                       road_id: str, lane_id: str, lane_position:float,
                        lane_index:int, edges: List[str], 
                        waiting_time: float, accumulated_waiting_time:float,
                        co2_emission: float, fuel_consumption: float,
@@ -81,7 +83,7 @@ class VehicleInfo:
         return cls(id=id, action_type=action_type, vehicle_type=vehicle_type,
                    length=length, width=width, heading=heading,
                    sumo=sumo, position=position, speed=speed,   
-                   road_id=road_id, lane_id=lane_id, lane_index=lane_index,
+                   road_id=road_id, lane_id=lane_id, lane_index=lane_index, lane_position=lane_position,
                    edges=edges, waiting_time=waiting_time,
                    accumulated_waiting_time=accumulated_waiting_time,
                    co2_emission=co2_emission, fuel_consumption=fuel_consumption,
@@ -105,6 +107,7 @@ class VehicleInfo:
             'road_id': 80,
             'lane_id': 81,
             'lane_index': 82,
+            'lane_position': 86,
             'edges': 84,
             'waiting_time': 122,
             'next_tls': 112,
@@ -124,6 +127,7 @@ class VehicleInfo:
         self.speed=vehicle_info.get(VehicleInfo.get_feature_index('speed'), None)
         self.road_id=vehicle_info.get(VehicleInfo.get_feature_index('road_id'), None)
         self.lane_id=vehicle_info.get(VehicleInfo.get_feature_index('lane_id'), None)
+        self.lane_position=vehicle_info.get(VehicleInfo.get_feature_index('lane_position'), None)
         self.lane_index=vehicle_info.get(VehicleInfo.get_feature_index('lane_index'), None)
         self.edges=vehicle_info.get(VehicleInfo.get_feature_index('edges'), None)
         self.waiting_time=vehicle_info.get(VehicleInfo.get_feature_index('waiting_time'), None)

@@ -3,7 +3,7 @@
 @Date: 2023-08-23 15:50:00
 @Description: 获得场景中所有车辆的信息
 # 这里需要可以在每隔 Ns 获得当前车辆的所有信息
-@LastEditTime: 2023-08-30 16:07:20
+@LastEditTime: 2024-04-09 21:12:05
 '''
 import sumolib
 from loguru import logger
@@ -17,7 +17,7 @@ import traci
 sumoBinary = sumolib.checkBinary('sumo-gui')
 
 path_convert = get_abs_path(__file__)
-set_logger(path_convert('./'))
+set_logger(path_convert('./'), terminal_log_level='INFO')
 
 sumocfg_file = path_convert("../sumo_env/single_junction/env/single_junction.sumocfg")
 traci.start([sumoBinary, "-c", sumocfg_file], label='0')
