@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:09:07
 @Description: 初始化 Map Info Object
-@LastEditTime: 2023-11-12 14:50:07
+@LastEditTime: 2024-04-09 23:02:30
 '''
 import sumolib
 
@@ -20,10 +20,10 @@ class MapBuilder(BaseBuilder):
         self.osm_file = osm_file # 原始 osm 文件
 
         self.map_info = {
-            'edge': dict(),
-            'node': dict(),
-            'building': dict()
-        } # building, edge, node
+            'lane': dict(), # 车道信息
+            'node': dict(), # 节点信息
+            'building': dict() # 建筑物信息
+        } # building, lane, node
         self.create_objects() # 创建地图元素
 
     def create_objects(self) -> None:
@@ -32,14 +32,18 @@ class MapBuilder(BaseBuilder):
         # 得到 edge 和 node 的 shape
         net = sumolib.net.readNet(self.net_file)
         for e in net._edges: # 获得所有的 edge
+            edge_id = e.getID() # 获得 edge ID
             for _lane in e._lanes: # 获取每一个 edge 所有的 lane
                 lane_id = _lane.getID()
+                lane_length = _lane.getLength() # 获得 lane 的长度
                 lane_shape = sumolib.geomhelper.line2boundary(
                     _lane.getShape(), _lane.getWidth()
                 ) # 获得每一个 lane 的 shape
-                self.map_info['edge'][lane_id] = PolygonInfo.create(
+                self.map_info['lane'][lane_id] = PolygonInfo.create(
                     id=lane_id,
-                    polygon_type='edge',
+                    edge_id=edge_id,
+                    length=lane_length,
+                    polygon_type='lane',
                     shape=lane_shape,
                     building_levels=None
                 )
@@ -50,6 +54,8 @@ class MapBuilder(BaseBuilder):
                 node_shape = _node.getShape()
                 self.map_info['node'][node_id] = PolygonInfo.create(
                     id=node_id,
+                    edge_id=None,
+                    length=0, # node 没有长度
                     polygon_type='node',
                     shape=node_shape+[node_shape[0]],
                     building_levels=None
@@ -60,6 +66,8 @@ class MapBuilder(BaseBuilder):
             for poly in sumolib.xml.parse(self.poly_file, "poly"):
                 self.map_info['building'][poly.id] = PolygonInfo.create(
                     id=poly.id,
+                    edge_id=None,
+                    length=0,
                     polygon_type=poly.type,
                     shape=poly.shape,
                     building_levels=1

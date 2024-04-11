@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-12 21:56:57
 @Description: 过滤感兴趣的物体
-@LastEditTime: 2023-11-13 23:16:03
+@LastEditTime: 2024-04-09 22:58:42
 '''
 import sumolib
 from loguru import logger
@@ -92,14 +92,14 @@ def filter_object(obs, focus_id:str=None, focus_type:str=None, focus_distance:fl
 
     Args:
         obs (dict): The observations containing the objects to filter. 
-                    The dictionary is expected to have keys 'vehicle', 'edge', and 'node', 
+                    The dictionary is expected to have keys 'vehicle', 'lane', and 'node', 
                     each containing a dictionary of objects of that type, keyed by their id. 
-                    Each object is expected to have a 'position' (for 'vehicle') or 'shape' (for 'edge' and 'node') attribute.
+                    Each object is expected to have a 'position' (for 'vehicle') or 'shape' (for 'lane' and 'node') attribute.
 
         focus_id (str, optional): The id of the focus object. If None, the function will return the original observations.
 
         focus_type (str, optional): The type of the focus object. 
-                                    Can be 'vehicle', 'edge', 'node', or None. 
+                                    Can be 'vehicle', 'lane', 'node', or None. 
                                     If None, the function will return the original observations.
 
         focus_distance (float, optional): The maximum distance an object can be from the focus object to be included in the filtered observations. 
@@ -109,12 +109,12 @@ def filter_object(obs, focus_id:str=None, focus_type:str=None, focus_distance:fl
         dict: The filtered observations. The structure is the same as the input observations, 
               but only includes objects that are within the specified distance of the focus object.
     """
-    valid_focus_types = [None, 'edge', 'node', 'vehicle']
+    valid_focus_types = [None, 'lane', 'node', 'vehicle']
     assert focus_type in valid_focus_types, f'focus_type can only be {valid_focus_types}, now is {focus_type}.'
 
     if (focus_id is None) or (focus_type is None) or (focus_distance is None):
         logger.warning(f'SIM: Since None in {focus_id}, {focus_type}, {focus_distance}, we render the global scenario.')
-        x_range, y_range = find_bounds(obs['edge'])
+        x_range, y_range = find_bounds(obs['lane'])
         return obs, x_range, y_range
     
     # 获取坐标, 如果是 vehicle 就是 position, 其他的就是 shape

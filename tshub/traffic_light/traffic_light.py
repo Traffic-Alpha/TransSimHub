@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2023-10-27 23:46:18
+@LastEditTime: 2024-04-09 22:42:13
 '''
 from __future__ import annotations
 
@@ -123,7 +123,7 @@ class TrafficLightInfo:
 
     def control_traffic_light(self, action) -> None:
         """
-        控制交通信号灯
+        控制交通信号灯, 如果没有到更新时间, feature 是不会更新的
         """
         if self.can_perform_action:
             self.tls_action.set_next_phases(action)

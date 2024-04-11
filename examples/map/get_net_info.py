@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-12 14:48:21
 @Description: 只获取 net 的信息, 包含 edge 和 node 的 shape
-@LastEditTime: 2023-11-12 14:48:22
+@LastEditTime: 2024-04-09 22:52:44
 '''
 from loguru import logger
 
@@ -15,7 +15,6 @@ path_convert = get_abs_path(__file__)
 set_logger(path_convert('./'))
 
 net_file = path_convert("../sumo_env/osm_berlin/env/berlin.net.xml")
-
 
 map_builder = MapBuilder(
     net_file=net_file,

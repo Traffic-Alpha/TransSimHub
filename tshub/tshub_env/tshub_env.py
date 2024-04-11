@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2023-11-24 18:20:05
+@LastEditTime: 2024-04-09 23:06:16
 '''
 import os
 import sys
@@ -170,7 +170,7 @@ class TshubEnvironment(BaseSumoEnvironment):
             if _object_builder is not None
         }
         if self.is_map_builder_initialized:
-            env_state.update(self.map_infos) # 这里使用 update 是因为
+            env_state.update(self.map_infos) # 地图信息是固定的, 只需要每次额外补充进去即可, 不需要每次计算
         return env_state
 
     def __computer_reward(self) -> Literal[0]:
@@ -212,10 +212,10 @@ class TshubEnvironment(BaseSumoEnvironment):
             if (x_range is None) and (y_range is None):
                 fig = None # 如果追踪的物体不在, 则 fig 直接返回 None
             else:
-                map_edges, map_nodes, vehicle_info = obs['edge'], obs['node'], obs['vehicle']
+                map_lanes, map_nodes, vehicle_info = obs['lane'], obs['node'], obs['vehicle']
                 fig = render_map(
                     focus_id,
-                    map_edges, map_nodes, vehicle_info, 
+                    map_lanes, map_nodes, vehicle_info, 
                     x_range=x_range, y_range=y_range
                 ) # 如果在, 则渲染 focus_id 附近的内容
             return fig
