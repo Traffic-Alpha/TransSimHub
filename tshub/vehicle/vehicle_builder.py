@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2024-04-13 16:23:58
+@LastEditTime: 2024-04-13 18:07:08
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -80,7 +80,7 @@ class VehicleBuilder(BaseBuilder):
         """
         subscription_results = self.sumo.vehicle.getAllSubscriptionResults()
         vehicle_ids = self.sumo.vehicle.getIDList()
-
+        
         # 更新已存在的车辆信息
         for vehicle_id in vehicle_ids:
             if vehicle_id in self.vehicles:

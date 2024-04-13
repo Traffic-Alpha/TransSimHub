@@ -150,6 +150,7 @@ class TshubEnvironment(BaseSumoEnvironment):
                 self.scene_objects[_object_type].control_objects(_object_action)
         
         self.sumo.simulationStep()
+        logger.debug(f'SIM: ==> Simulation Step: {self.sim_step} <==') # 日志中打印当前的仿真时间
 
         # update env
         obs = self.__computer_observation()
