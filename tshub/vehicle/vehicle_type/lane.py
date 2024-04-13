@@ -6,7 +6,7 @@ keep_lane: 保持车道, 加速
 slow_down: 保持车道, 减速
 change_lane_left: 向左变车道
 change_lane_right: 向右变车道
-@LastEditTime: 2023-08-31 14:10:06
+@LastEditTime: 2024-04-13 17:11:56
 '''
 import enum
 from .base_vehicle_action import VehicleAction
@@ -18,8 +18,8 @@ class LaneActionType(enum.Enum):
     change_lane_right = 3
 
 class LaneAction(VehicleAction):
-    def __init__(self, id, sumo) -> None:
-        super().__init__(id, sumo)
+    def __init__(self, id, vehicle_type, sumo) -> None:
+        super().__init__(id, vehicle_type, sumo)
 
     def execute(self, lane_change:int, target_speed:float, 
                 current_speed:float, current_lane_index:int, current_road_id:str) -> None:

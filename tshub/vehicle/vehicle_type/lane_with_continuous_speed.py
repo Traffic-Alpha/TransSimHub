@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 18:24:56
 @Description: 变车道+连续速度控制
-@LastEditTime: 2024-01-13 19:12:29
+@LastEditTime: 2024-04-13 17:11:49
 '''
 import enum
 from loguru import logger
@@ -15,8 +15,8 @@ class LaneChangeActionType(enum.Enum):
     change_lane_right = 2
 
 class LaneWithContinuousSpeedAction(VehicleAction):
-    def __init__(self, id, sumo) -> None:
-        super().__init__(id, sumo)
+    def __init__(self, id, vehicle_type, sumo) -> None:
+        super().__init__(id, vehicle_type, sumo)
 
     def execute(self, lane_change:int, target_speed:float, 
                 current_speed:float, current_lane_index:int, current_road_id:str
