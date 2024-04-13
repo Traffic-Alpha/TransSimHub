@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2022-03-05 20:51:25 by Eclipse SUMO jtrrouter Version 1.10.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/jtrrouterConfiguration.xsd">
+
+    <input>
+        <net-file value="/mnt/d/Aiolos/test/test_scene/test_calcFlow/../../../nets/single_junction/env/single_junction.net.xml"/>
+        <route-files value="/mnt/d/Aiolos/test/test_scene/test_calcFlow/./test.trip.xml"/>
+        <turn-ratio-files value="/mnt/d/Aiolos/test/test_scene/test_calcFlow/./test.turndefs.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/mnt/d/Aiolos/test/test_scene/test_calcFlow/./test.rou.xml"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="true"/>
+        <randomize-flows value="true"/>
+        <accept-all-destinations value="true"/>
+    </processing>
+
+    <defaults>
+        <departlane value="random"/>
+    </defaults>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+    <random_number>
+        <seed value="10"/>
+    </random_number>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="car_1" length="5.00" color="155,89,182" tau="1.0"/>
+    <vType id="car_2" length="5.00" color="100,80,60" tau="1.0"/>
+    <vehicle id="gsndj_s4__0.0" type="car_1" depart="9" departLane="1">
+        <route edges="gsndj_s4 gsndj_s5"/>
+    </vehicle>
+    <vehicle id="gsndj_s4__0.1" type="car_2" depart="15" departLane="1">
+        <route edges="gsndj_s4 gsndj_s5"/>
+    </vehicle>
+</routes>
