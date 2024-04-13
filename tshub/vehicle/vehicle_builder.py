@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2024-04-09 21:11:22
+@LastEditTime: 2024-04-13 16:23:58
 '''
 from loguru import logger
 from typing import Dict, Any
@@ -16,7 +16,7 @@ class VehicleBuilder(BaseBuilder):
     """
 
     def __init__(self, sumo, action_type, hightlight:bool=False) -> None:
-        self.sumo = sumo  # sumo connection]
+        self.sumo = sumo  # sumo connection
         self.action_type = action_type # lane, lane_continuous_speed
         self.vehicles: Dict[str, VehicleInfo] = {}
         self.controled_vehicles = [] # 被控制过的车辆

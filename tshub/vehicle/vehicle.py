@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2024-04-09 21:10:52
+@LastEditTime: 2024-04-13 17:11:26
 '''
 import traci
 from typing import Dict, Any
@@ -37,7 +37,7 @@ class VehicleInfo:
     distance: float # 车辆行驶距离
     co2_emission: float # 车辆每一个 step 的 co2 的排放 (mg/s)
     fuel_consumption: float # 车辆每一个 step 的油耗, mg/s
-    speed_without_traci: float # 如果不使用 sumo 控制车辆会行驶的速度 
+    speed_without_traci: float # 如果不使用 sumo 控制车辆会行驶的速度
     leader: Tuple[str, float] # 车辆的前车信息, (vehicle_id, distance)
     next_tls: List[str]  # The IDs of the next traffic lights the vehicle will encounter
     sumo: traci.connection.Connection
@@ -45,9 +45,9 @@ class VehicleInfo:
     def __post_init__(self) -> None:
         _action = vehicle_action_type(self.action_type)
         if _action == vehicle_action_type.Lane:
-            self.vehicle_action = LaneAction(id=self.id, sumo=self.sumo)
+            self.vehicle_action = LaneAction(id=self.id, vehicle_type=self.vehicle_type, sumo=self.sumo)
         elif _action == vehicle_action_type.LaneWithContinuousSpeed:
-            self.vehicle_action = LaneWithContinuousSpeedAction(id=self.id, sumo=self.sumo)
+            self.vehicle_action = LaneWithContinuousSpeedAction(id=self.id, vehicle_type=self.vehicle_type, sumo=self.sumo)
 
         # 订阅车辆
         self.sumo.vehicle.subscribe(
@@ -139,7 +139,7 @@ class VehicleInfo:
         self.fuel_consumption=vehicle_info.get(VehicleInfo.get_feature_index('fuel_consumption'), None)
         self.speed_without_traci=vehicle_info.get(VehicleInfo.get_feature_index('speed_without_traci'), None)
         
-
+        
     def get_features(self):
         output_dict = {}
         for field in fields(self):
@@ -148,6 +148,7 @@ class VehicleInfo:
             if field_name != 'sumo':
                 output_dict[field_name] = field_value
         return output_dict
+
 
     def control_vehicle(self, lane_change, target_speed) -> None:
         current_speed = self.speed # 目前车辆的速度
