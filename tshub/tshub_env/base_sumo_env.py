@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-04-14 15:19:47
+@LastEditTime: 2024-04-14 16:43:13
 '''
 import sumolib
 from typing import List
@@ -80,7 +80,7 @@ class BaseSumoEnvironment(ABC):
         else:
             self.traci = __import__('traci')
         
-        assert collision_action in ["teleport", "warn", "none", "remove"], \
+        assert collision_action in ["teleport", "warn", "none", "remove", None], \
             f"collision_action should be in [teleport, warn, none, remove]. Now is {collision_action}."
         
         self.collision_action = collision_action
