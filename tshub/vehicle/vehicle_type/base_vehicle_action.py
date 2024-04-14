@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 19:13:31
 @Description: 车辆控制基类
-@LastEditTime: 2024-04-13 17:16:37
+@LastEditTime: 2024-04-13 22:17:06
 '''
 from loguru import logger
 from abc import ABC, abstractmethod
@@ -19,6 +19,7 @@ class VehicleAction(ABC):
         # Collisions: https://sumo.dlr.de/docs/Simulation/Safety.html#collisions
         if 'ego' in vehicle_type:
             self.sumo.vehicle.setSpeedMode(self.veh_id, 0)
+            logger.info(f"SIM: Set {self.veh_id} speedmode to 0.")
 
     @abstractmethod
     def execute(self) -> None:

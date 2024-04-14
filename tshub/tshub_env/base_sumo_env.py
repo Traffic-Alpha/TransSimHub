@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2023-11-12 14:52:03
+@LastEditTime: 2024-04-14 15:19:47
 '''
 import sumolib
 from typing import List
@@ -48,6 +48,7 @@ class BaseSumoEnvironment(ABC):
                 max_depart_delay=100000, 
                 time_to_teleport=-1, 
                 sumo_seed:str='random', 
+                collision_action:str=None, # 发生碰撞后的变化 # https://sumo.dlr.de/docs/Simulation/Safety.html
                 remote_port:int=None, # 设置端口, 使用 libsumo 不要开启这个
                 num_clients:int=1) -> None:
         
@@ -79,6 +80,10 @@ class BaseSumoEnvironment(ABC):
         else:
             self.traci = __import__('traci')
         
+        assert collision_action in ["teleport", "warn", "none", "remove"], \
+            f"collision_action should be in [teleport, warn, none, remove]. Now is {collision_action}."
+        
+        self.collision_action = collision_action
         self.begin_time = begin_time
         self.sim_max_time = num_seconds # 最多的仿真时间
         self.max_depart_delay = max_depart_delay  # Max wait time to insert a vehicle
@@ -150,6 +155,8 @@ class BaseSumoEnvironment(ABC):
         if self.use_gui: # 是否使用 gui, start->直接开始仿真; quit-on-end->仿真结束关闭 GUI
             sumo_cmd.extend(['--start', '--quit-on-end'])
 
+        if self.collision_action is not None:
+            sumo_cmd.extend(['--collision.action', self.collision_action])
         if self.trip_info is not None: # 使得输出 trip_info
             sumo_cmd.extend(['--tripinfo-output', self.trip_info])
         if self.statistic_output is not None: # 使得输出 statistic_output
