@@ -5,7 +5,7 @@
 1. 可以设置 ego 车的渗透率, 这里是一个参数可以设置, 车辆类型可以设置车辆的 type
 2. 设置车辆的初始速度是 9m/s - 32km/s, 这里是一个参数可以设置
 3. 给出的是这个时间段内的来车的速度, vehicle/second
-@LastEditTime: 2023-12-20 14:20:34
+@LastEditTime: 2024-04-15 16:00:13
 '''
 import os
 import sumolib
@@ -161,6 +161,6 @@ def generate_route(sumo_net:str,
     if err == b'':
         logger.info('SIM: 生成 route 文件成功.')
     else:
-        logger.warning('{}'.format(err))
+        logger.error('{}'.format(err))
         raise Exception("route 文件生成失败, 检查 trip 文件和 turn definition 文件")
     temp_file.close()
