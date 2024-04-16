@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2024-03-23 01:19:09
+@LastEditTime: 2024-04-16 12:35:38
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -41,6 +41,8 @@ setup(
             'stable-baselines3',
             'tensorboard',
             'torchrl',
+            'pettingzoo',
+            'tqdm'
         ]
     },
     include_package_data=True,

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2023-11-12 14:52:03
+@LastEditTime: 2024-04-15 19:01:52
 '''
 import sumolib
 from typing import List
@@ -32,6 +32,8 @@ class BaseSumoEnvironment(ABC):
     - reset, 初始化 feature 和 agent
     - computer_observations_rewards, 重写计算特征
     """
+    CONNECTION_LABEL = 1  # For traci multi-client support
+    
     def __init__(self, 
                 sumo_cfg:str, # sumo config 文件
                 net_file:str=None, # sumo network 文件
@@ -48,6 +50,7 @@ class BaseSumoEnvironment(ABC):
                 max_depart_delay=100000, 
                 time_to_teleport=-1, 
                 sumo_seed:str='random', 
+                collision_action:str=None, # 发生碰撞后的变化 # https://sumo.dlr.de/docs/Simulation/Safety.html
                 remote_port:int=None, # 设置端口, 使用 libsumo 不要开启这个
                 num_clients:int=1) -> None:
         
@@ -79,12 +82,20 @@ class BaseSumoEnvironment(ABC):
         else:
             self.traci = __import__('traci')
         
+        assert collision_action in ["teleport", "warn", "none", "remove", None], \
+            f"collision_action should be in [teleport, warn, none, remove]. Now is {collision_action}."
+        
+        self.collision_action = collision_action
         self.begin_time = begin_time
         self.sim_max_time = num_seconds # 最多的仿真时间
         self.max_depart_delay = max_depart_delay  # Max wait time to insert a vehicle
         self.time_to_teleport = time_to_teleport
         self.sumo_seed = sumo_seed # 设置 sumo 的随机数种子
         self.sumo = None # self.sumo=traic
+
+        self.label = str(BaseSumoEnvironment.CONNECTION_LABEL)
+        BaseSumoEnvironment.CONNECTION_LABEL += 1 # 多次初始化 label 是不同的
+        logger.info(f'SIM: Env Label, {self.label}.')
     
     def _start_simulation(self):
         """开始仿真, 有四种情况来开启仿真
@@ -150,6 +161,8 @@ class BaseSumoEnvironment(ABC):
         if self.use_gui: # 是否使用 gui, start->直接开始仿真; quit-on-end->仿真结束关闭 GUI
             sumo_cmd.extend(['--start', '--quit-on-end'])
 
+        if self.collision_action is not None:
+            sumo_cmd.extend(['--collision.action', self.collision_action])
         if self.trip_info is not None: # 使得输出 trip_info
             sumo_cmd.extend(['--tripinfo-output', self.trip_info])
         if self.statistic_output is not None: # 使得输出 statistic_output
@@ -176,15 +189,19 @@ class BaseSumoEnvironment(ABC):
             if self.num_clients > 1:
                 self.sumo.setOrder(1) # 这里设置为 1
 
+        logger.info(f'SIM: Start Env Label, {self.label}.')
+
     def _close_simulation(self) -> None:
         """关闭仿真
         """
-        if self.sumo is None:
+        if self.sumo is None: # 第一次 reset 就会从这里走
+            logger.info(f'SIM: Close Env Label (Reset Mode), {self.label}.')
             return
         if not self.is_libsumo:
             self.traci.switch(self.label)
         self.traci.close()
-        self.sumo = None
+        self.sumo = None # 关闭仿真之后 self.sumo 设置为 None
+        logger.info(f'SIM: Close Env Label, {self.label}.')
 
     def __del__(self) -> None:
         self._close_simulation()

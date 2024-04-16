@@ -4,7 +4,7 @@
 @Description: 控制车辆进行碰撞
 => ego_crash_car_following, 追尾测试
 => ego_crash_intersection, 无保护左转撞车测试
-@LastEditTime: 2024-04-13 17:51:26
+@LastEditTime: 2024-04-13 22:18:01
 '''
 import traci
 import sumolib
@@ -13,7 +13,7 @@ from tshub.utils.get_abs_path import get_abs_path
 from tshub.vehicle.vehicle_builder import VehicleBuilder
 from tshub.utils.init_log import set_logger
 
-CRASH_TYPE = "ego_crash_intersection" # ego_crash_car_following, ego_crash_intersection
+CRASH_TYPE = "ego_crash_car_following" # ego_crash_car_following, ego_crash_intersection
 
 sumoBinary = sumolib.checkBinary('sumo-gui')
 

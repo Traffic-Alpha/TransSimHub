@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2023-11-26 12:50:15 by Eclipse SUMO jtrrouter Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/jtrrouterConfiguration.xsd">
+
+    <input>
+        <net-file value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./veh4_2.net.xml"/>
+        <route-files value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./testflow4_2copy.trip.xml"/>
+        <turn-ratio-files value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./testflow4_2copy.turndefs.xml"/>
+    </input>
+
+    <output>
+        <output-file value="D:\ProgramData\GitLoadWareHouse\TransSimHub\benchmark\sumo_envs\veh_speed\./veh4_2.roucopy.xml"/>
+    </output>
+
+    <processing>
+        <randomize-flows value="True"/>
+        <accept-all-destinations value="True"/>
+    </processing>
+
+    <defaults>
+        <departlane value="random"/>
+    </defaults>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+    <random_number>
+        <seed value="777"/>
+    </random_number>
+
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="background" length="7.00" maxSpeed="5.00" color="155,89,182" tau="1.0" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0"/>
+    <vType id="ego" length="7.00" maxSpeed="16.00" color="26,188,156" tau="1.0" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0"/>
+
+
+    <vehicle id="E0__0__background.0" type="background" depart="0.84" departLane="0" departSpeed="5">
+        <route edges="E0 E1"/>
+    </vehicle>
+    <vehicle id="E0__0__background.1" type="background" depart="5.0" departLane="0" departSpeed="5">
+        <route edges="E0 E1"/>
+    </vehicle>
+
+    <vehicle id="ego_1" type="ego" depart="20.0" departLane="0" departSpeed="10">
+        <route edges="E0 E1"/>
+    </vehicle>
+    <vehicle id="ego_2" type="ego" depart="30" departLane="0" departSpeed="13">
+        <route edges="E0 E1"/>
+    </vehicle>
+    <vehicle id="ego_3" type="ego" depart="40.0" departLane="0" departSpeed="16">
+        <route edges="E0 E1"/>
+    </vehicle>
+    <vehicle id="ego_4" type="ego" depart="50.0" departLane="0" departSpeed="10">
+        <route edges="E0 E1"/>
+    </vehicle>
+</routes>
+
