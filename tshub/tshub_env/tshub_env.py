@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-04-14 15:20:27
+@LastEditTime: 2024-04-15 17:13:40
 '''
 import os
 import sys
@@ -43,7 +43,6 @@ class TshubEnvironment(BaseSumoEnvironment):
     :sumo_seed: (int/string) Random seed for sumo. If 'random' it uses a randomly chosen seed.
     :fixed_ts: (bool) If true, it will follow the phase configuration in the route_file and ignore the actions. 不调整信号灯
     """
-    CONNECTION_LABEL = 1  # For traci multi-client support
 
     def __init__(self, 
                  sumo_cfg: str, 
@@ -69,9 +68,6 @@ class TshubEnvironment(BaseSumoEnvironment):
                          begin_time, num_seconds, max_depart_delay, time_to_teleport, 
                          sumo_seed, collision_action, remote_port, num_clients
                         )
-        
-        self.label = str(TshubEnvironment.CONNECTION_LABEL)
-        TshubEnvironment.CONNECTION_LABEL += 1 # 多次初始化 label 是不同的
 
         self.is_map_builder_initialized = is_map_builder_initialized
         self.is_vehicle_builder_initialized = is_vehicle_builder_initialized

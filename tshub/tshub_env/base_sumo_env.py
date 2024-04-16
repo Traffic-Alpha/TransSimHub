@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-04-14 16:43:13
+@LastEditTime: 2024-04-15 19:01:52
 '''
 import sumolib
 from typing import List
@@ -32,6 +32,8 @@ class BaseSumoEnvironment(ABC):
     - reset, 初始化 feature 和 agent
     - computer_observations_rewards, 重写计算特征
     """
+    CONNECTION_LABEL = 1  # For traci multi-client support
+    
     def __init__(self, 
                 sumo_cfg:str, # sumo config 文件
                 net_file:str=None, # sumo network 文件
@@ -90,6 +92,10 @@ class BaseSumoEnvironment(ABC):
         self.time_to_teleport = time_to_teleport
         self.sumo_seed = sumo_seed # 设置 sumo 的随机数种子
         self.sumo = None # self.sumo=traic
+
+        self.label = str(BaseSumoEnvironment.CONNECTION_LABEL)
+        BaseSumoEnvironment.CONNECTION_LABEL += 1 # 多次初始化 label 是不同的
+        logger.info(f'SIM: Env Label, {self.label}.')
     
     def _start_simulation(self):
         """开始仿真, 有四种情况来开启仿真
@@ -183,15 +189,19 @@ class BaseSumoEnvironment(ABC):
             if self.num_clients > 1:
                 self.sumo.setOrder(1) # 这里设置为 1
 
+        logger.info(f'SIM: Start Env Label, {self.label}.')
+
     def _close_simulation(self) -> None:
         """关闭仿真
         """
-        if self.sumo is None:
+        if self.sumo is None: # 第一次 reset 就会从这里走
+            logger.info(f'SIM: Close Env Label (Reset Mode), {self.label}.')
             return
         if not self.is_libsumo:
             self.traci.switch(self.label)
         self.traci.close()
-        self.sumo = None
+        self.sumo = None # 关闭仿真之后 self.sumo 设置为 None
+        logger.info(f'SIM: Close Env Label, {self.label}.')
 
     def __del__(self) -> None:
         self._close_simulation()
