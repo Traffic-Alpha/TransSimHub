@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-04-09 22:42:13
+@LastEditTime: 2024-04-24 20:45:28
 '''
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from typing import List, Dict, Any
 
 from .traffic_light_action_type import tls_action_type
 from .tls_type.choose_next_phase import choose_next_phase
+from .tls_type.choose_next_phase_syn import choose_next_phase_syn
 from .tls_type.next_or_not import next_or_not
 from ..utils.format_dict import dict_to_str
 
@@ -49,6 +50,8 @@ class TrafficLightInfo:
         _action = tls_action_type(self.action_type)
         if _action == tls_action_type.ChooseNextPhase:
             self.tls_action = choose_next_phase(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
+        elif _action == tls_action_type.ChooseNextPhaseSyn:
+            self.tls_action = choose_next_phase_syn(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         elif _action == tls_action_type.NextorNot:
             self.tls_action = next_or_not(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         else:

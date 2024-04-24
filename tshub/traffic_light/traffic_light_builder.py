@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2023-10-30 16:53:32
+@LastEditTime: 2024-04-16 12:52:12
 '''
 import traci
 import numpy as np
@@ -175,7 +175,7 @@ class TrafficLightBuilder(BaseBuilder):
 
     def control_objects(self, actions):
         """
-        控制所有交通信号灯
+        控制所有交通信号灯, 即使不能做动作, 也需要 control, 因为需要 update (黄灯->绿灯)
         """
         for _tls_id in self.tls_ids:
             tls_action = actions[_tls_id] # 得到对应 tls 的 action

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:09:32
 @Description: Next or Not
-@LastEditTime: 2023-08-28 16:16:53
+@LastEditTime: 2024-04-16 12:52:59
 '''
 from loguru import logger
 from .base_tls import BaseTLS
@@ -52,7 +52,7 @@ class next_or_not(BaseTLS):
             self.next_action_time = self.sim_step + self.delta_time + self.yellow_time
 
     def update(self) -> None:
-        """每进行一步仿真, 更新当前时间
+        """每进行一步仿真, 更新当前时间, 需要从黄灯切换为绿灯
         """
         self.time_since_last_phase_change += 1
         if self.is_yellow and self.time_since_last_phase_change == self.yellow_time:
