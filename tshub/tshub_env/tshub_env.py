@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-04-15 17:13:40
+@LastEditTime: 2024-05-01 17:26:28
 '''
 import os
 import sys
@@ -54,7 +54,7 @@ class TshubEnvironment(BaseSumoEnvironment):
                  poly_file:str = None, osm_file:str = None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
                  vehicle_action_type:str = 'lane', hightlight:bool = False,
-                 tls_action_type:str = 'next_or_not',
+                 tls_action_type:str = 'next_or_not', delta_time:int=5,
                  net_file: str = None, route_file: str = None, 
                  trip_info: str = None, statistic_output: str = None, summary: str = None, queue_output: str = None, 
                  tls_state_add: List = None, use_gui: bool = False, is_libsumo: bool = False, 
@@ -81,6 +81,7 @@ class TshubEnvironment(BaseSumoEnvironment):
         # Traffic Light Builder Input
         self.tls_ids = tls_ids
         self.tls_action_type = tls_action_type
+        self.delta_time = delta_time
         # Aircraft Builder Input
         self.aircraft_inits = aircraft_inits
         # Vehicle Builder Input
@@ -110,7 +111,7 @@ class TshubEnvironment(BaseSumoEnvironment):
             else None
         )
         tls_builder = (
-            TrafficLightBuilder(sumo=self.sumo, tls_ids=self.tls_ids, action_type=self.tls_action_type)
+            TrafficLightBuilder(sumo=self.sumo, tls_ids=self.tls_ids, action_type=self.tls_action_type, delta_time=self.delta_time)
             if self.is_traffic_light_builder_initialized
             else None
         )

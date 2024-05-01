@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 16:55:36
 @Description: Traffic Light Signal Action Type
-@LastEditTime: 2024-04-24 20:06:18
+@LastEditTime: 2024-05-01 15:32:59
 '''
 import enum
 
@@ -23,4 +23,8 @@ class tls_action_type(enum.Enum):
     
     + 0, Change to the next phase
     + 1, Keep the current phase
+    """
+
+    AdjustCycleDuration = 'adjust_cycle_duration'
+    """Action= ``List``. Fine-tuning of each phase duration
     """
