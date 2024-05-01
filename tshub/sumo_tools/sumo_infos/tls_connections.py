@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 17:07:29
 @Description: 通过 SUMO 获得信号灯控制的路口
-@LastEditTime: 2023-11-24 00:24:30
+@LastEditTime: 2024-05-01 18:55:35
 '''
 from typing import List
 
@@ -73,7 +73,9 @@ class tls_connection(object):
                 viaLane = connection[0][2] # internal lane
                 direction = lane2lane_direction['{}_{}'.format(fromLane, toLane)]
                 fromLane_length = self.sumo.lane.getLength(fromLane) # fromLane 的长度
-                if 'pedestrian' not in self.sumo.lane.getAllowed(fromLane): # 我们不考虑人行道
+                allowed = self.sumo.lane.getAllowed(fromLane)
+                condition = ('pedestrian' not in allowed) or ('passenger' in allowed)
+                if condition: # 我们不考虑人行道
                     connection_list.append(
                         [fromEdge, toEdge, fromLane, toLane, viaLane, direction, fromLane_length])
             elif keep_connection:
