@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-04-24 20:45:28
+@LastEditTime: 2024-05-01 15:33:24
 '''
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from typing import List, Dict, Any
 from .traffic_light_action_type import tls_action_type
 from .tls_type.choose_next_phase import choose_next_phase
 from .tls_type.choose_next_phase_syn import choose_next_phase_syn
+from .tls_type.adjust_cycle_duration import adjust_cycle_duration
 from .tls_type.next_or_not import next_or_not
 from ..utils.format_dict import dict_to_str
 
@@ -54,6 +55,8 @@ class TrafficLightInfo:
             self.tls_action = choose_next_phase_syn(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         elif _action == tls_action_type.NextorNot:
             self.tls_action = next_or_not(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
+        elif _action == tls_action_type.AdjustCycleDuration:
+            self.tls_action = adjust_cycle_duration(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         else:
             logger.error(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
@@ -106,8 +109,10 @@ class TrafficLightInfo:
                 self.jam_length_meters[i] = tls_data[key]['jam_length_meters']
                 self.last_step_occupancy[i] = tls_data[key]['last_step_occupancy']
                 self.last_step_vehicle_id_list[i] = tls_data[key]['last_step_vehicle_id_list']
+                
         # 更新 phase 的信息
         self.__update_this_phase(self.tls_action.phase_index)
+        
         # 当前的 traffic light 是否可以执行动作
         self.can_perform_action = (self.tls_action.sim_step == self.tls_action.next_action_time)
 
