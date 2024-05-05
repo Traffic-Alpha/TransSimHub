@@ -1,10 +1,10 @@
 '''
 @Author: WANG Maonan
 @Date: 2024-04-13 15:01:42
-@Description: 控制车辆进行碰撞
+@Description: 控制车辆进行碰撞, 由于速度引发的碰撞
 => ego_crash_car_following, 追尾测试
 => ego_crash_intersection, 无保护左转撞车测试
-@LastEditTime: 2024-04-13 22:18:01
+@LastEditTime: 2024-05-05 14:47:40
 '''
 import traci
 import sumolib
@@ -21,7 +21,7 @@ path_convert = get_abs_path(__file__)
 set_logger(path_convert('./'))
 
 sumocfg_file = path_convert(f"../../sumo_env/ego_crash/{CRASH_TYPE}/env.sumocfg")
-traci.start([sumoBinary, "-c", sumocfg_file, "--collision.action", "warn"], label='0')
+traci.start([sumoBinary, "-c", sumocfg_file, "--collision.action", "warn"], label='0') # 需要加入 collision.action
 conn = traci.getConnection('0')
 
 scene_vehicles = VehicleBuilder(sumo=conn, action_type='lane_continuous_speed')
