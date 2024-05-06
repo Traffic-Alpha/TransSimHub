@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:09:07
 @Description: 初始化 Map Info Object
-@LastEditTime: 2024-04-09 23:02:30
+@LastEditTime: 2024-05-06 23:49:27
 '''
 import sumolib
 
@@ -45,20 +45,26 @@ class MapBuilder(BaseBuilder):
                     length=lane_length,
                     polygon_type='lane',
                     shape=lane_shape,
-                    building_levels=None
+                    building_levels=None,
+                    node_type=None,
+                    node_coord=None
                 )
 
         for _node in net.getNodes():
             if _node.getType() != 'dead_end':
                 node_id = _node.getID()
                 node_shape = _node.getShape()
+                node_coord = _node.getCoord()
+                node_type = _node.getType()
                 self.map_info['node'][node_id] = PolygonInfo.create(
                     id=node_id,
                     edge_id=None,
                     length=0, # node 没有长度
                     polygon_type='node',
                     shape=node_shape+[node_shape[0]],
-                    building_levels=None
+                    building_levels=None,
+                    node_coord=node_coord,
+                    node_type=node_type
                 )
 
         # 遍历 poly 文件获得当前环境中所有的多边形
@@ -70,7 +76,9 @@ class MapBuilder(BaseBuilder):
                     length=0,
                     polygon_type=poly.type,
                     shape=poly.shape,
-                    building_levels=1
+                    building_levels=1,
+                    node_type=None,
+                    node_coord=None
                 )
         
         # 遍历 osm 文件更新 poly 的信息
