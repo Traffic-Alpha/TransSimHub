@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2024-04-16 12:35:38
+@LastEditTime: 2024-04-24 23:50:12
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -42,6 +42,7 @@ setup(
             'tensorboard',
             'torchrl',
             'pettingzoo',
+            'supersuit',
             'tqdm'
         ]
     },

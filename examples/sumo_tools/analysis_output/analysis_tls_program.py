@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-05-05 23:16:45
 @Description: 分析 tls program 文件
-@LastEditTime: 2024-05-05 23:26:40
+@LastEditTime: 2024-05-05 23:29:45
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -29,7 +29,7 @@ directions_state = {
 tls_analysis.visualize_cycles_timestamps(directions_state, current_file_path("./"))
 tls_analysis.visualize_cycles_idx(directions_state, current_file_path("./"))
 
-# 绘制 bar chart
+# 绘制 bar chart, 每一个 bar 表示一个 cycle, 其中长度表示 phase 在这个 cycle 的占比
 directions_state = {
     'grrrrrgGGGrgrrrgGGr': ['A', 'green'],
     'GrrrrrGrrrGGrrrGrrG': ['B', 'blue'],

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-05-01 17:26:28
+@LastEditTime: 2024-05-06 18:35:26
 '''
 import os
 import sys
@@ -147,7 +147,7 @@ class TshubEnvironment(BaseSumoEnvironment):
                 self.scene_objects[_object_type].control_objects(_object_action)
         
         self.sumo.simulationStep()
-        logger.debug(f'SIM: ==> Simulation Step: {self.sim_step} <==') # 日志中打印当前的仿真时间
+        logger.info(f'SIM: ==> Simulation Step: {self.sim_step} <==') # 日志中打印当前的仿真时间
 
         # update env
         obs = self.__computer_observation()

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-03-24 15:07:49
 @Description: 分析 route 文件, 并进行可视化
-@LastEditTime: 2024-03-24 15:35:32
+@LastEditTime: 2024-05-05 23:49:43
 '''
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
@@ -53,7 +53,7 @@ def count_vehicles_for_multiple_edges(xml_path, edges_list, interval):
     return {edges: count_vehicles(root, edges, interval) for edges in edges_list}
 
 
-def plot_vehicle_counts(data, file_path):
+def plot_vehicle_counts(data, file_path, marker:str='o'):
     """
     Plot a line graph of vehicle counts over intervals for different sets of edges and save the plot.
 
@@ -67,7 +67,7 @@ def plot_vehicle_counts(data, file_path):
         # Sort the intervals and get corresponding counts
         intervals = sorted(counts.keys())
         counts = [counts[interval] for interval in intervals]
-        plt.plot(intervals, counts, marker='o', label=edges)
+        plt.plot(intervals, counts, marker=marker, label=edges)
 
     plt.xlabel('Interval')
     plt.ylabel('Vehicle Count')

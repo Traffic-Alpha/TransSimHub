@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-01 23:44:45
 @Description: Plot reward curve according to the log file
-@LastEditTime: 2024-04-24 22:38:23
+@LastEditTime: 2024-04-24 23:00:35
 '''
 import pandas as pd
 import matplotlib.pyplot as plt
