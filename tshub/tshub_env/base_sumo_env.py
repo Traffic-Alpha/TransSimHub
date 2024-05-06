@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-04-15 19:01:52
+@LastEditTime: 2024-05-07 01:02:16
 '''
 import sumolib
 from typing import List
@@ -50,10 +50,11 @@ class BaseSumoEnvironment(ABC):
                 max_depart_delay=100000, 
                 time_to_teleport=-1, 
                 sumo_seed:str='random', 
+                tripinfo_output_unfinished:bool=True,
                 collision_action:str=None, # 发生碰撞后的变化 # https://sumo.dlr.de/docs/Simulation/Safety.html
                 remote_port:int=None, # 设置端口, 使用 libsumo 不要开启这个
-                num_clients:int=1) -> None:
-        
+                num_clients:int=1
+        ) -> None:
         # sumo basic config file
         self._sumo_cfg = sumo_cfg # sumo 配置文件
         self._net = net_file # net 文件
@@ -91,6 +92,7 @@ class BaseSumoEnvironment(ABC):
         self.max_depart_delay = max_depart_delay  # Max wait time to insert a vehicle
         self.time_to_teleport = time_to_teleport
         self.sumo_seed = sumo_seed # 设置 sumo 的随机数种子
+        self.tripinfo_output_unfinished = tripinfo_output_unfinished # 车辆不达到终点也可以写入 tripinfo
         self.sumo = None # self.sumo=traic
 
         self.label = str(BaseSumoEnvironment.CONNECTION_LABEL)
@@ -150,6 +152,8 @@ class BaseSumoEnvironment(ABC):
             sumo_cmd.append('-b {}'.format(self.begin_time))
         if self.sumo_seed == 'random': # 随机数种子
             sumo_cmd.append('--random')
+        if self.tripinfo_output_unfinished:
+            sumo_cmd.append('--tripinfo-output.write-unfinished')
         else:
             sumo_cmd.extend(['--seed', str(self.sumo_seed)])
 
