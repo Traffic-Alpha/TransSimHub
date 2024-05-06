@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-28 19:13:31
 @Description: 车辆控制基类
-@LastEditTime: 2024-04-13 22:17:06
+@LastEditTime: 2024-05-05 15:14:33
 '''
 from loguru import logger
 from abc import ABC, abstractmethod
@@ -16,10 +16,13 @@ class VehicleAction(ABC):
         # 如果是 ego 车辆, 那么可以自由控制对应的速度, 不受到 car-following 的限制
         # speed mode: https://sumo.dlr.de/docs/TraCI/Change_Vehicle_State.html#speed_mode_0xb3
         # lane change mode: https://sumo.dlr.de/docs/TraCI/Change_Vehicle_State.html#lane_change_mode_0xb6
-        # Collisions: https://sumo.dlr.de/docs/Simulation/Safety.html#collisions
+        # Collisions: https://sumo.dlr.de/docs/Simulation/Safety.html#collisions, 发生碰撞之后车辆消失, 还是继续仿真
         if 'ego' in vehicle_type:
             self.sumo.vehicle.setSpeedMode(self.veh_id, 0)
             logger.info(f"SIM: Set {self.veh_id} speedmode to 0.")
+            self.sumo.vehicle.setLaneChangeMode(self.veh_id, 1109)
+            logger.info(f"SIM: Set {self.veh_id} lanechangemode to 1109 (0b010001010101).")
+
 
     @abstractmethod
     def execute(self) -> None:
