@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-01 23:44:45
 @Description: Plot reward curve according to the log file
-@LastEditTime: 2024-04-24 23:00:35
+@LastEditTime: 2024-05-06 22:50:40
 '''
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -53,7 +53,7 @@ def plot_reward_curve(file_paths:List[str], output_file:str, window_size:int=10,
     plt.close()  # Close the figure
 
 
-def plot_multi_reward_curves(dirs_and_labels):
+def plot_multi_reward_curves(dirs_and_labels, window_size:int=3):
     """
     Plot the reward curve for all files in multiple directories.
 
@@ -71,12 +71,13 @@ def plot_multi_reward_curves(dirs_and_labels):
 
         # Loop over all files in the directory
         for file_path in files:
-                # Read the file
-                df = pd.read_csv(file_path, comment='#')
-                rewards.append(df['r'])
+            # Read the file
+            df = pd.read_csv(file_path, comment='#')
+            rewards.append(df['r'])
 
         # Concatenate all rewards and calculate the mean and standard deviation
         rewards = pd.concat(rewards, axis=1)
+        rewards = rewards.rolling(window_size).mean().dropna()
         mean_rewards = rewards.mean(axis=1)
         std_rewards = rewards.std(axis=1)
 
