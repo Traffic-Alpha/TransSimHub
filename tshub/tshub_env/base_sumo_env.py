@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-05-07 01:02:16
+@LastEditTime: 2024-05-07 15:01:38
 '''
 import sumolib
 from typing import List
@@ -168,6 +168,7 @@ class BaseSumoEnvironment(ABC):
         if self.collision_action is not None:
             sumo_cmd.extend(['--collision.action', self.collision_action])
         if self.trip_info is not None: # 使得输出 trip_info
+            sumo_cmd.extend(['--device.emissions.probability', '1.0']) # 输出 emission
             sumo_cmd.extend(['--tripinfo-output', self.trip_info])
         if self.statistic_output is not None: # 使得输出 statistic_output
             sumo_cmd.extend(['--statistic-output', self.statistic_output])
