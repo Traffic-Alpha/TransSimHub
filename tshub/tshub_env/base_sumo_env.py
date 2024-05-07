@@ -2,8 +2,10 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-05-07 15:01:38
+@LastEditTime: 2024-05-07 15:23:06
 '''
+import os
+import shutil
 import sumolib
 from typing import List
 from loguru import logger
@@ -97,15 +99,47 @@ class BaseSumoEnvironment(ABC):
 
         self.label = str(BaseSumoEnvironment.CONNECTION_LABEL)
         BaseSumoEnvironment.CONNECTION_LABEL += 1 # 多次初始化 label 是不同的
+        self.reset_num = 0 # 重启环境的次数
         logger.info(f'SIM: Env Label, {self.label}.')
-    
-    def _start_simulation(self):
-        """开始仿真, 有四种情况来开启仿真
+
+    def __copy_files_with_reset_num(self):
+        # Check and copy `self.trip_info` if it's not None
+        if self.trip_info is not None:
+            new_trip_info_path = f"{os.path.splitext(self.trip_info)[0]}_{self.reset_num}{os.path.splitext(self.trip_info)[1]}"
+            shutil.copy(self.trip_info, new_trip_info_path)
+
+        # Check and copy `self.statistic_output` if it's not None
+        if self.statistic_output is not None:
+            new_statistic_output_path = f"{os.path.splitext(self.statistic_output)[0]}_{self.reset_num}{os.path.splitext(self.statistic_output)[1]}"
+            shutil.copy(self.statistic_output, new_statistic_output_path)
+
+        # Check and copy `self.summary` if it's not None
+        if self.summary is not None:
+            new_summary_path = f"{os.path.splitext(self.summary)[0]}_{self.reset_num}{os.path.splitext(self.summary)[1]}"
+            shutil.copy(self.summary, new_summary_path)
+
+        # Check and copy `self.queue_output` if it's not None
+        if self.queue_output is not None:
+            new_queue_output_path = f"{os.path.splitext(self.queue_output)[0]}_{self.reset_num}{os.path.splitext(self.queue_output)[1]}"
+            shutil.copy(self.queue_output, new_queue_output_path)
+
+        # Check and copy each file in `self.tls_state_add` if it's not None
+        if self.tls_state_add is not None:
+            for tls_state in self.tls_state_add:
+                new_tls_state_path = f"{os.path.splitext(tls_state)[0]}_{self.reset_num}{os.path.splitext(tls_state)[1]}"
+                shutil.copy(tls_state, new_tls_state_path)
+
+    def _start_simulation(self) -> None:
+        """开始仿真. 在开启之前, 需要首先检查是否有 output 的文件, 如果有就进行复制, 仿真开启仿真之后被删除.
+        接着就可以开启仿真, 有四种情况来开启仿真
         1. 只指定 sumocfg 文件
         2. 指定 sumocfg 和 route 文件, (新的 route 可以覆盖 sumocfg 的设置)
         3. 制定 sumocfg 和 net 文件, (新的 net 可以覆盖 sumocfg 的设置)
         4. 直接指定 net 和 route, 不使用 sumocfg
         """
+        if self.reset_num>0: # 第一次启动是不需要复制文件的
+            self.__copy_files_with_reset_num() # 复制 output 的文件
+        self.reset_num += 1 # 重置次数 +1
         if (self._net == None) and (self._route == None):
             # 使用 sumocfg 来启动 (没有指定 route 和 net)
             logger.info('SIM: 使用 sumocfg 来启动 (没有指定 route 和 net)')
