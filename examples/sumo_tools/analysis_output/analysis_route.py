@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-03-24 15:19:10
 @Description: 分析生成的路网数据
-@LastEditTime: 2024-03-24 15:36:27
+@LastEditTime: 2024-05-14 03:14:01
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -19,4 +19,9 @@ edge_vehs = count_vehicles_for_multiple_edges(
     edges_list=["gsndj_s4 gsndj_s5", "gsndj_n7 gsndj_n6"],
     interval=120
 )
+
+# 修改 key 用于修改 label
+edge_vehs['NS-SN'] = edge_vehs.pop("gsndj_s4 gsndj_s5")
+edge_vehs['WE-EW'] = edge_vehs.pop("gsndj_n7 gsndj_n6")
+
 plot_vehicle_counts(edge_vehs, current_file_path('./route.png'))
