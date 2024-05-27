@@ -7,7 +7,7 @@
     - https://sumo.dlr.de/docs/netconvert.html
     - https://sumo.dlr.de/docs/netgenerate.html
 + polyconvert, https://sumo.dlr.de/docs/polyconvert.html
-@LastEditTime: 2023-09-26 20:16:24
+@LastEditTime: 2024-05-27 15:18:33
 '''
 import sumolib
 import subprocess
@@ -32,8 +32,19 @@ DEFAULT_NETCONVERT_OPTS = (
 )
 
 
-
 def scenario_build(osm_file:str, output_directory:str, netconvert_typemap:str=None, poly_typemap:str=None):
+    """根据 OSM 文件生成 *.poly.xml 和 *.net.xml 文件
+
+    Args:
+        osm_file (str): 原始的 OSM 文件
+        output_directory (str): *.net.xml 和 *.poly.xml 输出的文件夹
+        netconvert_typemap (str, optional): _description_. Defaults to None.
+        poly_typemap (str, optional): _description_. Defaults to None.
+
+    Raises:
+        subprocess.CalledProcessError: _description_
+        Exception: _description_
+    """
     osm_file = Path(osm_file)
     output_directory = Path(output_directory)
     file_name = osm_file.stem # osm 文件的名字
@@ -50,11 +61,11 @@ def scenario_build(osm_file:str, output_directory:str, netconvert_typemap:str=No
     logger.info(f'SIM: 开始设置 netconvert 的参数.')
     net_cfg = output_directory/f'{file_name}.netgcfg' # 配置文件
     if netconvert_typemap is None:
-        netconvert_typemap = current_file_path('./net.typ.xml')
+        netconvert_typemap = current_file_path('./osm_build_type/net.typ.xml')
     netconvert_opts = [netconvert]
     netconvert_opts += ["-t", netconvert_typemap]
     netconvert_opts += DEFAULT_NETCONVERT_OPTS.strip().split(',')
-    netconvert_opts += ["--keep-edges.by-vclass", "passenger"]
+    netconvert_opts += ["--keep-edges.by-vclass", "passenger"] # 保留行人的道路
     netconvert_opts += ['--osm-files', osm_file] # 输入的 osm 文件
     netconvert_opts += ['-o', net_file] # 输出的 net file 文件        
     netconvert_opts += ['--save-configuration', net_cfg]
@@ -64,12 +75,13 @@ def scenario_build(osm_file:str, output_directory:str, netconvert_typemap:str=No
     # ###################
     logger.info(f'SIM: 开始设置 polyconvert 的参数.')
     if poly_typemap is None:
-        poly_typemap = current_file_path("./poly.typ.xml")
+        poly_typemap = current_file_path("./osm_build_type/poly.typ.xml")
     poly_cfg = output_directory/f'{file_name}.polygcfg' # 配置文件
     polyconvert_opts = [polyconvert]
     polyconvert_opts += ['--type-file', poly_typemap] # 保留的 poly type 类型
     polyconvert_opts += ['--osm-files', osm_file] # 输入的 osm 文件
     polyconvert_opts += ['--discard', 'true'] # 去掉 unknown 的 polygon
+    polyconvert_opts += ['--osm.merge-relations', '1']
     polyconvert_opts += ["-n", net_file, "-o", poly_file]
     polyconvert_opts += ['--save-configuration', poly_cfg]
 
