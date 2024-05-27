@@ -1,0 +1,3 @@
+include tshub/aircraft/aircraft.png
+include tshub/sumo_tools/osm_build_type/net.typ.xml
+include tshub/sumo_tools/osm_build_type/poly.typ.xml
