@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:09:07
 @Description: 初始化 Map Info Object
-@LastEditTime: 2024-05-29 16:19:57
+@LastEditTime: 2024-05-29 16:37:23
 '''
 import sumolib
 from typing import Dict
@@ -36,6 +36,11 @@ class MapBuilder(BaseBuilder):
         """
         # 得到 edge 和 node 的 shape
         net = sumolib.net.readNet(self.net_file)
+
+        # 得到基础信息
+        x_offset, y_offset = net.getLocationOffset()
+
+        # 统计 edge 的信息
         for e in net._edges: # 获得所有的 edge
             edge_id = e.getID() # 获得 edge ID
             for _lane in e._lanes: # 获取每一个 edge 所有的 lane
@@ -102,7 +107,7 @@ class MapBuilder(BaseBuilder):
         # 处理 radio map 的信息, 获得每个点的信息
         if self.radio_map_files is not None:
             for file_type, file_path in self.radio_map_files.items():
-                self.map_info['grid'][file_type] = GridInfo.from_radio_map_txt(file_path)
+                self.map_info['grid'][file_type] = GridInfo.from_radio_map_txt(file_path, x_offset, y_offset)
 
     def get_objects_infos(self) -> None:
         """获得 map 的信息

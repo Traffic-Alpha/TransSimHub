@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-05-29 15:23:55
 @Description: 将 Map 划分为 Grid, 从而获得 Grid 内部的信息
-@LastEditTime: 2024-05-29 16:18:27
+@LastEditTime: 2024-05-29 16:36:12
 '''
 import numpy as np
 from typing import Tuple, List
@@ -22,7 +22,7 @@ class GridInfo:
     grid_z: np.ndarray = field(default_factory=lambda: np.array([]))
 
     @classmethod
-    def from_radio_map_txt(cls, file_path: str):
+    def from_radio_map_txt(cls, file_path: str, x_offset: float, y_offset: float):
         """从 radio map 文件中读取数据
 
         Args:
@@ -45,7 +45,7 @@ class GridInfo:
                 if "END_DATA" in line:
                     break
                 parts = line.split()
-                coord = (float(parts[0]), float(parts[1]))
+                coord = (float(parts[0])+x_offset, float(parts[1])+y_offset) # 这里加上 offset, 转换为 SUMO 仿真的坐标
                 value = np.nan if parts[2] == "N.C." else float(parts[2])
                 data.append((*coord, value))
 

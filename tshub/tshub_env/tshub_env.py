@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-05-07 01:03:41
+@LastEditTime: 2024-05-29 16:28:39
 '''
 import os
 import sys
@@ -51,7 +51,7 @@ class TshubEnvironment(BaseSumoEnvironment):
                  is_aircraft_builder_initialized:bool = True, 
                  is_traffic_light_builder_initialized:bool = True,
                  is_person_builder_initialized:bool = True,
-                 poly_file:str = None, osm_file:str = None,
+                 poly_file:str = None, osm_file:str = None, radio_map_files:Dict[str, str]=None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
                  vehicle_action_type:str = 'lane', hightlight:bool = False,
                  tls_action_type:str = 'next_or_not', delta_time:int=5,
@@ -79,6 +79,7 @@ class TshubEnvironment(BaseSumoEnvironment):
         # Map Builder Input
         self.poly_file = poly_file
         self.osm_file = osm_file
+        self.radio_map_files = radio_map_files
         # Traffic Light Builder Input
         self.tls_ids = tls_ids
         self.tls_action_type = tls_action_type
@@ -94,7 +95,7 @@ class TshubEnvironment(BaseSumoEnvironment):
 
     def __init_builder(self) -> None:
         map_builder = (
-            MapBuilder(net_file=self._net, poly_file=self.poly_file, osm_file=self.osm_file)
+            MapBuilder(net_file=self._net, poly_file=self.poly_file, osm_file=self.osm_file, radio_map_files=self.radio_map_files)
             if self.is_map_builder_initialized
             else None
         )
