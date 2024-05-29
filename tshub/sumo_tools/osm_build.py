@@ -7,7 +7,7 @@
     - https://sumo.dlr.de/docs/netconvert.html
     - https://sumo.dlr.de/docs/netgenerate.html
 + polyconvert, https://sumo.dlr.de/docs/polyconvert.html
-@LastEditTime: 2024-05-27 15:18:33
+@LastEditTime: 2024-05-28 20:59:56
 '''
 import sumolib
 import subprocess
@@ -59,7 +59,7 @@ def scenario_build(osm_file:str, output_directory:str, netconvert_typemap:str=No
     # netconvert config
     # ##################
     logger.info(f'SIM: 开始设置 netconvert 的参数.')
-    net_cfg = output_directory/f'{file_name}.netgcfg' # 配置文件
+    net_cfg = output_directory/f'{file_name}.netecfg' # 配置文件
     if netconvert_typemap is None:
         netconvert_typemap = current_file_path('./osm_build_type/net.typ.xml')
     netconvert_opts = [netconvert]

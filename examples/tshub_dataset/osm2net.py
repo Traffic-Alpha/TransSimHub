@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-05-27 13:14:57
 @Description: Convert OSM to Net 
-@LastEditTime: 2024-05-27 15:23:36
+@LastEditTime: 2024-05-28 17:54:58
 '''
 import os
 from tshub.utils.get_abs_path import get_abs_path
@@ -15,18 +15,18 @@ set_logger(current_file_path('./'))
 
 
 if __name__ == '__main__':
-    osm_file = current_file_path("./map_sea.osm")
-    output_directory = current_file_path("./map_sea/")
+    osm_file = current_file_path("./shanghai_songjiang.osm")
+    output_directory = current_file_path("./shanghai_songjiang/")
     scenario_build(
         osm_file=osm_file,
         output_directory=output_directory
     )
     keep_ids = extract_ids(
-        poly_xml_path=os.path.join(output_directory, 'map_sea.poly.xml'),
-        net_xml_path=os.path.join(output_directory, 'map_sea.net.xml'),
+        poly_xml_path=os.path.join(output_directory, 'shanghai_songjiang.poly.xml'),
+        net_xml_path=os.path.join(output_directory, 'shanghai_songjiang.net.xml'),
     )
     filter_osm(
         ways_to_keep=keep_ids,
         input_osm=osm_file,
-        output_osm=current_file_path("./map_sea_filter.osm")
+        output_osm=current_file_path("./shanghai_songjiang_filter.osm")
     )
