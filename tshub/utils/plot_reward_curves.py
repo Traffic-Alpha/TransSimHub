@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-01 23:44:45
 @Description: Plot reward curve according to the log file
-@LastEditTime: 2024-05-06 22:53:06
+@LastEditTime: 2024-06-18 23:27:27
 '''
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -38,8 +38,8 @@ def plot_reward_curve(file_paths:List[str], output_file:str, window_size:int=10,
     # Apply a rolling window for the rewards
     rewards = rewards.rolling(window_size).mean().dropna()
 
-    mean_rewards = rewards.mean(axis=1)
-    std_rewards = rewards.std(axis=1)
+    mean_rewards = rewards.mean(axis=1).reset_index(drop=True)
+    std_rewards = rewards.std(axis=1).reset_index(drop=True)
 
     plt.figure(figsize=(10, 6))
     plt.plot(mean_rewards, label='Mean Reward')
