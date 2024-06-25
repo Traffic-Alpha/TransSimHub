@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-05-07 15:23:06
+@LastEditTime: 2024-06-25 17:28:19
 '''
 import os
 import shutil
@@ -102,7 +102,9 @@ class BaseSumoEnvironment(ABC):
         self.reset_num = 0 # 重启环境的次数
         logger.info(f'SIM: Env Label, {self.label}.')
 
-    def __copy_files_with_reset_num(self):
+    def __copy_files_with_reset_num(self) -> None:
+        """在 reset 之前, 需要复制产生的 output 文件, 然后进行重命名, 防止被覆盖
+        """
         # Check and copy `self.trip_info` if it's not None
         if self.trip_info is not None:
             new_trip_info_path = f"{os.path.splitext(self.trip_info)[0]}_{self.reset_num}{os.path.splitext(self.trip_info)[1]}"
@@ -124,8 +126,10 @@ class BaseSumoEnvironment(ABC):
             shutil.copy(self.queue_output, new_queue_output_path)
 
         # Check and copy each file in `self.tls_state_add` if it's not None
+        # 这里需要确保 output 的文件名字和 add 的文件名是一样的
         if self.tls_state_add is not None:
             for tls_state in self.tls_state_add:
+                tls_state = tls_state.replace('.add', '.out') # 只需要 output 文件，即可
                 new_tls_state_path = f"{os.path.splitext(tls_state)[0]}_{self.reset_num}{os.path.splitext(tls_state)[1]}"
                 shutil.copy(tls_state, new_tls_state_path)
 
