@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:30:01
 @Description: Base tshub Environment
-@LastEditTime: 2024-06-25 17:28:19
+@LastEditTime: 2024-06-25 17:36:13
 '''
 import os
 import shutil
@@ -130,8 +130,9 @@ class BaseSumoEnvironment(ABC):
         if self.tls_state_add is not None:
             for tls_state in self.tls_state_add:
                 tls_state = tls_state.replace('.add', '.out') # 只需要 output 文件，即可
-                new_tls_state_path = f"{os.path.splitext(tls_state)[0]}_{self.reset_num}{os.path.splitext(tls_state)[1]}"
-                shutil.copy(tls_state, new_tls_state_path)
+                if os.path.exists(tls_state):
+                    new_tls_state_path = f"{os.path.splitext(tls_state)[0]}_{self.reset_num}{os.path.splitext(tls_state)[1]}"
+                    shutil.copy(tls_state, new_tls_state_path)
 
     def _start_simulation(self) -> None:
         """开始仿真. 在开启之前, 需要首先检查是否有 output 的文件, 如果有就进行复制, 仿真开启仿真之后被删除.
