@@ -1,0 +1,84 @@
+'''
+@Author: WANG Maonan
+@Date: 2024-06-25 22:01:24
+@Description: 分析 tripinfo 文件
+@LastEditTime: 2024-06-25 22:12:50
+'''
+import numpy as np
+from loguru import logger
+from typing import Dict, List
+import xml.etree.ElementTree as ET
+
+class TripInfoAnalysis:
+    def __init__(self, xml_file) -> None:
+        with open(xml_file, 'r') as file:
+            self.xml_data = file.read()
+        logger.info(f"SIM: 读取 {xml_file} 完成.")
+        self.metrics = self.parse_xml()
+        logger.info(f"SIM: 解析 {xml_file} 完成.")
+
+    def parse_xml(self)-> Dict[str, List]:
+        """解析 xml 文件, 获得各个指标
+        """
+        tree = ET.ElementTree(ET.fromstring(self.xml_data))
+        root = tree.getroot()
+
+        metrics = {
+            'travelTime': [],
+            'waitingTime': [],
+            'waitingCount': [],
+            'stopTime': [],
+            'timeLoss': [],
+            'CO_abs': [],
+            'CO2_abs': [],
+            'HC_abs': [],
+            'PMx_abs': [],
+            'NOx_abs': [],
+            'fuel_abs': [],
+            'electricity_abs': []
+        }
+
+        for tripinfo in root.findall('tripinfo'):
+            metrics['travelTime'].append(float(tripinfo.get('duration')))
+            metrics['waitingTime'].append(float(tripinfo.get('waitingTime')))
+            metrics['waitingCount'].append(int(tripinfo.get('waitingCount')))
+            metrics['stopTime'].append(float(tripinfo.get('stopTime')))
+            metrics['timeLoss'].append(float(tripinfo.get('timeLoss')))
+            
+            emissions = tripinfo.find('emissions')
+            metrics['CO_abs'].append(float(emissions.get('CO_abs')))
+            metrics['CO2_abs'].append(float(emissions.get('CO2_abs')))
+            metrics['HC_abs'].append(float(emissions.get('HC_abs')))
+            metrics['PMx_abs'].append(float(emissions.get('PMx_abs')))
+            metrics['NOx_abs'].append(float(emissions.get('NOx_abs')))
+            metrics['fuel_abs'].append(float(emissions.get('fuel_abs')))
+            metrics['electricity_abs'].append(float(emissions.get('electricity_abs')))
+
+        return metrics
+
+    def calculate_stats(self, values):
+        return {
+            'mean': np.mean(values),
+            'variance': np.var(values),
+            'max': np.max(values),
+            'min': np.min(values),
+            'percentile_25': np.percentile(values, 25),
+            'percentile_50': np.percentile(values, 50),
+            'percentile_75': np.percentile(values, 75)
+        }
+
+    def get_all_stats(self):
+        all_stats = {}
+        for key, values in self.metrics.items():
+            all_stats[key] = self.calculate_stats(values)
+        return all_stats
+
+    def print_stats(self) -> None:
+        """将指标输出, 方便统计结果
+        """
+        all_stats = self.get_all_stats()
+        for metric, stats in all_stats.items():
+            print(f"Statistics for {metric}:")
+            for stat_name, value in stats.items():
+                print(f"  {stat_name.capitalize()}: {value:.2f}")
+            print()  # Blank line for better readability
