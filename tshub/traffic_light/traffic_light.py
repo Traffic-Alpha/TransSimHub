@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-05-01 15:33:24
+@LastEditTime: 2024-06-27 19:03:19
 '''
 from __future__ import annotations
 
@@ -13,10 +13,11 @@ import numpy as np
 from typing import List, Dict, Any
 
 from .traffic_light_action_type import tls_action_type
+from .tls_type.next_or_not import next_or_not
 from .tls_type.choose_next_phase import choose_next_phase
 from .tls_type.choose_next_phase_syn import choose_next_phase_syn
 from .tls_type.adjust_cycle_duration import adjust_cycle_duration
-from .tls_type.next_or_not import next_or_not
+from .tls_type.set_phase_duration import set_phase_duration
 from ..utils.format_dict import dict_to_str
 
 @dataclass
@@ -57,6 +58,8 @@ class TrafficLightInfo:
             self.tls_action = next_or_not(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         elif _action == tls_action_type.AdjustCycleDuration:
             self.tls_action = adjust_cycle_duration(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
+        elif _action == tls_action_type.SetPhaseDuration:
+            self.tls_action = set_phase_duration(ts_id=self.id, sumo=self.sumo, delta_time=self.delta_time)
         else:
             logger.error(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')

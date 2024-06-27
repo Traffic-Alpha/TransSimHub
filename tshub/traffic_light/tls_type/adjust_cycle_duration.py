@@ -5,7 +5,7 @@
 1. 覆盖父类中的 build_phases, 此时需要让相位时间按照指定时间初始化
 2. 完成功能函数 set_duration, 可以直接修改相位的时间长度
 3. 覆盖父类中的 update, 不需要进行黄灯的切换
-@LastEditTime: 2024-05-01 16:14:33
+@LastEditTime: 2024-06-27 18:38:57
 '''
 import numpy as np
 from typing import List
@@ -27,6 +27,7 @@ class adjust_cycle_duration(BaseTLS):
         self.init_green_duration = init_green_duration # 每个相位初始的绿灯时间
         self.green_loss = 0 # 所有黄灯时间的求和
 
+        # 记录当前所在的相位, 但是此时是一个周期进行调整, 所以是 -1
         self.phase_index = -1 # 用于和其他 action type 对齐
 
 
