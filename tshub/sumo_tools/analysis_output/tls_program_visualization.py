@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-06-25 22:53:53
 @Description: 对 Phase Duration Visualization 进行可视化
-@LastEditTime: 2024-06-25 23:42:00
+@LastEditTime: 2024-06-27 17:39:43
 '''
 import scienceplots
 import numpy as np
@@ -21,10 +21,10 @@ class TLSProgram_PDVis(TLSProgramAnalysis):
         for state in phase_strs:
             if state in self.state_index_map:
                 index = self.state_index_map[state]
-                duration_values.append([cycle[index]/100 for cycle in self.percentage_cycles]) # 每一个phase在整个 cycle 的占比
+                duration_values.append([cycle[index]/100 for cycle in self.percentage_cycles[:-1]]) # 每一个phase在整个 cycle 的占比
 
         # 计算每个点的坐标, 用于 x 轴
-        cycle_duration_sum = np.cumsum([sum(_cycle_duration)/60 for _cycle_duration in self.cycle_durations]) 
+        cycle_duration_sum = np.cumsum([sum(_cycle_duration)/60 for _cycle_duration in self.cycle_durations[:-1]]) 
 
         # 开始绘图
         plt.figure(figsize=plt.figaspect(0.6))
@@ -63,7 +63,7 @@ class TLSProgram_PDVis(TLSProgramAnalysis):
         for state in phase_strs:
             if state in self.state_index_map:
                 index = self.state_index_map[state]
-                duration_values.append([cycle[index] for cycle in self.cycle_durations])
+                duration_values.append([cycle[index] for cycle in self.cycle_durations[:-1]])
         
         data_array = np.array(duration_values) # 每个相位的持续时间
         col_sums = data_array.sum(axis=0)
