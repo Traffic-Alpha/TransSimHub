@@ -3,7 +3,7 @@
 @Date: 2024-07-03 16:05:08
 @Description: 将 SUMO Net 转换为 glb 文件
 这部分修改自, https://github.com/huawei-noah/SMARTS/blob/master/smarts/core/sumo_road_network.py
-@LastEditTime: 2024-07-05 22:11:05
+@LastEditTime: 2024-07-06 20:20:49
 '''
 import math
 import sumolib
@@ -20,13 +20,13 @@ from shapely.ops import nearest_points, snap
 from typing import Any, Dict, List, Optional, Tuple
 
 from .vis3d_net.road_map import RoadMap
-from .vis3d_utils.coordinates import BoundingBox, Point
 from .vis3d_utils.geometry import buffered_shape
+from .vis3d_utils.coordinates import BoundingBox, Point
 
-from .vis3d_net.feature import Feature # 地图的信号灯
 from .vis3d_net.lane import Lane
 from .vis3d_net.road import Road
-from .vis3d_net.glb import make_map_glb, make_road_line_glb
+from .vis3d_net.feature import Feature
+from .vis3d_net.glb import make_map_glb, make_line_glb, make_road_glb
 
 class SumoNet3D():
     DEFAULT_LANE_WIDTH = 3.2
@@ -61,10 +61,10 @@ class SumoNet3D():
         )
         map_glb.write_glb(Path(glb_dir) / "map.glb")
 
-        road_lines_glb = make_road_line_glb(edge_dividers)
+        road_lines_glb = make_road_glb(edge_dividers)
         road_lines_glb.write_glb(Path(glb_dir) / "road_lines.glb")
 
-        lane_lines_glb = make_road_line_glb(lane_dividers)
+        lane_lines_glb = make_line_glb(lane_dividers)
         lane_lines_glb.write_glb(Path(glb_dir) / "lane_lines.glb")
     
     # -------------------- #
@@ -297,24 +297,23 @@ class SumoNet3D():
 
                 # Edge Board 里面有第一个边和最后一个边
                 if i == 0:
-                    edge_borders.append(SumoNet3D.interpolate_points(
-                        points=right_side, 
-                        distance=0.5
-                    )
-                )
+                    edge_borders.append(right_side)
 
                 if i == len(lanes) - 1:
-                    edge_borders.append(SumoNet3D.interpolate_points(
-                        points=left_side, 
-                        distance=0.5
-                    )
-                )
+                    edge_borders.append(left_side)
                 else: # 其他的放在 lane driver 里面, lane 的间隔可以不需要很密
                     lane_dividers.append(SumoNet3D.interpolate_points(
                         points=left_side, 
                         distance=3
                     )
                 )
+            # 将 road 边缘可以封闭 (例如有路口停车线)
+            edge_borders.append(
+                [
+                    edge_borders[-2][-1], # 新加入的两条边的最后一个点
+                    edge_borders[-1][-1]
+                ]
+            )
 
         return lane_dividers, edge_borders
 
@@ -337,6 +336,7 @@ class SumoNet3D():
         interpolated_points.append(points[-1])  # Add the last point
         return interpolated_points.copy()
     
+
     # ------- #
     # 工具函数
     # ------- #
