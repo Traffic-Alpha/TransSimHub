@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-05-06 18:35:59
+ * @LastEditTime: 2024-07-06 22:30:18
 -->
 # Change Log
 
@@ -17,6 +17,39 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+
+<!-- v0.9.9 -->
+## [v0.9.9] - 2024-07-06
+
+### News
+
+Congratulations! The paper `UniTSA: A Universal Reinforcement Learning Framework for V2X Traffic Signal Control` based on TransSimHub has been accepted by `IEEE Transactions on Vehicular Technology`. This paper mainly discusses the generalization of RL-based TSC tasks.
+- Paper link: https://ieeexplore.ieee.org/abstract/document/10535743/
+- Code link: https://github.com/wmn7/Universal-Light
+
+### Added
+
+- Updated static data Map:
+  - For nodes, added coordinate information and node types (e.g., whether it's a traffic light)
+  - In addition to `polygon.py` (lane, edge, and node) in the map, there's also `grid.py`, which contains statistical information within an area (e.g., SNR within a region)
+- Added results analysis section:
+  - Parse `tripinfo.xml` file to get statistical measures of all indicators.
+  - Parse `route.xml` file to get the change in vehicle numbers in each time period.
+  - Parse `tls_program.xml` file to get the change in traffic phase duration.
+- OSM to SUMO Net:
+  - Can convert OSM to Net map.
+  - According to the filtered net map, output a new OSM map, retaining only the necessary elements.
+
+### Changed
+
+- Added `__copy_files_with_reset_num` in base_sumo_env to ensure that all output files are copied before reset to prevent overwriting. This makes it easy to analyze sumo output files.
+- Modified the tripinfo.out.xml file in base_env to output the fuel consumption and carbon emissions of each vehicle.
+
+### Fixed
+
+- Fixed the issue in plot_reward_curves.py where mean value and std error could not align.
+- Modified setup file to install static files, resolving the issue of aircraft visualization lacking textures.
 
 
 <!-- v0.9.7 -->
@@ -57,7 +90,7 @@ The `TSHub` project has been undergoing numerous updates recently, with new feat
 <!-- v0.9.5 -->
 ## [v0.9.5] - 2023-12-30 - Happy New Year 2024!
 
-Happy New Year 2024!
+**Happy New Year 2024!**
 
 ### Added
 
