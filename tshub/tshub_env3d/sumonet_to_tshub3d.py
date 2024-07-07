@@ -3,7 +3,7 @@
 @Date: 2024-07-03 16:05:08
 @Description: 将 SUMO Net 转换为 glb 文件
 这部分修改自, https://github.com/huawei-noah/SMARTS/blob/master/smarts/core/sumo_road_network.py
-@LastEditTime: 2024-07-06 20:20:49
+@LastEditTime: 2024-07-08 01:01:31
 '''
 import math
 import sumolib
@@ -25,7 +25,7 @@ from .vis3d_utils.coordinates import BoundingBox, Point
 
 from .vis3d_net.lane import Lane
 from .vis3d_net.road import Road
-from .vis3d_net.feature import Feature
+from .vis3d_net.feature import Feature # TODO, 确认一下 Feature 是否有用到
 from .vis3d_net.glb import make_map_glb, make_line_glb, make_road_glb
 
 class SumoNet3D():

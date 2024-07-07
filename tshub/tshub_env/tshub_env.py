@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-05-29 16:28:39
+@LastEditTime: 2024-07-06 23:13:20
 '''
 import os
 import sys
@@ -80,12 +80,20 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.poly_file = poly_file
         self.osm_file = osm_file
         self.radio_map_files = radio_map_files
+
         # Traffic Light Builder Input
         self.tls_ids = tls_ids
         self.tls_action_type = tls_action_type
         self.delta_time = delta_time
+        if self.is_traffic_light_builder_initialized is True and not self.tls_ids:
+            raise ValueError("Both `map_init` and `tls_ids` need to be set together.")
+        if tls_ids is not None:
+            if not isinstance(self.tls_ids, list):
+                raise TypeError("The 'tls_ids' must be of type 'list'.")
+
         # Aircraft Builder Input
         self.aircraft_inits = aircraft_inits
+        
         # Vehicle Builder Input
         self.vehicle_action_type = vehicle_action_type
         self.hightlight = hightlight
