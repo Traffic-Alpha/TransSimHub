@@ -2,14 +2,10 @@
 @Author: WANG Maonan
 @Date: 2024-07-12 21:38:26
 @Description: 场景加载相关的方法 (用于初始化场景)
-TODO
-1. 加载灯光也需要在这里完成
-2. terrain 可以使用多个 terrain 拼接而成
-3. skybox 需要进一步优化
-4. 加入 logger, 方便用户判断哪些是加载了
-@LastEditTime: 2024-07-13 03:23:42
+@LastEditTime: 2024-07-13 21:02:54
 '''
 from pathlib import Path
+from loguru import logger
 from panda3d.core import (
     Shader,
     SamplerState,
@@ -21,13 +17,19 @@ from panda3d.core import (
     GeomVertexFormat,
     GeomVertexReader,
     GeomVertexWriter,
+    AmbientLight,
+    CardMaker,
+    Vec4,
+    DirectionalLight
 )
-
-from ...vis3d_utils.colors import SceneColors
+from ...vis3d_utils.colors import SceneColors, Colors
 
 class SceneLoader(object):
-    MAP_FILENAME = "map.glb"
     ROAD_MAP_NODE_NAME = "road_map"
+    MAP_FILENAME = "map.glb"
+    TERRAIN_FILENAME = "ground.glb"
+    LANE_FILENAME = "lane_lines.glb"
+    ROAD_FILENAME = "road_lines.glb"
 
     def __init__(
             self, 
@@ -50,12 +52,15 @@ class SceneLoader(object):
         self.map_center = None
     
 
-    def init_scene(self) -> None:
+    def initialize_scene(self, use_render_pipeline=False) -> None:
+        logger.info("SIM: Starting TSHub3D scene initialization.")
         self.load_map()
         self.load_road_lines()
         self.load_lane_lines()
-        # self.load_sky_box()
-        # self.load_terrain()
+        if not use_render_pipeline:
+            self.load_sky_box()
+            self.load_flat_terrain()
+            self.setup_lighting()
 
         return self.map_radius, self.map_center
 
@@ -64,6 +69,7 @@ class SceneLoader(object):
         """Load map & 并获得中心位置
         """
         map_path = self.scenario_glb_dir / self.MAP_FILENAME
+        logger.info(f"SIM: 加载场景地图, {map_path}.")
         try:
             map_np = self._showbase_instance.loader.loadModel(map_path, noCache=True)
             node_path = self._root_np.attachNewNode(self.ROAD_MAP_NODE_NAME)
@@ -78,6 +84,9 @@ class SceneLoader(object):
                 map_model_center.getY(), 
                 map_model_center.getZ()
             )
+            logger.info(f"SIM: 场景地图加载成功.")
+            logger.info(f"SIM: 地图的中心 {self.map_center}.")
+            logger.info(f"SIM: 地图的半径 {self.map_radius}.")
         except Exception as e:
             print(f"Error loading map: {e}")
         return map_np
@@ -86,18 +95,22 @@ class SceneLoader(object):
     def load_road_lines(self):
         """Road lines (solid, yellow)
         """
-        road_lines_path = self.scenario_glb_dir / "road_lines.glb"
+        road_lines_path = self.scenario_glb_dir / SceneLoader.ROAD_FILENAME
+        logger.info(f"SIM: 加载道路边界线, {road_lines_path}.")
         if road_lines_path.exists():
             road_lines_np = self._load_line_data(road_lines_path, "road_lines")
             solid_lines_np = self._root_np.attachNewNode(road_lines_np)
             solid_lines_np.setColor(SceneColors.EdgeDivider.value)
             solid_lines_np.setRenderModeThickness(2) # 设置显示的粗细
+            logger.info(f"SIM: 加载道路线成功.")
         return solid_lines_np
 
     
     def load_lane_lines(self):
-        # Lane lines (dashed, white)
-        lane_lines_path = self.scenario_glb_dir / "lane_lines.glb"
+        """Lane lines (dashed, white)
+        """
+        lane_lines_path = self.scenario_glb_dir / SceneLoader.LANE_FILENAME
+        logger.info(f"SIM: 加载车道线, {lane_lines_path}.")
         if lane_lines_path.exists():
             lane_lines_np = self._load_line_data(lane_lines_path, "lane_lines")
             dashed_lines_np = self._root_np.attachNewNode(lane_lines_np)
@@ -113,6 +126,7 @@ class SceneLoader(object):
             dashed_lines_np.setShaderInput(
                 "iResolution", self._showbase_instance.getSize()
             )
+            logger.info(f"SIM: 加载车道线成功.")
             return dashed_lines_np
 
 
@@ -157,9 +171,41 @@ class SceneLoader(object):
         return node_path
 
 
+    def setup_lighting(
+            self, 
+            ambient_color: Vec4 = Vec4(0.25, 0.25, 0.25, 1), 
+            directional_color: Vec4 = Vec4(1, 1, 1, 1), 
+            light_temperature: int = 6000, 
+            light_height: int = 200
+        ) -> None:
+        """设置光照
+        """
+        logger.info("SIM: 设置光照.")
+        # Set up ambient light
+        ambient_light = AmbientLight('ambientLight')
+        ambient_light.setColor(ambient_color)
+        ambient_light.set_color_temperature(light_temperature)
+        ambient_light_node_path = self._root_np.attachNewNode(ambient_light)
+        self._root_np.setLight(ambient_light_node_path)
+        
+        # Set up directional light
+        directional_light = DirectionalLight('directionalLight')
+        directional_light.setColor(directional_color)
+        directional_light.set_color_temperature(light_temperature)
+        directional_light_node_path = self._root_np.attachNewNode(directional_light)
+        directional_light_node_path.setPos(
+            self.map_center[0]-self.map_radius,
+            self.map_center[1]-self.map_radius,
+            light_height
+        )
+        directional_light_node_path.lookAt(self.map_center) # 照向地图中心
+        self._root_np.setLight(directional_light_node_path)
+        self._root_np.setShaderAuto() # 场景开启阴影接收
+        
     def load_sky_box(self) -> None:
         """初始化环境的时候, 设置 skybox
         """
+        logger.info(f"SIM: 初始化 Skybox.")
         # 加载 skybox 模型
         skybox = self._showbase_instance.loader.loadModel(self.skybox_dir/"skybox.bam")
         skybox_scale = self.map_radius * 2 # 设置 skybox 的大小
@@ -184,61 +230,76 @@ class SceneLoader(object):
         skybox.setPos(
             self.map_center[0], 
             self.map_center[1], 
-            self.map_center[2] - self.map_radius*0.9 # TODO, 关于高度的设置
+            100
         )
-        # skybox.setH(0)
 
         # Ensure the skybox is always rendered behind everything else
-        skybox.set_bin('background', 0)
-        skybox.set_depth_write(False)
+        skybox.set_bin('background', 0) # 确保 skybox 首先被渲染
+        skybox.set_depth_write(False) # skybox 不会遮挡任意的对象
         skybox.set_compass()  # This makes the skybox fixed relative to the camera's rotation
 
-    def load_terrain(self):
-        self.terrain_node = ShaderTerrainMesh()
+    def load_flat_terrain(self):
+        """直接加载生成的平面 terrain
+        """
+        ground_path = self.scenario_glb_dir / SceneLoader.TERRAIN_FILENAME
+        logger.info(f"SIM: 加载地平面, {ground_path}.")
+        if ground_path.exists():
+            ground_np = self._showbase_instance.loader.loadModel(ground_path, noCache=True)
+            node_path = self._root_np.attachNewNode("ground_node")
+            ground_np.reparent_to(node_path)
+            node_path.setColor(Colors.Grey.value)
+            node_path.set_bin('background', 1)  # Ensure terrain is rendered after skybox
+            node_path.set_depth_write(False) 
 
-        # Set a heightfield, the heightfield should be a 16-bit png and
-        # have a quadratic size of a power of two.
-        heightfield = self._showbase_instance.loader.loadTexture(self.terrain_dir/"heightfield.png")
-        heightfield.wrap_u = SamplerState.WM_clamp
-        heightfield.wrap_v = SamplerState.WM_clamp
-        self.terrain_node.heightfield = heightfield
+        return ground_np
 
-        # Set the target triangle width. For a value of 10.0 for example,
-        # the terrain will attempt to make every triangle 10 pixels wide on screen.
-        self.terrain_node.target_triangle_width = 10.0
+    # TODO, 可以尝试加入地面的纹理
+    # def load_terrain(self) -> None:
+    #     self.terrain_node = ShaderTerrainMesh()
 
-        # Generate the terrain
-        self.terrain_node.generate()
+    #     # Set a heightfield, the heightfield should be a 16-bit png and
+    #     # have a quadratic size of a power of two.
+    #     heightfield = self._showbase_instance.loader.loadTexture(self.terrain_dir/"heightfield.png")
+    #     heightfield.wrap_u = SamplerState.WM_clamp
+    #     heightfield.wrap_v = SamplerState.WM_clamp
+    #     self.terrain_node.heightfield = heightfield
 
-        # Attach the terrain to the main scene and set its scale. With no scale
-        # set, the terrain ranges from (0, 0, 0) to (1, 1, 1)
-        self.terrain = self._root_np.attach_new_node(self.terrain_node)
-        self.terrain.set_scale(
-            self.map_radius*2, 
-            self.map_radius*2, 
-            1
-        )
-        self.terrain.set_pos(
-            self.map_center[0]-self.map_radius, 
-            self.map_center[1]-self.map_radius, 
-            self.map_center[2] - 3 # 将 terrain 的高度稍微设置的低一些, 避免 road 被遮挡
-        )
+    #     # Set the target triangle width. For a value of 10.0 for example,
+    #     # the terrain will attempt to make every triangle 10 pixels wide on screen.
+    #     self.terrain_node.target_triangle_width = 10.0
 
-        # Set a shader on the terrain. The ShaderTerrainMesh only works with
-        # an applied shader. You can use the shaders used here in your own application
-        terrain_shader = Shader.load(
-            Shader.SL_GLSL, 
-            self.terrain_dir/"terrain.vert.glsl",
-            self.terrain_dir/"terrain.frag.glsl"
-        )
-        self.terrain.set_shader(terrain_shader)
-        self.terrain.set_shader_input(
-            "camera", 
-            self._showbase_instance.camera
-        )
+    #     # Generate the terrain
+    #     self.terrain_node.generate()
 
-        # Set some texture on the terrain
-        grass_tex = self._showbase_instance.loader.loadTexture(self.terrain_dir/"ground.png")
-        grass_tex.set_minfilter(SamplerState.FT_linear_mipmap_linear)
-        grass_tex.set_anisotropic_degree(16)
-        self.terrain.set_texture(grass_tex)
+    #     # Attach the terrain to the main scene and set its scale. With no scale
+    #     # set, the terrain ranges from (0, 0, 0) to (1, 1, 1)
+    #     self.terrain = self._root_np.attach_new_node(self.terrain_node)
+    #     self.terrain.set_scale(
+    #         self.map_radius*5, 
+    #         self.map_radius*5, 
+    #         1
+    #     )
+    #     self.terrain.set_pos(
+    #         self.map_center[0]-2*self.map_radius, 
+    #         self.map_center[1]-2*self.map_radius, 
+    #         self.map_center[2] - 3 # 将 terrain 的高度稍微设置的低一些, 避免 road 被遮挡
+    #     )
+        
+    #     # Set a shader on the terrain. The ShaderTerrainMesh only works with
+    #     # an applied shader. You can use the shaders used here in your own application
+    #     terrain_shader = Shader.load(
+    #         Shader.SL_GLSL, 
+    #         self.terrain_dir/"terrain.vert.glsl",
+    #         self.terrain_dir/"terrain.frag.glsl"
+    #     )
+    #     self.terrain.set_shader(terrain_shader)
+    #     self.terrain.set_shader_input(
+    #         "camera", 
+    #         self._showbase_instance.camera
+    #     )
+
+    #     # Set some texture on the terrain
+    #     grass_tex = self._showbase_instance.loader.loadTexture(self.terrain_dir/"ground.png")
+    #     grass_tex.set_minfilter(SamplerState.FT_linear_mipmap_linear)
+    #     grass_tex.set_anisotropic_degree(16)
+    #     self.terrain.set_texture(grass_tex)
