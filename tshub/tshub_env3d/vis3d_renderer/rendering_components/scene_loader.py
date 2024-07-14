@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-12 21:38:26
 @Description: 场景加载相关的方法 (用于初始化场景)
-@LastEditTime: 2024-07-13 21:02:54
+@LastEditTime: 2024-07-14 20:25:46
 '''
 from pathlib import Path
 from loguru import logger
@@ -22,6 +22,7 @@ from panda3d.core import (
     Vec4,
     DirectionalLight
 )
+from ...vis3d_utils.masks import CamMask
 from ...vis3d_utils.colors import SceneColors, Colors
 
 class SceneLoader(object):
@@ -74,7 +75,10 @@ class SceneLoader(object):
             map_np = self._showbase_instance.loader.loadModel(map_path, noCache=True)
             node_path = self._root_np.attachNewNode(self.ROAD_MAP_NODE_NAME)
             map_np.reparent_to(node_path)
-            # Ensure SceneColors.Road.value is defined or handle it appropriately
+            # 定义 mask
+            node_path.hide(CamMask.AllOn)
+            node_path.show(CamMask.MapMask) # 只给部分 camera 展示
+            # 设置路面的颜色
             node_path.setColor(SceneColors.Road.value)
             map_bounds = map_np.getBounds()
             self.map_radius = map_bounds.getRadius()
@@ -100,6 +104,10 @@ class SceneLoader(object):
         if road_lines_path.exists():
             road_lines_np = self._load_line_data(road_lines_path, "road_lines")
             solid_lines_np = self._root_np.attachNewNode(road_lines_np)
+            # 定义 mask
+            solid_lines_np.hide(CamMask.AllOn)
+            solid_lines_np.show(CamMask.MapMask) # 只给部分 camera 展示
+            # 设置车道边线的颜色
             solid_lines_np.setColor(SceneColors.EdgeDivider.value)
             solid_lines_np.setRenderModeThickness(2) # 设置显示的粗细
             logger.info(f"SIM: 加载道路线成功.")
@@ -114,6 +122,10 @@ class SceneLoader(object):
         if lane_lines_path.exists():
             lane_lines_np = self._load_line_data(lane_lines_path, "lane_lines")
             dashed_lines_np = self._root_np.attachNewNode(lane_lines_np)
+            # 定义 mask
+            dashed_lines_np.hide(CamMask.AllOn)
+            dashed_lines_np.show(CamMask.MapMask) # 只给部分 camera 展示
+            # 设置车道线的颜色
             dashed_lines_np.setColor(SceneColors.LaneDivider.value)
             dashed_lines_np.setRenderModeThickness(2)
             
@@ -210,6 +222,9 @@ class SceneLoader(object):
         skybox = self._showbase_instance.loader.loadModel(self.skybox_dir/"skybox.bam")
         skybox_scale = self.map_radius * 2 # 设置 skybox 的大小
         skybox.set_scale(skybox_scale)
+        # 设置 skybox 的 mask
+        skybox.hide(CamMask.AllOn)
+        skybox.show(CamMask.SkyBoxMask) # 只给部分 camera 展示
 
         # 设置 skybox 纹理
         skybox_texture = self._showbase_instance.loader.loadTexture(self.skybox_dir/"skybox.jpg")
@@ -246,10 +261,13 @@ class SceneLoader(object):
         if ground_path.exists():
             ground_np = self._showbase_instance.loader.loadModel(ground_path, noCache=True)
             node_path = self._root_np.attachNewNode("ground_node")
-            ground_np.reparent_to(node_path)
-            node_path.setColor(Colors.Grey.value)
-            node_path.set_bin('background', 1)  # Ensure terrain is rendered after skybox
-            node_path.set_depth_write(False) 
+            ground_np.reparent_to(node_path) # 将 ground_np（地面模型的 NodePath）作为子节点附加到了 node_path 上
+            # 定义 mask
+            ground_np.hide(CamMask.AllOn)
+            ground_np.show(CamMask.GroundMask) # 只给部分 camera 展示
+            # 设置地面的颜色
+            ground_np.set_bin('background', 1)  # Ensure terrain is rendered after skybox
+            ground_np.set_depth_write(False) 
 
         return ground_np
 
