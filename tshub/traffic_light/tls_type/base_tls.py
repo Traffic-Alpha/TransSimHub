@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-@LastEditTime: 2023-10-27 23:49:30
+@LastEditTime: 2024-07-19 18:02:42
 '''
 from abc import ABC, abstractmethod
 from ...sumo_tools.sumo_infos.tls_connections import tls_connection
@@ -16,6 +16,9 @@ class BaseTLS(ABC):
         self.id = ts_id # 信号灯的 id
         self.sumo = sumo
 
+        # 获得路口位置 (TODO, 这里我们假设路口信号灯和路口 ID 是一样的, 如果写得比较好, 可以根据 in_roads 计算出 junction id)
+        self.tls_position = self.sumo.junction.getPosition(self.id)
+        
         # 获得路口连接
         tls_info = tls_connection(self.sumo)
         self.tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
@@ -30,9 +33,19 @@ class BaseTLS(ABC):
         self.phase2movements = {} # 记录每个 phase 由哪些 movement 组成
 
         self.lanes = list(dict.fromkeys(self.sumo.trafficlight.getControlledLanes(self.id)))  # Remove duplicates and keep order
-        self.out_lanes = [link[0][1] for link in self.sumo.trafficlight.getControlledLinks(self.id) if link]
-        self.out_lanes = list(set(self.out_lanes))
+        # getControlledLinks 返回的格式为 [('29257863#2_0', 'gsndj_n6_0', ':htddj_gsndj_0_0')]
+        self.in_out_lanes = [
+            (link[0][0], link[0][1]) 
+            for link in self.sumo.trafficlight.getControlledLinks(self.id) if link
+        ] # 获得所有的 in 和 out lanes
+        self.in_lanes = [_lanes[0] for _lanes in self.in_out_lanes] # 获得所有进入的 lanes
+        self.out_lanes = [_lanes[1] for _lanes in self.in_out_lanes] # 获得所有离开的 lane
         self.lanes_lenght = {lane: self.sumo.lane.getLength(lane) for lane in self.lanes}
+
+        # 获得 road 相关信息 (edge info)
+        self.in_roads = self.lanes_to_edges(self.in_lanes)
+        # 计算进入 road 的角度（可以用于将摄像头按这个角度布置）
+        self.in_roads_heading = [self.sumo.edge.getAngle(_road_id) for _road_id in self.in_roads]
 
         self.program_id = self.sumo.trafficlight.getProgram(self.id) # 获得这个信号的当前的 program id
 
@@ -245,3 +258,15 @@ class BaseTLS(ABC):
                 output_dict[key] = value
 
         return output_dict
+    
+    def lanes_to_edges(self, lanes):
+        """将车道 ID 转换为 Edge IDs, 需要进行去重
+
+        Args:
+            lanes (List[str]): 车道 ID 组成的 List
+        """
+        road_ids = set()
+        for lane_id in lanes:
+            _road_id = self.sumo.lane.getEdgeID(lane_id)
+            road_ids.add(_road_id)
+        return list(road_ids)

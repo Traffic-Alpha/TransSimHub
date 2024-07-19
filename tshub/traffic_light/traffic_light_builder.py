@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:23:21
 @Description: 调度场景中的 traffic lights
-@LastEditTime: 2024-04-16 12:52:12
+@LastEditTime: 2024-07-19 18:53:52
 '''
 import traci
 import numpy as np
@@ -108,32 +108,33 @@ class TrafficLightBuilder(BaseBuilder):
             parts = key.split('--')
             junction_id = parts[1]
             edge_id = parts[2]
-            direction = parts[4]
+            directions = parts[4] # 这里会出现 rs 这样的 diractions
             
-            edge_direction = f'{edge_id}--{direction}'
-            
-            # 处理每一个 lane 对应的 {17: 14.374141326903933, 24: 7, 25: 1, 19: 0.4} 的信息
-            for k, v in value.items():
-                _meaning_key = self.tsc_convert.get_meaning(k) # key 名称转换
-                _is_init = (output[junction_id][edge_direction][_meaning_key] == defaultdict()) # 需要初始化的状态
-                if isinstance(v, (int, float)):
-                    if _is_init:
-                        output[junction_id][edge_direction][_meaning_key] = v
-                    else:
-                        output[junction_id][edge_direction][_meaning_key] += v
-                else: # 如果是 tuple or list
-                    if _is_init:
-                        output[junction_id][edge_direction][_meaning_key] = list(v)
-                    else:
-                        output[junction_id][edge_direction][_meaning_key] += list(v)
-                count[junction_id][edge_direction][_meaning_key] += 1 # 多个车道的情况
+            for direction in directions: # 多功能车道, 就两侧都进行统计
+                edge_direction = f'{edge_id}--{direction}'
+                
+                # 处理每一个 lane 对应的 {17: 14.374141326903933, 24: 7, 25: 1, 19: 0.4} 的信息
+                for k, v in value.items():
+                    _meaning_key = self.tsc_convert.get_meaning(k) # key 名称转换
+                    _is_init = (output[junction_id][edge_direction][_meaning_key] == defaultdict()) # 需要初始化的状态
+                    if isinstance(v, (int, float)):
+                        if _is_init:
+                            output[junction_id][edge_direction][_meaning_key] = v
+                        else:
+                            output[junction_id][edge_direction][_meaning_key] += v
+                    else: # 如果是 tuple or list
+                        if _is_init:
+                            output[junction_id][edge_direction][_meaning_key] = list(v)
+                        else:
+                            output[junction_id][edge_direction][_meaning_key] += list(v)
+                    count[junction_id][edge_direction][_meaning_key] += 1 # 多个车道的情况
         
         for junction_id, edges in output.items():
             for edge_direction, values in edges.items():
                 for k in values:
                     if k != 'last_step_vehicle_id_list':
                         values[k] /= count[junction_id][edge_direction][k]
-        
+
         return defaultdict2dict(output)
 
     def update_objects_state(self, processed_data) -> None:

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-06-27 19:03:19
+@LastEditTime: 2024-07-19 18:03:12
 '''
 from __future__ import annotations
 
@@ -35,6 +35,9 @@ class TrafficLightInfo:
     last_phase: List[bool]
     next_phase: List[bool]
     sumo: traci.connection.Connection # 与 sumo 的 connection
+    # 初始化的时候会生成
+    tls_position: List[float] = None # 信号灯的坐标
+    in_roads_heading: List[float] = None # 路口进入车道的 angle 角度
     fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
     movement_lane_numbers: List[int] = None, # 每一个 movement 包含的车道数
@@ -64,11 +67,13 @@ class TrafficLightInfo:
             logger.error(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
         self.tls_action.build_phases()
+        self.tls_position = self.tls_action.tls_position
         self.movement_ids = self.tls_action.movement_ids
         self.movement_directions = self.tls_action.movement_directions
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers
         self.phase2movements = self.tls_action.phase2movements
         self.fromEdge_toEdge = self.tls_action.fromEdge_toEdge
+        self.in_roads_heading = self.tls_action.in_roads_heading
 
         logger.debug(f'SIM: Phase to Movement: \n{dict_to_str(self.phase2movements)}')
 
