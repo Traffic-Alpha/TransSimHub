@@ -9,7 +9,7 @@
 --> begin render node
 -> 在 node 上添加传感器
 这里 Element 可以是 vehicles, aircrsaft, 或是 traffic signal light
-@LastEditTime: 2024-07-15 12:09:15
+@LastEditTime: 2024-07-19 16:22:22
 '''
 import numpy as np
 from typing import Tuple
@@ -22,7 +22,7 @@ class BaseElement(ABC):
             self,
             element_id:str,
             element_position:Tuple[float, float],
-            element_heading:float,
+            element_heading:float = None,
             element_length:float = None,
             root_np = None,
             showbase_instance = None

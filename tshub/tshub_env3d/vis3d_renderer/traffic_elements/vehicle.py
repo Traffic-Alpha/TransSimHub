@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-15 23:22:06
+@LastEditTime: 2024-07-17 18:27:14
 '''
 import random
 from pathlib import Path

@@ -4,13 +4,9 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-14 20:27:15
+@LastEditTime: 2024-07-19 18:08:53
 '''
 import math
-import random
-import numpy as np
-
-from pathlib import Path
 from loguru import logger
 from typing import Collection, Dict, Literal, Optional, Tuple, Union
 
@@ -47,7 +43,7 @@ from ..vis3d_utils.coordinates import Pose, Heading, Point
 from ..vis3d_renderer._showbase_instance import _ShowBaseInstance
 from ..vis3d_renderer.base_render import BaseRender, DEBUG_MODE
 
-from .elements.traffic_signals import signal_state_to_color
+from .traffic_elements.traffic_signals import signal_state_to_color
 
 from ...utils.get_abs_path import get_abs_path
 
@@ -206,6 +202,7 @@ class TSHubRenderer(BaseRender):
             self._signals_np.removeNode()
             self._signals_np = self._root_np.attachNewNode("signals")
 
+        # 初始化场景的时候, 需要新建一下路口的摄像头
         self.scene_sync.reset()
 
         # 设置相机的参数 (相机的参数可以在调试部分设置)
@@ -279,7 +276,7 @@ class TSHubRenderer(BaseRender):
         node_path = self._root_np.attachNewNode(geom_node)
         node_path.setName(name)
         node_path.setColor(color.value)
-        node_path.setPos(position.x, position.y, 0.01)
+        node_path.setPos(position.x, position.y, 0.01) # 设置信号灯的位置
         node_path.setScale(0.9, 0.9, 1)
         self._signal_nodes[sig_id] = node_path
         return True
@@ -319,14 +316,3 @@ class TSHubRenderer(BaseRender):
 #         """Remove the rendering buffer.
 #         """
 #         self._showbase_instance.graphicsEngine.removeWindow(buffer)
-
-#     def set_interest(self, interest_filter: re.Pattern, interest_color: Colors):
-#         """Sets the color of all vehicles that have ids that match the given pattern.
-
-#         Args:
-#             interest_filter (re.Pattern): The regular expression pattern to match.
-#             interest_color (Colors): The color that the vehicle should show as.
-#         """
-#         assert isinstance(interest_filter, re.Pattern)
-#         self._interest_filter = interest_filter
-#         self._interest_color = interest_color

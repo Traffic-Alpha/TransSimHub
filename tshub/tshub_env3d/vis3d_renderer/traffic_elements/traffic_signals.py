@@ -2,12 +2,13 @@
 @Author: WANG Maonan
 @Date: 2024-07-07 10:01:04
 @Description: 
-@LastEditTime: 2024-07-13 21:46:46
+@LastEditTime: 2024-07-19 16:25:30
 '''
 from enum import IntFlag
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
+from   .base_element import BaseElement
 from ...vis3d_utils.coordinates import Point
 from ...vis3d_utils.colors import SceneColors
 
@@ -48,3 +49,19 @@ class SignalState():
 
     def __post_init__(self):
         assert self.state is not None
+
+
+# 这个是模拟路口的摄像头
+class TLS3DElement(BaseElement):
+    def __init__(
+            self, 
+            element_id: str, 
+            element_position: Tuple[float, float], 
+            element_heading: float = None, 
+            element_length: float = None, 
+            root_np=None, 
+            showbase_instance=None
+        ) -> None:
+        super().__init__(element_id, element_position, element_heading, element_length, root_np, showbase_instance)
+        # 路口的 id
+        # 四个 incoming lane 的 id，和停车线的位置

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-12 21:38:26
 @Description: 场景加载相关的方法 (用于初始化场景)
-@LastEditTime: 2024-07-14 20:25:46
+@LastEditTime: 2024-07-17 00:29:45
 '''
 from pathlib import Path
 from loguru import logger
@@ -270,54 +270,3 @@ class SceneLoader(object):
             ground_np.set_depth_write(False) 
 
         return ground_np
-
-    # TODO, 可以尝试加入地面的纹理
-    # def load_terrain(self) -> None:
-    #     self.terrain_node = ShaderTerrainMesh()
-
-    #     # Set a heightfield, the heightfield should be a 16-bit png and
-    #     # have a quadratic size of a power of two.
-    #     heightfield = self._showbase_instance.loader.loadTexture(self.terrain_dir/"heightfield.png")
-    #     heightfield.wrap_u = SamplerState.WM_clamp
-    #     heightfield.wrap_v = SamplerState.WM_clamp
-    #     self.terrain_node.heightfield = heightfield
-
-    #     # Set the target triangle width. For a value of 10.0 for example,
-    #     # the terrain will attempt to make every triangle 10 pixels wide on screen.
-    #     self.terrain_node.target_triangle_width = 10.0
-
-    #     # Generate the terrain
-    #     self.terrain_node.generate()
-
-    #     # Attach the terrain to the main scene and set its scale. With no scale
-    #     # set, the terrain ranges from (0, 0, 0) to (1, 1, 1)
-    #     self.terrain = self._root_np.attach_new_node(self.terrain_node)
-    #     self.terrain.set_scale(
-    #         self.map_radius*5, 
-    #         self.map_radius*5, 
-    #         1
-    #     )
-    #     self.terrain.set_pos(
-    #         self.map_center[0]-2*self.map_radius, 
-    #         self.map_center[1]-2*self.map_radius, 
-    #         self.map_center[2] - 3 # 将 terrain 的高度稍微设置的低一些, 避免 road 被遮挡
-    #     )
-        
-    #     # Set a shader on the terrain. The ShaderTerrainMesh only works with
-    #     # an applied shader. You can use the shaders used here in your own application
-    #     terrain_shader = Shader.load(
-    #         Shader.SL_GLSL, 
-    #         self.terrain_dir/"terrain.vert.glsl",
-    #         self.terrain_dir/"terrain.frag.glsl"
-    #     )
-    #     self.terrain.set_shader(terrain_shader)
-    #     self.terrain.set_shader_input(
-    #         "camera", 
-    #         self._showbase_instance.camera
-    #     )
-
-    #     # Set some texture on the terrain
-    #     grass_tex = self._showbase_instance.loader.loadTexture(self.terrain_dir/"ground.png")
-    #     grass_tex.set_minfilter(SamplerState.FT_linear_mipmap_linear)
-    #     grass_tex.set_anisotropic_degree(16)
-    #     self.terrain.set_texture(grass_tex)

@@ -2,11 +2,12 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-14 00:27:26
+@LastEditTime: 2024-07-19 18:06:27
 '''
 from loguru import logger
 
-from ..elements.vehicle import Vehicle3DElement
+from ..traffic_elements.vehicle import Vehicle3DElement
+from ..traffic_elements.traffic_signals import TLS3DElement
 
 class SceneSync(object):
     def __init__(self, root_np, showbase_instance) -> None:
@@ -15,6 +16,9 @@ class SceneSync(object):
 
         # 记录场景中的 element
         self._vehicle_elements = {} # 加入渲染的车辆
+
+        # 初始化路口的摄像头
+
 
     def reset(self) -> None:
         self._vehicle_elements = {}
@@ -57,8 +61,9 @@ class SceneSync(object):
                 self._vehicle_elements[veh_id].create_node() # 创建车辆的节点
                 self._vehicle_elements[veh_id].begin_rendering_node() # 开始渲染车辆节点
                 if veh_type == 'ego': # 给 ego vehicle 上面添加 sensor
-                    # pass # 首先不进行渲染, 渲染后面再调整
-                    self._vehicle_elements[veh_id].attach_rgbsensor_to_element()
+                    # 这里可以根据参数选择添加合适的传感器, 传感器需要有不同的类型
+                    self._vehicle_elements[veh_id].attach_bev_all_sensor_to_element()
+                    self._vehicle_elements[veh_id].attach_front_all_sensor_to_element()
 
 
             # traffic signal 的颜色绘制在停车线上面
