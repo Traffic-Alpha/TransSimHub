@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-09-22 14:09:07
 @Description: 初始化 Map Info Object
-@LastEditTime: 2024-05-29 16:37:23
+@LastEditTime: 2024-07-19 17:59:32
 '''
 import sumolib
 from typing import Dict
@@ -66,7 +66,7 @@ class MapBuilder(BaseBuilder):
                 node_id = _node.getID()
                 node_shape = _node.getShape()
                 node_coord = _node.getCoord()
-                node_type = _node.getType()
+                node_type = _node.getType() # 普通路口/包含信号灯
                 self.map_info['node'][node_id] = PolygonInfo.create(
                     id=node_id,
                     edge_id=None,

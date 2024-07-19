@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 17:07:29
 @Description: 通过 SUMO 获得信号灯控制的路口
-@LastEditTime: 2024-05-01 18:55:35
+@LastEditTime: 2024-07-19 18:49:14
 '''
 from typing import List
 
@@ -57,6 +57,7 @@ class tls_connection(object):
             ...
         ]
         这里信息是最全的, 后面的都是基于这个数据结构进行生成.
+        Note: 这里 direction 只会有一个方向, 但是由于道路有多功能车道, 所以会出现 rs 这样的 diraction, 因此需要进行拆分
 
         keep_connection (bool): 是否保留 getControlledLinks 中的空值，从而提取的 connection 可以与 phase.state 的字母对应上
         """
