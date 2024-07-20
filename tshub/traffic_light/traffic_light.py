@@ -2,15 +2,16 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-07-19 18:03:12
+@LastEditTime: 2024-07-20 14:21:46
 '''
 from __future__ import annotations
 
 import traci
+import numpy as np
+
 from loguru import logger
 from dataclasses import dataclass, fields
-import numpy as np
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 from .traffic_light_action_type import tls_action_type
 from .tls_type.next_or_not import next_or_not
@@ -37,6 +38,8 @@ class TrafficLightInfo:
     sumo: traci.connection.Connection # 与 sumo 的 connection
     # 初始化的时候会生成
     tls_position: List[float] = None # 信号灯的坐标
+    tls_shape: List[Tuple[float, float]] = None # 路口的形状
+    tls_radius: float = None # 路口的半径
     in_roads_heading: List[float] = None # 路口进入车道的 angle 角度
     fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
@@ -68,6 +71,8 @@ class TrafficLightInfo:
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
         self.tls_action.build_phases()
         self.tls_position = self.tls_action.tls_position
+        self.tls_shape = self.tls_action.tls_shape
+        self.tls_radius = self.tls_action.tls_radius
         self.movement_ids = self.tls_action.movement_ids
         self.movement_directions = self.tls_action.movement_directions
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers
