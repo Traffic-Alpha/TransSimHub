@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-@LastEditTime: 2024-07-20 23:00:49
+@LastEditTime: 2024-07-21 03:12:59
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -76,9 +76,6 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             simid=f"tshub-{self.tshub_env.CONNECTION_LABEL}", # 场景的 ID
             scenario_glb_dir=scenario_glb_dir,
         )
-
-
-        # 在 aircraft 上加入 sensor
 
         
     def reset(self):

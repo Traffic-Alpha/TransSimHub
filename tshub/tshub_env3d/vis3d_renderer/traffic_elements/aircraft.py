@@ -2,10 +2,8 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 22:14:31
 @Description: 仿真器中飞行器的可视化 (在飞行器上安装摄像头)
-@LastEditTime: 2024-07-21 03:55:18
+@LastEditTime: 2024-07-21 04:06:07
 '''
-import random
-from loguru import logger
 from typing import Tuple
 
 from .base_element import BaseElement
