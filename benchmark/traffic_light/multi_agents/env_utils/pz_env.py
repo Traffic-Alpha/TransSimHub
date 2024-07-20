@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 23:28:22
 @Description: Multi-Agent TSC Env Unsing Petting Zoo
-@LastEditTime: 2023-12-18 20:30:34
+@LastEditTime: 2024-04-24 21:00:44
 '''
 import functools
 
@@ -55,6 +55,7 @@ class TSCEnvironmentPZ(ParallelEnv):
 
         for _tls_id in self.agents:
             infos[_tls_id] = {f'{i}': 0 for i in range(2)}
+            infos[_tls_id]['can_perform_action'] = True
 
         return observations, infos
 

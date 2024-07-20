@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 14:22:45
 @Description: 计算 tsc env 中的 state 和 reward
-@LastEditTime: 2023-11-01 17:54:43
+@LastEditTime: 2024-04-24 22:06:50
 '''
 import time
 import numpy as np
@@ -31,7 +31,7 @@ class VehicleIDList:
     
     def flatten_remove_duplicates_elements(self):
         flattened_list = list(chain(*self.elements))  # 展开列表
-        unique_list = list(set(flattened_list))  # 去除重复的元素
+        unique_list = list(set(flattened_list)) # 去除重复的元素
         self.clear_elements()
         return unique_list
         
@@ -135,14 +135,13 @@ class TSCEnvWrapper(gym.Wrapper):
         return occupancy, vehicle_ids, can_perform_action
     
     def reward_wrapper(self, vehicle_info, tls_vehicle_ids) -> float:
-        """返回路口对应的车辆的等待时间, 有可能车辆离开路口, 此时等待时间是 0
+        """返回路口对应的车辆的等待时间, 有可能车辆离开路口, 此时等待时间是 0 (所有车辆的平均等待时间)
         """
-        total_waiting_time = 0
-        for _veh_id in tls_vehicle_ids:
-            total_waiting_time += vehicle_info.get(_veh_id, {}).get('waiting_time', 0)
-        return -total_waiting_time
+        waiting_times = [min(vehicle_info.get(_veh_id, {}).get('waiting_time', 0), 80) for _veh_id in tls_vehicle_ids]
+
+        return -np.mean(waiting_times) if waiting_times else 0
     
-    def info_wrapper(self, infos, occupancy, tls_id):
+    def info_wrapper(self, infos, occupancy, can_perform_action, tls_id):
         """在 info 中加入每个 phase 的占有率
         """
         movement_occ = {key: value for key, value in zip(self.movement_ids[tls_id], occupancy)}
@@ -151,6 +150,7 @@ class TSCEnvWrapper(gym.Wrapper):
             phase_occ[f'{phase_index}'] = sum([movement_occ[phase] for phase in phase_movements])
         
         infos[tls_id] = phase_occ
+        infos[tls_id]['can_perform_action'] = can_perform_action
         return infos
 
     def reset(self, seed=1) -> Tuple[Any, Dict[str, Any]]:
@@ -171,12 +171,14 @@ class TSCEnvWrapper(gym.Wrapper):
 
     def step(self, action: Dict[str, int]) -> Tuple[Any, SupportsFloat, bool, bool, Dict[str, Any]]:
         can_perform_action = False
+        can_perform_action_int = {} # 每个路口是否可以做动作
         while not can_perform_action:
             states, rewards, truncated, done, infos = super().step(action) # 与环境交互
             for _tls_id in self.tls_ids:
                 occupancy, vehicle_ids, can_perform_action = self.state_wrapper(state=states['tls'][_tls_id]) # 处理每一帧的数据
                 self.occupancy[_tls_id].add_element(occupancy)
-                self.veh_ids[_tls_id].add_element(vehicle_ids)         
+                self.veh_ids[_tls_id].add_element(vehicle_ids)
+                can_perform_action_int[_tls_id] =  can_perform_action
         
         # 当可以执行动作的时候, 开始处理时序的 state
         rewards = dict()
@@ -188,7 +190,11 @@ class TSCEnvWrapper(gym.Wrapper):
                 vehicle_info=states['vehicle'],
                 tls_vehicle_ids=self.veh_ids[_tls_id].flatten_remove_duplicates_elements()
             ) # 计算每个 tls 的 vehicle waiting time
-            infos = self.info_wrapper(infos, occupancy=avg_occupancy, tls_id=_tls_id) # info 里面包含每个 phase 的排队
+            infos = self.info_wrapper(
+                infos, occupancy=avg_occupancy, 
+                can_perform_action=can_perform_action_int[_tls_id],
+                tls_id=_tls_id
+            ) # info 里面包含每个 phase 的排队
             self.states[_tls_id].append(avg_occupancy) # 这里 state 是一个时间序列
             truncateds[_tls_id] = truncated
             dones[_tls_id] = done
