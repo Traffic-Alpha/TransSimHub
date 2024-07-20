@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-09-26 20:16:54 by Eclipse SUMO netconvert Version 1.15.0
+<!-- generated on 2024-05-27 16:16:51 by Eclipse SUMO netconvert Version 1.19.0
 -->
 
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <type-files value="/home/wmn/TransSimHub/tshub/sumo_tools/./net.typ.xml"/>
+        <type-files value="/home/wmn/TransSimHub/tshub/sumo_tools/./osm_build_type/net.typ.xml"/>
         <osm-files value="/home/wmn/TransSimHub/examples/sumo_tools/../sumo_env/osm_berlin/berlin.osm"/>
     </input>
 
