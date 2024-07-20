@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-07 22:32:07
 @Description: Camera Sensor (For RGB Image)
-@LastEditTime: 2024-07-15 21:07:13
+@LastEditTime: 2024-07-20 15:48:06
 '''
 from typing import Tuple
 from abc import abstractmethod
@@ -18,14 +18,14 @@ class CameraSensor(BaseSensor):
         pass
     
     @abstractmethod
-    def step(self, element_pose) -> None:
-        """更新 camera 的位置, 确保可以获得指定 element 的信息
+    def init_actor(self, element_pose) -> None:
+        """初始化相机的位置
         """
         raise NotImplementedError
-
+    
     @abstractmethod
-    def _follow_actor(self) -> None:
-        """更新相机位置, 确保可以跟上 element (不同 camera 要求的参数是不同的)
+    def step(self, element_pose) -> None:
+        """更新 camera 的位置, 确保可以获得指定 element 的信息
         """
         raise NotImplementedError
 

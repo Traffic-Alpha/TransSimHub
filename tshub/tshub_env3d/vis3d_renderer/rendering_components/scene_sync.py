@@ -2,12 +2,13 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-19 18:06:27
+@LastEditTime: 2024-07-21 02:30:53
 '''
 from loguru import logger
 
 from ..traffic_elements.vehicle import Vehicle3DElement
 from ..traffic_elements.traffic_signals import TLS3DElement
+from ...vis3d_utils.core_math import calculate_center_point
 
 class SceneSync(object):
     def __init__(self, root_np, showbase_instance) -> None:
@@ -16,12 +17,40 @@ class SceneSync(object):
 
         # 记录场景中的 element
         self._vehicle_elements = {} # 加入渲染的车辆
+        self._tls_elements = {} # 加入信号灯 (每一个 in road 会有一个), 这里信号灯没有实体, 只有 sensor
 
-        # 初始化路口的摄像头
 
-
-    def reset(self) -> None:
+    def reset(self, tshub_init_obs) -> None:
+        # 初始化车辆 & 关闭所有车辆的 sensors
+        for veh_id, veh_info in self._vehicle_elements.items():
+            print(1)
+            
         self._vehicle_elements = {}
+        
+        # 初始化信号灯
+        if not self._tls_elements: # 只需要加载一次即可
+            for _tls_id, _tls_info in tshub_init_obs['tls'].items():
+                _tls_in_roads_heading = _tls_info['in_roads_heading'] # 路口进入方向车道的角度
+                _tls_in_road_stop_line = _tls_info['in_road_stop_line']
+
+                # 按照 heading 角度从小到大排序
+                sorted_road_ids = sorted(_tls_in_roads_heading, key=_tls_in_roads_heading.get)
+
+                for _tls_road_index, _road_id in enumerate(sorted_road_ids):
+                    _tls_element_id = f'{_tls_id}_{_tls_road_index}'
+                    # 生成对应的信号灯
+                    self._tls_elements[_tls_element_id] = TLS3DElement(
+                        element_id=_tls_element_id,
+                        element_position=calculate_center_point(_tls_in_road_stop_line[_road_id]),
+                        element_heading=_tls_in_roads_heading[_road_id],
+                        root_np=self.root_np,
+                        showbase_instance=self.showbase_instance
+                    ) # 记录对应的 tls 3d element
+                    self._tls_elements[_tls_element_id].attach_sensors_to_element([
+                        # 'junction_front_all', 'junction_front_vehicle',
+                        'junction_back_all', 'junction_back_vehicle',
+                    ])
+                
 
     def _sync(self, tshub_obs) -> None:
         """Update the current state of the vehicles and signals within the renderer.
@@ -61,9 +90,14 @@ class SceneSync(object):
                 self._vehicle_elements[veh_id].create_node() # 创建车辆的节点
                 self._vehicle_elements[veh_id].begin_rendering_node() # 开始渲染车辆节点
                 if veh_type == 'ego': # 给 ego vehicle 上面添加 sensor
-                    # 这里可以根据参数选择添加合适的传感器, 传感器需要有不同的类型
-                    self._vehicle_elements[veh_id].attach_bev_all_sensor_to_element()
-                    self._vehicle_elements[veh_id].attach_front_all_sensor_to_element()
+                    pass
+                    # self._vehicle_elements[veh_id].attach_sensors_to_element([
+                    #     # 'front_left_all', 'front_right_all', 'front_all', # 前向摄像头
+                    #     # 'back_left_all', 'back_right_all', 'back_all', # 后向摄像头
+                    #     # 'front_left_vehicle', 'front_right_vehicle', 'front_vehicle', # 前向摄像头
+                    #     # 'back_left_vehicle', 'back_right_vehicle', 'back_vehicle', # 后向摄像头
+                    #     # 'bev_all', 'bev_vehicle', # 俯视摄像头
+                    # ])
 
 
             # traffic signal 的颜色绘制在停车线上面
@@ -75,10 +109,14 @@ class SceneSync(object):
             #         self.begin_rendering_signal(actor_id)
             #     else:
             #         self.update_signal_node(actor_id, actor_state.stopping_pos, color)
+        
+        # 在 render 中更新 tls 的信息
+        for _tls_id, _tls_element in self._tls_elements.items():
+            sensors[_tls_id] = _tls_element.get_sensor().copy()
 
         # 查看哪些车辆离开了路网
         missing_vehicle_ids = set(self._vehicle_elements) - set(veh_ids)
-        # missing_signal_ids = set(self._signal_nodes) - signal_ids
+
         
         # 删除离开路网的车辆
         for vid in missing_vehicle_ids:

@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-19 18:08:53
+@LastEditTime: 2024-07-20 22:58:43
 '''
 import math
 from loguru import logger
@@ -192,7 +192,7 @@ class TSHubRenderer(BaseRender):
     # ----------------- #
     # Gym Env Interface
     # ----------------- #
-    def reset(self) -> None:
+    def reset(self, tshub_init_obs) -> None:
         """Reset the render back to initialized state.
         """
         if self._vehicles_np is not None:
@@ -203,11 +203,10 @@ class TSHubRenderer(BaseRender):
             self._signals_np = self._root_np.attachNewNode("signals")
 
         # 初始化场景的时候, 需要新建一下路口的摄像头
-        self.scene_sync.reset()
+        self.scene_sync.reset(tshub_init_obs)
 
         # 设置相机的参数 (相机的参数可以在调试部分设置)
-        self._showbase_instance.camLens.set_fov(90)
-        # self._showbase_instance.camLens.set_near_far(0.1, 50000)
+        
 
 
     def teardown(self):
@@ -312,7 +311,7 @@ class TSHubRenderer(BaseRender):
         signal_np.removeNode()
         del self._signal_nodes[sig_id]
 
-#     def remove_buffer(self, buffer):
-#         """Remove the rendering buffer.
-#         """
-#         self._showbase_instance.graphicsEngine.removeWindow(buffer)
+    # def remove_buffer(self, buffer):
+    #     """Remove the rendering buffer.
+    #     """
+    #     self._showbase_instance.graphicsEngine.removeWindow(buffer)

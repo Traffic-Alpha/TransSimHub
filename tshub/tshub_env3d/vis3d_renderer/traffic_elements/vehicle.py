@@ -2,23 +2,18 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-17 18:27:14
+@LastEditTime: 2024-07-21 02:02:44
 '''
 import random
-from pathlib import Path
 from loguru import logger
-from typing import Tuple, Union, Optional, Dict, Any
+from typing import Tuple
 
 from .base_element import BaseElement
-from ...vis3d_utils.coordinates import Pose, Heading
 
 # 导入传感器
 from ..sensors.rgb_sensor import RGBSensor
-from ..sensors.vehicle_mask_sensor import VehicleSensor
-from ..sensors.camera_sensor_type import CameraSensorID
 from ...vis3d_utils.masks import CamMask
 from ....utils.get_abs_path import get_abs_path
-
 
 class Vehicle3DElement(BaseElement):
     current_file_path = get_abs_path(__file__)
@@ -61,7 +56,7 @@ class Vehicle3DElement(BaseElement):
         """
         if 'ego' in self.veh_type:
             veh_list = ['AudiTT', 'FerrariF355']
-            weights = [4/5, 1/5]
+            weights = [0, 1]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego_vehicles/{selected_model}.bam")
         else:
@@ -98,6 +93,7 @@ class Vehicle3DElement(BaseElement):
             logger.warning(f"SIM: Renderer ignoring invalid vehicle id: {self.element_id}")
             return
         self.veh_node_path.removeNode()
+        # TODO, 同时删除所有的 sensor
         
     def begin_rendering_node(self) -> None:
         """Add the vehicle node to the scene graph
@@ -109,64 +105,104 @@ class Vehicle3DElement(BaseElement):
         # 连接到 TSHub Render 的根节点
         self.veh_node_path.reparentTo(self.root_np.find("**/vehicles"))
     
-    # ############
-    # 添加 Sensors
-    # ############
-    # 这里需要重构一下, attach_sensor, 然后可以有不同种类的 sensor
-    def attach_bev_all_sensor_to_element(self) -> None:
-        # 生成当前 camera 的名称
+    # #################
+    # 添加和更新 Sensors
+    # #################
+    def attach_sensor_to_element(self, sensor_type: str) -> None:
+        sensor_configs = {
+            'bev_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_BEV_Camera'
+            },
+            'bev_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_BEV_Camera'
+            },
+            # --- 正前方 ---
+            'front_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_Front_Camera'
+            },
+            'front_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_Front_Camera'
+            },
+            # 正前方 (左侧)
+            'front_left_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_FrontLeft_Camera'
+            },
+            'front_left_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_FrontLeft_Camera'
+            },
+            # 正前方 (右侧)
+            'front_right_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_FrontRight_Camera'
+            },
+            'front_right_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_FrontRight_Camera'
+            },
+            # --- 正后方 ---
+            'back_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_Back_Camera'
+            },
+            'back_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_Back_Camera'
+            },
+            # 正前方 (左侧)
+            'back_left_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_BackLeft_Camera'
+            },
+            'back_left_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_BackLeft_Camera'
+            },
+            # 正前方 (右侧)
+            'back_right_all': {
+                'camera_mask': (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
+                'camera_type': 'Off_BackRight_Camera'
+            },
+            'back_right_vehicle': {
+                'camera_mask': CamMask.VehMask,
+                'camera_type': 'Off_BackRight_Camera'
+            },
+        }
+
+        config = sensor_configs.get(sensor_type)
+        if config is None:
+            raise ValueError(f"Unknown sensor type: {sensor_type}")
+
         _camera_name = BaseElement._gen_sensor_name(
-            base_name=CameraSensorID.BEV_ALL.value,
-            vehicle_id=self.element_id
+            base_name=sensor_type, # sensor 类型
+            vehicle_id=self.element_id, # sensor 放在哪一个 element 上面
         )
 
-        # 生成对应的 sensor
         veh_rgb_sensor = RGBSensor(
             camera_name=_camera_name,
-            camera_mask= (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
-            # camera_mask= CamMask.VehMask, # 需要场景内所有信息
+            camera_mask=config['camera_mask'],
             showbase_instance=self.showbase_instance,
             root_np=self.root_np,
             init_element_pose=self.get_element_pose_from_bumper(),
             element_dimensions=(self.length, self.width, self.height),
-            fig_width=800,
-            fig_height=600,
+            fig_width=360, # 360, 480
+            fig_height=240, # 240, 320
             fig_resolution=0.2,
-            camera_height=50,
-            camera_type='Off_BEV_Camera' # Off_Front_Camera, Off_BEV_Camera
+            camera_type=config['camera_type']
         )
-        self.sensors['bev_all'] = veh_rgb_sensor # 在 element 上新增 sensors
-
-    def attach_front_all_sensor_to_element(self) -> None:
-        # 生成当前 camera 的名称
-        _camera_name = BaseElement._gen_sensor_name(
-            base_name=CameraSensorID.BEV_ALL.value,
-            vehicle_id=self.element_id
-        )
-
-        # 生成对应的 sensor
-        veh_rgb_sensor = RGBSensor(
-            camera_name=_camera_name,
-            camera_mask= (CamMask.VehMask | CamMask.GroundMask | CamMask.MapMask | CamMask.SkyBoxMask),
-            # camera_mask= CamMask.VehMask, # 需要场景内所有信息
-            showbase_instance=self.showbase_instance,
-            root_np=self.root_np,
-            init_element_pose=self.get_element_pose_from_bumper(),
-            element_dimensions=(self.length, self.width, self.height),
-            fig_width=800,
-            fig_height=600,
-            fig_resolution=0.2,
-            camera_height=3,
-            camera_type='Off_Front_Camera' # Off_Front_Camera, Off_BEV_Camera
-        )
-        self.sensors['front_all'] = veh_rgb_sensor # 在 element 上新增 sensors
+        self.sensors[sensor_type] = veh_rgb_sensor
 
     def update_sensor(self) -> None:
         """更新 sensor 的数据
         """
         for _sensor_id, _sensor in self.sensors.items():
-            # TODO, 这里 step 传入的参数可能不一样
-            _sensor.step(self.get_element_pose_from_bumper()) # 更新 camera 的位置
+            # 更新 camera 的位置, 车辆的 sensor 跟着车辆跑就行
+            _sensor.step(self.get_element_pose_from_bumper())
     
     def get_sensor(self):
         sensor_data = {}
