@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-29 22:47:54
 @Description: 测试训练好的 MAPPO 模型
-@LastEditTime: 2023-11-01 12:43:38
+@LastEditTime: 2024-04-25 01:34:20
 '''
 import torch
 
@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # 2. Load Model Dict
     policy_gen = policy_module(tsc_env, n_agents, device)
-    policy_gen.load_model(path_convert('mappo_models/actor.pkl'))
+    policy_gen.load_model(path_convert('mappo_models/actor_147.pkl'))
     policy = policy_gen.make_policy_module()
 
     # 3. Simulation with environment using the policy

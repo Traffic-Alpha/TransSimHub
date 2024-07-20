@@ -2,8 +2,9 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-@LastEditTime: 2024-07-19 18:02:42
+@LastEditTime: 2024-07-21 00:25:23
 '''
+import sumolib
 from abc import ABC, abstractmethod
 from ...sumo_tools.sumo_infos.tls_connections import tls_connection
 
@@ -12,13 +13,10 @@ class BaseTLS(ABC):
     This class represents a Traffic Signal of an intersection
     It is responsible for retrieving information and changing the traffic phase using Traci API
     """
-    def __init__(self, ts_id, sumo):
+    def __init__(self, ts_id, sumo) -> None:
         self.id = ts_id # 信号灯的 id
         self.sumo = sumo
 
-        # 获得路口位置 (TODO, 这里我们假设路口信号灯和路口 ID 是一样的, 如果写得比较好, 可以根据 in_roads 计算出 junction id)
-        self.tls_position = self.sumo.junction.getPosition(self.id)
-        
         # 获得路口连接
         tls_info = tls_connection(self.sumo)
         self.tls_connections = tls_info._get_tls_connection(self.id, keep_connection=True) # 获得当前路口的连接
@@ -44,8 +42,16 @@ class BaseTLS(ABC):
 
         # 获得 road 相关信息 (edge info)
         self.in_roads = self.lanes_to_edges(self.in_lanes)
+
         # 计算进入 road 的角度（可以用于将摄像头按这个角度布置）
-        self.in_roads_heading = [self.sumo.edge.getAngle(_road_id) for _road_id in self.in_roads]
+        self.in_roads_heading = {_road_id:self.sumo.edge.getAngle(_road_id) for _road_id in self.in_roads}
+
+        # 获得每一个 in road 的 stop line 的坐标
+        self.in_road_stop_line = {_road_id:list() for _road_id in self.in_roads}
+        for _lane_id in self.in_lanes:
+            _road_name = self.sumo.lane.getEdgeID(_lane_id)
+            _lane_end_position = self.sumo.lane.getShape(_lane_id)[1] # 距离路口的为 lane 的 end
+            self.in_road_stop_line[_road_name].append(_lane_end_position)
 
         self.program_id = self.sumo.trafficlight.getProgram(self.id) # 获得这个信号的当前的 program id
 
@@ -54,7 +60,7 @@ class BaseTLS(ABC):
         self.collect_controled_phase_movements()
 
     @abstractmethod
-    def set_next_phases(self):
+    def set_next_phases(self) -> None:
         """实现控制信号灯不同的动作
         """
         pass
@@ -65,7 +71,7 @@ class BaseTLS(ABC):
         """
         return self.sumo.simulation.getTime()
 
-    def build_phases(self):
+    def build_phases(self) -> None:
         """初始化信号灯的方案, 在中间添加黄灯状态, 下面是一个例子.
         输入为：
             {
@@ -269,4 +275,4 @@ class BaseTLS(ABC):
         for lane_id in lanes:
             _road_id = self.sumo.lane.getEdgeID(lane_id)
             road_ids.add(_road_id)
-        return list(road_ids)
+        return sorted(list(road_ids)) # 确保环境里面的 road_ids 顺序是一样的

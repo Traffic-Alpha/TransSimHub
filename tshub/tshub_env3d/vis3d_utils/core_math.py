@@ -1,27 +1,16 @@
-# Copyright (C) 2020. Huawei Technologies Co., Ltd. All rights reserved.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+'''
+@Author: WANG Maonan
+@Date: 2024-07-03 17:41:09
+@Description: 一些数学函数
+@LastEditTime: 2024-07-21 03:36:09
+'''
 import math
+import numpy as np
+
+from math import factorial
 from dataclasses import dataclass
 from itertools import chain, permutations, product, repeat
-from math import factorial
-from typing import Callable, Generator, List, Sequence, Tuple, Union
+from typing import Callable, List, Sequence, Tuple, Union
 
 
 @dataclass(frozen=True)
@@ -54,14 +43,12 @@ class CubicPolynomial:
 
 
 def constrain_angle(angle: float) -> float:
-    """Constrain an angle within the inclusive range [-pi, pi]"""
+    """Constrain an angle within the inclusive range [-pi, pi]
+    """
     angle %= 2 * math.pi
     if angle > math.pi:
         angle -= 2 * math.pi
     return angle
-
-
-import numpy as np
 
 
 def batches(list_, n):
@@ -190,8 +177,8 @@ def signed_dist_to_line(point, line_point, line_dir_vec) -> float:
 
 
 def vec_2d(v) -> np.ndarray:
-    """Converts a higher order vector to a 2D vector."""
-
+    """Converts a higher order vector to a 2D vector.
+    """
     assert len(v) >= 2
     return np.array(v[:2])
 
@@ -272,7 +259,8 @@ def radians_to_vec(radians) -> np.ndarray:
 
 
 def vec_to_radians(v) -> float:
-    """Converts a vector to a radian value. [0x,+y] is 0 rad with counter-clockwise rotation."""
+    """Converts a vector to a radian value. [0x,+y] is 0 rad with counter-clockwise rotation.
+    """
     # See: https://stackoverflow.com/a/15130471
     assert len(v) == 2, f"Vector must be 2D: {repr(v)}"
 
@@ -506,7 +494,8 @@ def evaluate_bezier(points, total):
 
 
 def inplace_unwrap(wp_array):
-    """Unwraps an array in place."""
+    """Unwraps an array in place.
+    """
     ## minor optimization hack adapted from
     ##  https://github.com/numpy/numpy/blob/v1.20.0/numpy/lib/function_base.py#L1492-L1546
     ## to avoid unnecessary (slow) np array copy
@@ -680,6 +669,10 @@ def slope(horizontal, vertical, default=math.inf):
     return safe_division(vertical, horizontal, default=default)
 
 
-def is_power_of_2(value: int) -> bool:
-    """Test if the given value is a power of 2 greater than 2**0. (e.g. 2**4)"""
-    return (value & (value - 1) == 0) and value != 0
+def calculate_center_point(points):
+    # 计算所有点的 x 坐标和 y 坐标的平均值
+    x_coords = [p[0] for p in points]
+    y_coords = [p[1] for p in points]
+    center_x = sum(x_coords) / len(points)
+    center_y = sum(y_coords) / len(points)
+    return center_x, center_y

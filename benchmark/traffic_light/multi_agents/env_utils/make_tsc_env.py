@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-30 19:34:54
 @Description: Create Multi-Junctions Environment
-@LastEditTime: 2023-11-01 12:27:09
+@LastEditTime: 2024-04-24 20:50:09
 '''
 from typing import List
 from env_utils.tsc_env import TSCEnvironment
@@ -26,7 +26,7 @@ def make_multi_envs(
         sumo_cfg=sumo_cfg,
         num_seconds=num_seconds,
         tls_ids=tls_ids,
-        tls_action_type='choose_next_phase',
+        tls_action_type='choose_next_phase_syn',
         use_gui=use_gui
     )
     tsc_env = TSCEnvWrapper(tsc_env, filepath=log_file)

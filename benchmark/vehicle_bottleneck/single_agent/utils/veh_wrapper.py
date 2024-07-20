@@ -7,7 +7,7 @@
     -> 每一个车道的信息 (包括 bottleneck): (1) 平均速度; (2) 平均等待时间; (3) 平均 timeloss
 @ + Action: 每个 ego vehicle 三个离散的动作: (加速, 减速, 维持不变)
 @ + Reward: 全局平均速度(距离/时间) + ego 自己的速度
-@LastEditTime: 2023-12-21 17:36:24
+@LastEditTime: 2023-12-21 23:24:45
 '''
 import time
 import numpy as np
@@ -96,6 +96,9 @@ class VehEnvWrapper(gym.Wrapper):
             if _veh_id in self.actions:
                 speed = self.action_speed.get(_action, 1) # 获得对应的速度
                 edge_id = self.vehicles_info.get(_veh_id, [0, None])[1] # 判断是否在 bottleneck 上
+                vspeed = self.vehicles_info.get(_veh_id, [0, 0])[-1]
+                if vspeed > 10:
+                    print(1)
                 if edge_id in self.bottle_necks:
                     new_speed = calculate_speed(
                         congestion_level=self.congestion_level,

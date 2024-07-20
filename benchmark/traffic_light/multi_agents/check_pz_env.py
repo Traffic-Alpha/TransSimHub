@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-10-31 18:59:34
 @Description: 检查 TSC PZ Env 环境, 尝试多次 reset
-@LastEditTime: 2023-11-01 12:45:04
+@LastEditTime: 2024-04-24 21:01:52
 '''
 import numpy as np
 from loguru import logger
@@ -28,7 +28,7 @@ def make_multi_envs(
         sumo_cfg=sumo_cfg,
         num_seconds=num_seconds,
         tls_ids=tls_ids,
-        tls_action_type='choose_next_phase',
+        tls_action_type='choose_next_phase_syn',
         use_gui=use_gui
     )
     tsc_env = TSCEnvWrapper(tsc_env, filepath=filepath)

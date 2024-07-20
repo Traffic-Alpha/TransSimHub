@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2024-07-13 04:54:57
+@LastEditTime: 2024-07-15 10:48:32
 '''
 from __future__ import division
 from __future__ import print_function
@@ -20,7 +20,6 @@ extras_require={
     ], # 文档生成
     'scene':[
         'matplotlib',
-        'scipy',
         'opencv-python'
     ], # 场景生成
     'rl':[

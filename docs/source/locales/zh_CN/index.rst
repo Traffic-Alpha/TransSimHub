@@ -9,4 +9,5 @@ TransSimHub 中文文档
     installation/index
     sumo_tools/index
     object/index
+    tshub3d_sensors/index
     stepbystep_tutorial/index

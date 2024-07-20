@@ -9,10 +9,10 @@
 --> begin render node
 -> 在 node 上添加传感器
 这里 Element 可以是 vehicles, aircrsaft, 或是 traffic signal light
-@LastEditTime: 2024-07-19 16:22:22
+@LastEditTime: 2024-07-20 16:01:59
 '''
 import numpy as np
-from typing import Tuple
+from typing import Tuple, List
 from abc import ABC, abstractmethod
 
 from ...vis3d_utils.coordinates import Pose, Heading
@@ -37,9 +37,16 @@ class BaseElement(ABC):
         self.showbase_instance = showbase_instance
 
         # element 的属性
-        self.length, self.width, self.height = None, None, None # 模型的长宽高
+        self.length, self.width, self.height = 0,0,0 # 模型的长宽高
         self.sensors = {} # 记录 element 上面绑定的 sensors
-        self._cameras = {} # 记录这个 element 上面拥有的 camera
+
+    def get_element_pose_from_center(self) -> Pose:
+        """将当前 element (这里是 tls) 的位置转换为 TSHub3D 中的坐标
+        """
+        return Pose.from_center(
+            base_position=np.array(self.element_position),
+            heading=Heading.from_sumo(self.element_heading),
+        )
     
     def get_element_pose_from_bumper(self) -> Pose:
         """将当前 element (这里是 vehicle) 的位置转换为 TSHub3D 中的坐标
@@ -99,9 +106,13 @@ class BaseElement(ABC):
     # ----------- #
     # 添加 Sensor
     # ----------- #
-    def attach_sensor_to_element(self):
+    def attach_sensor_to_element(self, sensor_type: str) -> None:
         raise NotImplementedError
     
+    def attach_sensors_to_element(self, sensor_types: List[str]) -> None:
+        for sensor_type in sensor_types:
+            self.attach_sensor_to_element(sensor_type)
+
     @staticmethod
     def _gen_sensor_name(base_name: str, vehicle_id: str):
         return BaseElement._gen_base_sensor_name(base_name, vehicle_id)

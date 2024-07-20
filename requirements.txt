@@ -3,3 +3,5 @@ numpy
 traci
 sumolib
 libsumo
+scipy
+scienceplots

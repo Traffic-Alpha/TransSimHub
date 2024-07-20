@@ -7,7 +7,7 @@
     - 添加 node
     - 更新 node
     - 删除 node
-@LastEditTime: 2024-07-13 23:56:56
+@LastEditTime: 2024-07-20 22:37:04
 '''
 import numpy as np
 from loguru import logger
@@ -92,7 +92,6 @@ class BaseRender(metaclass=ABCMeta):
     """The base class for rendering, 主要的功能是:
     1. setup -> 场景初始化, 包括路网, skybox 和 terrain
     2. 123
-    3. 
 
     Returns:
         BaseRender:
@@ -168,7 +167,6 @@ class BaseRender(metaclass=ABCMeta):
         for child in nodepath.getChildren():
             BaseRender.print_node_paths(child, prefix + '  ')
 
-
     # @abstractmethod
     # def build_shader_step(
     #     self,
@@ -183,7 +181,6 @@ class BaseRender(metaclass=ABCMeta):
     # ) -> None:
     #     """Generates a new shader camera."""
     #     raise NotImplementedError
-
 
     # @abstractmethod
     # def remove_buffer(self, buffer):

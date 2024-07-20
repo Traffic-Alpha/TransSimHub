@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-@LastEditTime: 2024-07-14 01:53:51
+@LastEditTime: 2024-07-21 03:12:59
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -17,7 +17,7 @@ from .vis3d_renderer.tshub_render import TSHubRenderer # tshub3D render
 
 class Tshub3DEnvironment(BaseSumoEnvironment3D):
     def __init__(
-            # TshubEnvironment 的参数
+            # TshubEnvironment 的参数 (与 SUMO 交互)
             self, sumo_cfg: str, 
             scenario_glb_dir: str, # 场景 3D 模型存储的位置
             is_map_builder_initialized: bool = False, 
@@ -47,8 +47,11 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             num_clients: int = 1,
             # TSHubRenderer 的参数
             use_render_pipeline: bool = False,
-            render_mode: str = "onscreen"
+            render_mode: str = "onscreen",
+            debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
         ) -> None:
+
+        self.debuger_print_node = debuger_print_node
 
         # 初始化 tshub 环境与 sumo 交互
         self.tshub_env = TshubEnvironment(
@@ -74,21 +77,23 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             scenario_glb_dir=scenario_glb_dir,
         )
 
-        # 需要在 ego vehicles 中加入 sensor
-
-        # 在路口的四个方向加入 sensor
-
-        # 在 aircraft 上加入 sensor
-
         
     def reset(self):
         state_infos = self.tshub_env.reset() # 重置 sumo 环境
-        self.tshub_render.reset() # 重置 render
-        # self.tshub_render.print_node_paths(self.tshub_render._root_np) # 重置后打印 node path
+        logger.info(f'SIM: 完成 TSHub 初始化, 得到地图和信号灯信息.')
+
+        self.tshub_render.reset(state_infos) # 重置 render, 需要将信号灯的信息传入, 辅助进行路口 camera 的初始化
+
+        # 重置后打印 node path (查看每次 reset 是否会重置所有 node 和 camera)
+        if self.debuger_print_node:
+            self.tshub_render.print_node_paths(self.tshub_render._root_np)
+
+        # 场景添加相机, 可以进行可视化
         self.tshub_render._showbase_instance.taskMgr.add(
             self.tshub_render.test_spin_camera_task, 
             "SpinCamera"
-        ) # TODO, 这里需要转移到 debug 的地方
+        )
+        self.tshub_render._showbase_instance.camLens.set_fov(90) # TODO, 这里需要转移到 debug 的地方
 
         return state_infos
     

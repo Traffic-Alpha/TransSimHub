@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-07-06 22:30:18
+ * @LastEditTime: 2024-07-19 18:52:33
 -->
 # Change Log
 
@@ -18,6 +18,17 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Removed
 ### Security
 
+<!-- v1.0 -->
+## [v1.0] - 2024-07-09
+
+### Added
+
+- 添加了 3D 可视化
+  - [sumonet_to_tshub3d.py](./tshub/tshub_env3d/sumonet_to_tshub3d.py) 可以快速将 SUMO Network 转换为 glb 文件，用于 3D 的展示。
+
+### Fixed
+
+- 修复了多功能车道无法获得数据的问题，之前由于 connection 只有 r，s，l，但是实际会存在 rs 导致无法正确获得数据
 
 <!-- v0.9.9 -->
 ## [v0.9.9] - 2024-07-06
