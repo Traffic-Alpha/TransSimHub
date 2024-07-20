@@ -2,12 +2,14 @@
 @Author: WANG Maonan
 @Date: 2024-07-03 17:41:09
 @Description: 一些数学函数
-@LastEditTime: 2024-07-21 00:15:44
+@LastEditTime: 2024-07-21 03:36:09
 '''
 import math
+import numpy as np
+
+from math import factorial
 from dataclasses import dataclass
 from itertools import chain, permutations, product, repeat
-from math import factorial
 from typing import Callable, List, Sequence, Tuple, Union
 
 
@@ -41,14 +43,12 @@ class CubicPolynomial:
 
 
 def constrain_angle(angle: float) -> float:
-    """Constrain an angle within the inclusive range [-pi, pi]"""
+    """Constrain an angle within the inclusive range [-pi, pi]
+    """
     angle %= 2 * math.pi
     if angle > math.pi:
         angle -= 2 * math.pi
     return angle
-
-
-import numpy as np
 
 
 def batches(list_, n):
@@ -177,8 +177,8 @@ def signed_dist_to_line(point, line_point, line_dir_vec) -> float:
 
 
 def vec_2d(v) -> np.ndarray:
-    """Converts a higher order vector to a 2D vector."""
-
+    """Converts a higher order vector to a 2D vector.
+    """
     assert len(v) >= 2
     return np.array(v[:2])
 
@@ -259,7 +259,8 @@ def radians_to_vec(radians) -> np.ndarray:
 
 
 def vec_to_radians(v) -> float:
-    """Converts a vector to a radian value. [0x,+y] is 0 rad with counter-clockwise rotation."""
+    """Converts a vector to a radian value. [0x,+y] is 0 rad with counter-clockwise rotation.
+    """
     # See: https://stackoverflow.com/a/15130471
     assert len(v) == 2, f"Vector must be 2D: {repr(v)}"
 

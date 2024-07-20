@@ -2,13 +2,15 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-21 02:30:53
+@LastEditTime: 2024-07-21 03:57:29
 '''
+import math
 from loguru import logger
 
 from ..traffic_elements.vehicle import Vehicle3DElement
 from ..traffic_elements.traffic_signals import TLS3DElement
-from ...vis3d_utils.core_math import calculate_center_point
+from ..traffic_elements.aircraft import Aircraft3DElement
+from ...vis3d_utils.core_math import calculate_center_point, vec_to_radians, vec_2d
 
 class SceneSync(object):
     def __init__(self, root_np, showbase_instance) -> None:
@@ -18,6 +20,7 @@ class SceneSync(object):
         # 记录场景中的 element
         self._vehicle_elements = {} # 加入渲染的车辆
         self._tls_elements = {} # 加入信号灯 (每一个 in road 会有一个), 这里信号灯没有实体, 只有 sensor
+        self._aircraft_elements = {} # 目前 aircraft 没有实体, 只有摄像头
 
 
     def reset(self, tshub_init_obs) -> None:
@@ -56,12 +59,55 @@ class SceneSync(object):
         """Update the current state of the vehicles and signals within the renderer.
         根据当前的状况更新 render 的信息, 包含 vehicle, traffic signals
         """
-        signal_ids = set() # 记录路口的信号灯 id
         veh_ids = set() # 记录车辆的 id, 用于比较车辆的进入和驶出
+        aircraft_ids = set() # 记录飞行器的 id, 用于比较飞行器的新增和离开
 
         sensors = {} # 记录传感器的数据, 作为 state 返回
         
+        # ##########################
+        # 在 render 中更新 tls 的信息
+        # ##########################
+        for _tls_id, _tls_element in self._tls_elements.items():
+            # 这里路口传感器数量不会发生改变, 位置也不变, 因此只需要直接获取数据即可
+            sensors[_tls_id] = _tls_element.get_sensor().copy()
+
+        # ##############################
+        # 在 render 中更新 aircraft 的信息
+        # ##############################
+        for aircraft_id, aircraft_info in tshub_obs['aircraft'].items():
+            aircraft_ids.add(aircraft_id) # 记录当前场景下车辆的 id
+            aircraft_pos=aircraft_info['position'] # 三维坐标
+
+            aircraft_heading_radians=vec_to_radians(vec_2d(aircraft_info['heading'])) # 转换为度
+            aircraft_heading = math.degrees(aircraft_heading_radians) % 360
+
+            # 如果飞行器存在, 则更新飞行器上面的 camera 的位置
+            if aircraft_id in self._aircraft_elements:
+                self._aircraft_elements[aircraft_id].update_sensor(
+                    new_position=aircraft_pos,
+                    new_heading=aircraft_heading,
+                ) # 更新摄像头位置
+                sensors[aircraft_id] = self._aircraft_elements[aircraft_id].get_sensor() # 获得传感器数据
+            
+            # 如果飞行器不在场景, 则创建飞行器的 node
+            else:
+                self._aircraft_elements[aircraft_id] = Aircraft3DElement(
+                    aircraft_id=aircraft_id,
+                    aircraft_pos=aircraft_pos,
+                    aircraft_heading=aircraft_heading,
+                    root_np=self.root_np,
+                    showbase_instance=self.showbase_instance
+                ) # 创建飞行器的 element
+                self._aircraft_elements[aircraft_id].attach_sensors_to_element([
+                    'aircraft_all', 'aircraft_vehicle'
+                ]) # 添加传感器
+
+        # 查看哪些飞行器离开了路网
+        # missing_vehicle_ids = set(self._vehicle_elements) - set(veh_ids)
+
+        # ##############################
         # 在 render 中更新 vehicle 的信息
+        # ##############################
         for veh_id, veh_info in tshub_obs['vehicle'].items():
             veh_ids.add(veh_id) # 记录当前场景下车辆的 id
             veh_pos=veh_info['position']
@@ -90,30 +136,13 @@ class SceneSync(object):
                 self._vehicle_elements[veh_id].create_node() # 创建车辆的节点
                 self._vehicle_elements[veh_id].begin_rendering_node() # 开始渲染车辆节点
                 if veh_type == 'ego': # 给 ego vehicle 上面添加 sensor
-                    pass
-                    # self._vehicle_elements[veh_id].attach_sensors_to_element([
-                    #     # 'front_left_all', 'front_right_all', 'front_all', # 前向摄像头
-                    #     # 'back_left_all', 'back_right_all', 'back_all', # 后向摄像头
-                    #     # 'front_left_vehicle', 'front_right_vehicle', 'front_vehicle', # 前向摄像头
-                    #     # 'back_left_vehicle', 'back_right_vehicle', 'back_vehicle', # 后向摄像头
-                    #     # 'bev_all', 'bev_vehicle', # 俯视摄像头
-                    # ])
-
-
-            # traffic signal 的颜色绘制在停车线上面
-            # elif isinstance(actor_state, SignalState):
-            #     signal_ids.add(actor_id)
-            #     color = signal_state_to_color(actor_state.state)
-            #     if actor_id not in self._signal_nodes:
-            #         self.create_signal_node(actor_id, actor_state.stopping_pos, color)
-            #         self.begin_rendering_signal(actor_id)
-            #     else:
-            #         self.update_signal_node(actor_id, actor_state.stopping_pos, color)
-        
-        # 在 render 中更新 tls 的信息
-        for _tls_id, _tls_element in self._tls_elements.items():
-            sensors[_tls_id] = _tls_element.get_sensor().copy()
-
+                    self._vehicle_elements[veh_id].attach_sensors_to_element([
+                        # 'front_left_all', 'front_right_all', 'front_all', # 前向摄像头
+                        # 'back_left_all', 'back_right_all', 'back_all', # 后向摄像头
+                        # 'front_left_vehicle', 'front_right_vehicle', 'front_vehicle', # 前向摄像头
+                        # 'back_left_vehicle', 'back_right_vehicle', 'back_vehicle', # 后向摄像头
+                        'bev_all', 'bev_vehicle', # 俯视摄像头
+                    ])
         # 查看哪些车辆离开了路网
         missing_vehicle_ids = set(self._vehicle_elements) - set(veh_ids)
 

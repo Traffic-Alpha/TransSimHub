@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-15 11:53:11
 @Description: 创建不同类型的 Offscreen Camera Type
-@LastEditTime: 2024-07-21 02:21:31
+@LastEditTime: 2024-07-21 03:19:06
 '''
 from panda3d.core import (
     FrameBufferProperties,
@@ -27,7 +27,9 @@ from .offscreen_camera import (
     # 后方摄像头
     OffscreenBackCamera,
     OffscreenBackLeftCamera,
-    OffscreenBackRightCamera
+    OffscreenBackRightCamera,
+    # 无人机的摄像头
+    OffscreenAircraftCamera,
 )
 from .offscreen_camera.offscreen_camera_type import OffscreenCameraType
 
@@ -100,9 +102,11 @@ def build_offscreen_camera(
     # mask is set to make undesirable objects invisible to this camera
     camera_np.node().setCameraMask(mask)
 
+    # #########################################
     # 设置 camera, 这里 camera update 的方式不一样
-
-    # 俯视 (UAV/UAM)
+    # #########################################
+    
+    # 跟车的视角
     _camera_type = OffscreenCameraType(camera_type)
     if _camera_type == OffscreenCameraType.BEV:
         camera = OffscreenBEVCamera(camera_np=camera_np, buffer=buffer, tex=tex)
@@ -124,7 +128,10 @@ def build_offscreen_camera(
     elif _camera_type == OffscreenCameraType.Back_LEFT: # 后拍 (左侧)
         camera = OffscreenBackLeftCamera(camera_np, buffer, tex)
     elif _camera_type == OffscreenCameraType.Back_RIGHT: # 后拍 (右侧)
-        camera = OffscreenBackRightCamera(camera_np, buffer, tex)    
+        camera = OffscreenBackRightCamera(camera_np, buffer, tex)
+    # 无人机的视角
+    elif _camera_type == OffscreenCameraType.Aircraft: # 无人机从上往下拍摄
+        camera = OffscreenAircraftCamera(camera_np, buffer, tex)  
     else:
-        raise ValueError(f"请你确认 camera 的名字, {camera_type}")
+        raise ValueError(f"请你确认 camera 的名字, 没有 {camera_type}.")
     return camera

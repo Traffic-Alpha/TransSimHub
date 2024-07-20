@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-20 22:58:43
+@LastEditTime: 2024-07-21 03:21:59
 '''
 import math
 from loguru import logger
@@ -42,8 +42,6 @@ from ..vis3d_utils.coordinates import Pose, Heading, Point
 
 from ..vis3d_renderer._showbase_instance import _ShowBaseInstance
 from ..vis3d_renderer.base_render import BaseRender, DEBUG_MODE
-
-from .traffic_elements.traffic_signals import signal_state_to_color
 
 from ...utils.get_abs_path import get_abs_path
 
@@ -205,11 +203,7 @@ class TSHubRenderer(BaseRender):
         # 初始化场景的时候, 需要新建一下路口的摄像头
         self.scene_sync.reset(tshub_init_obs)
 
-        # 设置相机的参数 (相机的参数可以在调试部分设置)
-        
-
-
-    def teardown(self):
+    def teardown(self) -> None:
         """Clean up internal resources.
         """
         if self._root_np is not None:
@@ -231,85 +225,6 @@ class TSHubRenderer(BaseRender):
 
     def __del__(self):
         self.destroy()
-
-    # ------------------------------- #
-    # Traffic Signal Node 创建&更新&删除
-    # ------------------------------- #
-    def create_signal_node(
-        self, sig_id: str, 
-        position: Point, 
-        color: Union[Colors, SceneColors]
-    ) -> bool:
-        """Create a signal node.
-        """
-        if sig_id in self._signal_nodes:
-            return False
-
-        # Create geometry node
-        name = f"signal-{sig_id}"
-        geo_format = GeomVertexFormat.getV3()
-        vdata = GeomVertexData(name, geo_format, Geom.UHStatic)
-        vertex = GeomVertexWriter(vdata, "vertex")
-
-        num_pts = 10  # number of points around the circumference
-        seg_radians = 2 * math.pi / num_pts
-        vertex.addData3(0, 0, 0)
-        for i in range(num_pts):
-            angle = i * seg_radians
-            x = math.cos(angle)
-            y = math.sin(angle)
-            vertex.addData3(x, y, 0)
-
-        prim = GeomTrifans(Geom.UHStatic)
-        prim.addVertex(0)  # add center point
-        prim.add_next_vertices(num_pts)  # add outer points
-        prim.addVertex(1)  # add first outer point again to complete the circle
-        assert prim.closePrimitive()
-
-        geom = Geom(vdata)
-        geom.addPrimitive(prim)
-
-        geom_node = GeomNode(name)
-        geom_node.addGeom(geom)
-
-        node_path = self._root_np.attachNewNode(geom_node)
-        node_path.setName(name)
-        node_path.setColor(color.value)
-        node_path.setPos(position.x, position.y, 0.01) # 设置信号灯的位置
-        node_path.setScale(0.9, 0.9, 1)
-        self._signal_nodes[sig_id] = node_path
-        return True
-
-    def begin_rendering_signal(self, sig_id: str):
-        """Add the signal node to the scene graph"""
-        signal_np = self._signal_nodes.get(sig_id, None)
-        if not signal_np:
-            self._log.warning("Renderer ignoring invalid signal id: %s", sig_id)
-            return
-        signal_np.reparentTo(self._signals_np)
-
-    def update_signal_node(
-        self, sig_id: str, 
-        position: Point, 
-        color: Union[Colors, SceneColors]
-    ) -> None:
-        """Move the specified signal node."""
-        signal_np = self._signal_nodes.get(sig_id, None)
-        if not signal_np:
-            self._log.warning("Renderer ignoring invalid signal id: %s", sig_id)
-            return
-        signal_np.setPos(position.x, position.y, 0.01)
-        signal_np.setColor(color.value)
-
-    def remove_signal_node(self, sig_id: str):
-        """Remove a signal node
-        """
-        signal_np = self._signal_nodes.get(sig_id, None)
-        if not signal_np:
-            self._log.warning("Renderer ignoring invalid signal id: %s", sig_id)
-            return
-        signal_np.removeNode()
-        del self._signal_nodes[sig_id]
 
     # def remove_buffer(self, buffer):
     #     """Remove the rendering buffer.
