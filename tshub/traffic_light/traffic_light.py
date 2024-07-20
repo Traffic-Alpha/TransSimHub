@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-07-20 14:21:46
+@LastEditTime: 2024-07-21 00:23:32
 '''
 from __future__ import annotations
 
@@ -37,10 +37,9 @@ class TrafficLightInfo:
     next_phase: List[bool]
     sumo: traci.connection.Connection # 与 sumo 的 connection
     # 初始化的时候会生成
-    tls_position: List[float] = None # 信号灯的坐标
-    tls_shape: List[Tuple[float, float]] = None # 路口的形状
-    tls_radius: float = None # 路口的半径
-    in_roads_heading: List[float] = None # 路口进入车道的 angle 角度
+    in_roads: List[str] = None # 路口的进入车道的 id
+    in_road_stop_line: Dict[str, List[Tuple[float, float]]] = None # 路口进入 road 的 point 的坐标, {'161701303#7.248': [(1777.55, 911.8), (1775.26, 914.04), (1772.97, 916.28), (1770.68, 918.51)], ...}
+    in_roads_heading: Dict[str, List[float]] = None # 路口进入车道的 angle 角度
     fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
     movement_lane_numbers: List[int] = None, # 每一个 movement 包含的车道数
@@ -70,15 +69,15 @@ class TrafficLightInfo:
             logger.error(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
         self.tls_action.build_phases()
-        self.tls_position = self.tls_action.tls_position
-        self.tls_shape = self.tls_action.tls_shape
-        self.tls_radius = self.tls_action.tls_radius
+        
+        self.in_roads = self.tls_action.in_roads
+        self.in_road_stop_line = self.tls_action.in_road_stop_line
+        self.in_roads_heading = self.tls_action.in_roads_heading
         self.movement_ids = self.tls_action.movement_ids
         self.movement_directions = self.tls_action.movement_directions
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers
         self.phase2movements = self.tls_action.phase2movements
         self.fromEdge_toEdge = self.tls_action.fromEdge_toEdge
-        self.in_roads_heading = self.tls_action.in_roads_heading
 
         logger.debug(f'SIM: Phase to Movement: \n{dict_to_str(self.phase2movements)}')
 
