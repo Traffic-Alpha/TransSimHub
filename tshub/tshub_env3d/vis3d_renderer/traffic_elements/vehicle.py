@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-21 02:02:44
+@LastEditTime: 2024-07-21 07:06:01
 '''
 import random
 from loguru import logger
@@ -58,6 +58,7 @@ class Vehicle3DElement(BaseElement):
             veh_list = ['AudiTT', 'FerrariF355']
             weights = [0, 1]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
+            logger.info(f"随机选择 {selected_model} 作为 ego vehicle 模型.")
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego_vehicles/{selected_model}.bam")
         else:
             veh_list = [
@@ -67,6 +68,7 @@ class Vehicle3DElement(BaseElement):
             ]
             weights = [1/14, 1/14, 1/14, 1/2, 1/14, 1/14, 1/14, 1/14]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
+            logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/social_vehicles/{selected_model}.bam")
 
 
