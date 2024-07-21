@@ -15,6 +15,7 @@ SUMO 可视化
 .. figure:: ../../../_static/tshub3d_sensors/traffic_scenario/sumo.gif
    :alt: SUMO 模拟效果图
    :align: center
+   :figwidth: 75%
 
    SUMO模拟效果图。图中展示了十字路口的车辆通行以及无人机的飞行状态。
 
@@ -26,6 +27,7 @@ TSHub3D 可视化
 .. figure:: ../../../_static/tshub3d_sensors/traffic_scenario/tshub3d.gif
    :alt: TSHub3D 可视化效果图
    :align: center
+   :figwidth: 75%
 
    TSHub3D 可视化效果图。图中显示了传感器捕捉的三维场景，包括车道、车道线和路口的车辆。
 
