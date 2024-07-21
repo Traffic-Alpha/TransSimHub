@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-21 05:40:41
 @Description: 合并 gif, 用于文档的书写
-@LastEditTime: 2024-07-22 01:07:42
+@LastEditTime: 2024-07-22 01:20:34
 '''
 import imageio
 from PIL import Image
@@ -49,7 +49,10 @@ def merge_gifs_in_grid(gif_paths, output_path, gifs_per_row, spacing=10) -> None
         merged_frames.append(new_frame)
     
     # Save the frames as a new GIF
-    merged_frames[0].save(output_path, save_all=True, append_images=merged_frames[1:], loop=0, duration=gifs[0][0].meta['duration'])
+    merged_frames[0].save(
+        output_path, save_all=True, append_images=merged_frames[1:], 
+        loop=0, duration=gifs[0][0].meta['duration']
+    )
 
 # Example usage:
 # merge_gifs_in_grid([
