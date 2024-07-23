@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-@LastEditTime: 2024-07-21 03:12:59
+@LastEditTime: 2024-07-23 18:24:53
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -46,7 +46,6 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             remote_port: int = None, 
             num_clients: int = 1,
             # TSHubRenderer 的参数
-            use_render_pipeline: bool = False,
             render_mode: str = "onscreen",
             debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
         ) -> None:
@@ -71,10 +70,9 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
 
         # 初始化渲染器, 将场景渲染为 3D
         self.tshub_render = TSHubRenderer(
-            use_render_pipeline=use_render_pipeline,
-            render_mode=render_mode,
             simid=f"tshub-{self.tshub_env.CONNECTION_LABEL}", # 场景的 ID
             scenario_glb_dir=scenario_glb_dir,
+            render_mode=render_mode,
         )
 
         
