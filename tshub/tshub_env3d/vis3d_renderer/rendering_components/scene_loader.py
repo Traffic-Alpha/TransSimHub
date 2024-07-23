@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-12 21:38:26
 @Description: 场景加载相关的方法 (用于初始化场景)
-@LastEditTime: 2024-07-17 00:29:45
+@LastEditTime: 2024-07-23 18:25:31
 '''
 from pathlib import Path
 from loguru import logger
@@ -53,15 +53,14 @@ class SceneLoader(object):
         self.map_center = None
     
 
-    def initialize_scene(self, use_render_pipeline=False) -> None:
+    def initialize_scene(self) -> None:
         logger.info("SIM: Starting TSHub3D scene initialization.")
         self.load_map()
         self.load_road_lines()
         self.load_lane_lines()
-        if not use_render_pipeline:
-            self.load_sky_box()
-            self.load_flat_terrain()
-            self.setup_lighting()
+        self.load_flat_terrain()
+        self.load_sky_box()
+        self.setup_lighting()
 
         return self.map_radius, self.map_center
 

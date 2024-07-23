@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-15 11:53:11
 @Description: 创建不同类型的 Offscreen Camera Type
-@LastEditTime: 2024-07-21 03:19:06
+@LastEditTime: 2024-07-23 18:20:56
 '''
 from panda3d.core import (
     FrameBufferProperties,
@@ -82,15 +82,10 @@ def build_offscreen_camera(
         tex, GraphicsOutput.RTM_copy_ram, GraphicsOutput.RTP_color
     )
 
-    # setup camera (人眼的视角, 有 3D 效果)
-    lens = PerspectiveLens()
+    # setup camera
+    lens = PerspectiveLens() # 人眼的视角, 有 3D 效果
+    # lens = OrthographicLens() # 这一类的 camera 没有 3D 的效果
     lens.setFov(90)  # Set the field of view to 45 degrees, or another value as needed
-    # lens.setNearFar(0.1, 1000)  # Set near and far clipping planes
-
-    # ------
-
-    # setup camera (没有 3D 的效果)
-    # lens = OrthographicLens()
     lens.setFilmSize(width * resolution, height * resolution)
 
     camera_np = showbase_instance.makeCamera(

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-21 04:23:48
+@LastEditTime: 2024-07-21 23:07:45
 '''
 import math
 from loguru import logger
@@ -137,10 +137,10 @@ class SceneSync(object):
                 self._vehicle_elements[veh_id].begin_rendering_node() # 开始渲染车辆节点
                 if veh_type == 'ego': # 给 ego vehicle 上面添加 sensor
                     self._vehicle_elements[veh_id].attach_sensors_to_element([
-                        'front_left_all', 'front_right_all', 'front_all', # 前向摄像头
-                        'back_left_all', 'back_right_all', 'back_all', # 后向摄像头
-                        'front_left_vehicle', 'front_right_vehicle', 'front_vehicle', # 前向摄像头
-                        'back_left_vehicle', 'back_right_vehicle', 'back_vehicle', # 后向摄像头
+                        # 'front_left_all', 'front_right_all', 'front_all', # 前向摄像头
+                        # 'back_left_all', 'back_right_all', 'back_all', # 后向摄像头
+                        # 'front_left_vehicle', 'front_right_vehicle', 'front_vehicle', # 前向摄像头
+                        # 'back_left_vehicle', 'back_right_vehicle', 'back_vehicle', # 后向摄像头
                         'bev_all', 'bev_vehicle', # 俯视摄像头
                     ])
         # 查看哪些车辆离开了路网

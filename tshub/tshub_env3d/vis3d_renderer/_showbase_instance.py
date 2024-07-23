@@ -2,14 +2,10 @@
 @Author: WANG Maonan
 @Date: 2024-07-03 23:43:42
 @Description: 继承 ShowBase, Panda3D 的主界面
-@LastEditTime: 2024-07-13 03:28:32
+@LastEditTime: 2024-07-23 18:22:19
 '''
 from ...utils.get_abs_path import get_abs_path
 current_file_path = get_abs_path(__file__)
-
-import sys
-sys.path.insert(0, current_file_path("../../../render_pipeline"))
-from render_pipeline.rpcore import RenderPipeline
 
 import simplepbr
 from loguru import logger
@@ -29,7 +25,6 @@ class _ShowBaseInstance(ShowBase):
     """
     _debug_mode: DEBUG_MODE = DEBUG_MODE.WARNING
     _rendering_backend: BACKEND_LITERALS = "p3headlessgl" # pandagl
-    _use_render_pipeline: bool = False
     _render_mode: str = "onscreen" # onscreen or offscreen
 
     @classmethod
@@ -90,25 +85,16 @@ class _ShowBaseInstance(ShowBase):
         self._render_lock = Lock()
         try:
             # There can be only 1 ShowBase instance at a time.
-            if _ShowBaseInstance._use_render_pipeline:
-                self.render_pipeline = RenderPipeline()
-                self.render_pipeline.load_settings(
-                    current_file_path("./pipeline_render_pipeline.yaml")
-                ) # 加载 render pipeline 的配置文件
-                self.render_pipeline.pre_showbase_init()
-                loadPrcFileData("", "gl-immutable-texture-storage 0")
-                self.render_pipeline.create(self)
-            else:
-                if _ShowBaseInstance._render_mode == "offscreen":
-                    super().__init__(windowType="offscreen") # 此时是没有界面的
-                elif _ShowBaseInstance._render_mode == "onscreen":
-                    super().__init__() # 开启可视化界面
-                simplepbr.init(
-                    msaa_samples=16,
-                    use_hardware_skinning=True,
-                    use_normal_maps=True,
-                    use_330=False
-                ) # https://github.com/Moguri/panda3d-simplepbr
+            if _ShowBaseInstance._render_mode == "offscreen":
+                super().__init__(windowType="offscreen") # 此时是没有界面的
+            elif _ShowBaseInstance._render_mode == "onscreen":
+                super().__init__() # 开启可视化界面
+            simplepbr.init(
+                msaa_samples=16,
+                use_hardware_skinning=True,
+                use_normal_maps=True,
+                use_330=False
+            ) # https://github.com/Moguri/panda3d-simplepbr
 
             self.setBackgroundColor(255, 255, 255, 1) # 设置背景颜色, (0,0,0) 是黑色
             self.setFrameRateMeter(True) # 是否显示 FPS
@@ -119,12 +105,6 @@ class _ShowBaseInstance(ShowBase):
     # #################################
     # 下面两个 method 用于调整 class 的参数
     # #################################
-    @classmethod
-    def set_use_render_pipeline(cls, use_render_pipeline: bool) -> None:
-        """Sets the use of render pipeline.
-        """
-        cls._use_render_pipeline = use_render_pipeline
-
     @classmethod
     def set_render_mode(cls, render_mode: str) -> None:
         """Sets the render mode.

@@ -4,48 +4,21 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-21 03:21:59
+@LastEditTime: 2024-07-23 18:25:41
 '''
 import math
 from loguru import logger
 from typing import Collection, Dict, Literal, Optional, Tuple, Union
 
 from direct.task import Task
-from panda3d.core import (
-    Camera,
-    CardMaker,
-    FrameBufferProperties,
-    Geom,
-    GeomLinestrips,
-    GeomNode,
-    GeomTrifans,
-    GeomVertexData,
-    GeomVertexFormat,
-    GeomVertexReader,
-    GeomVertexWriter,
-    GraphicsOutput,
-    GraphicsPipe,
-    NodePath,
-    OrthographicLens,
-    Shader,
-    ShaderInput,
-    Texture,
-    WindowProperties,
-    loadPrcFileData,
-    Vec4,
-    AmbientLight, 
-    DirectionalLight
-)
 
 from ..vis3d_utils.colors import Colors, SceneColors
-from ..vis3d_utils.coordinates import Pose, Heading, Point
 
+from ..vis3d_utils.masks import CamMask
 from ..vis3d_renderer._showbase_instance import _ShowBaseInstance
 from ..vis3d_renderer.base_render import BaseRender, DEBUG_MODE
 
 from ...utils.get_abs_path import get_abs_path
-
-from ..vis3d_utils.masks import CamMask
 
 # 场景渲染步骤
 from .rendering_components import (
@@ -69,7 +42,6 @@ class TSHubRenderer(BaseRender):
         self,
         simid: str,
         scenario_glb_dir:str, # 场景 glb 文件夹
-        use_render_pipeline:bool=False, # 使用 render_pipeline 此时就是 onscreen 渲染
         render_mode:str="onscreen", # onscreen or offscreen
         debug_mode: DEBUG_MODE = DEBUG_MODE.ERROR,
         rendering_backend: BACKEND_LITERALS = "pandagl",
@@ -83,11 +55,8 @@ class TSHubRenderer(BaseRender):
         self._root_np = None
         self._vehicles_np = None # 车辆节点, 在上面加入新的车辆
         self._signals_np = None # 信号灯节点
-
-        self.use_render_pipeline = use_render_pipeline
         
         # 设置 showbase 的参数
-        _ShowBaseInstance.set_use_render_pipeline(use_render_pipeline)
         _ShowBaseInstance.set_render_mode(render_mode)
         _ShowBaseInstance.set_rendering_verbosity(debug_mode=debug_mode)
         _ShowBaseInstance.set_rendering_backend(rendering_backend=rendering_backend)
@@ -135,7 +104,7 @@ class TSHubRenderer(BaseRender):
             map_road_lane_glsl_dir=self.current_file_path("../_assets_3d/map_road_lines/"),
         )
         # 完成了场景的初始化
-        self.map_radius, self.map_center = scene_loader.initialize_scene(self.use_render_pipeline)
+        self.map_radius, self.map_center = scene_loader.initialize_scene()
         self._is_setup = True # 完成初始化
 
         # 初始化场景同步器
