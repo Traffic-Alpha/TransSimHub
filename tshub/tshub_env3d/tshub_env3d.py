@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-@LastEditTime: 2024-07-25 00:48:14
+@LastEditTime: 2024-07-25 01:06:39
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -48,10 +48,12 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             # TSHubRenderer 的参数
             render_mode: str = "onscreen",
             debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
+            debugr_spin_camera:bool = False, # 是否显示 spin camera
             sensor_config: Dict[str, List[str]] = None,
         ) -> None:
 
         self.debuger_print_node = debuger_print_node
+        self.debugr_spin_camera = debugr_spin_camera
 
         # 初始化 tshub 环境与 sumo 交互
         self.tshub_env = TshubEnvironment(
@@ -89,11 +91,11 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             self.tshub_render.print_node_paths(self.tshub_render._root_np)
 
         # 场景添加相机, 可以进行可视化
-        self.tshub_render._showbase_instance.taskMgr.add(
-            self.tshub_render.test_spin_camera_task, 
-            "SpinCamera"
-        )
-        self.tshub_render._showbase_instance.camLens.set_fov(90) # TODO, 这里需要转移到 debug 的地方
+        if self.debugr_spin_camera:
+            self.tshub_render._showbase_instance.taskMgr.add(
+                self.tshub_render.test_spin_camera_task, 
+                "SpinCamera"
+            )
 
         return state_infos
     

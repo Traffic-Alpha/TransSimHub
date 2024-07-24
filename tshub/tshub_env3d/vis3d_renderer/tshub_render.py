@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-25 00:47:37
+@LastEditTime: 2024-07-25 01:05:53
 '''
 import math
 from loguru import logger
@@ -152,6 +152,7 @@ class TSHubRenderer(BaseRender):
         cameraZ = self.map_center[2] + height
         self._showbase_instance.camera.setPos(cameraX, cameraY, cameraZ)
         self._showbase_instance.camera.lookAt(*self.map_center)  # Adjust the camera to look at the center of the model
+        self._showbase_instance.camLens.set_fov(90)
 
         # 获取 Camera 节点
         camera_node = self._showbase_instance.cam
