@@ -2,12 +2,12 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 00:32:12
 @Description: 单路口 3D 可视化
-@LastEditTime: 2024-07-21 04:21:34
+@LastEditTime: 2024-07-25 01:02:02
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.tshub_env3d.tshub_env3d import Tshub3DEnvironment
-# from tshub.tshub_env3d.show_sensor_images import show_sensor_images # TODO, 检查这个会有 QT 的报错和提示
+from tshub.tshub_env3d.show_sensor_images import show_sensor_images # TODO, 检查这个会有 QT 的报错和提示
 path_convert = get_abs_path(__file__)
 set_logger(path_convert('./'), terminal_log_level='INFO')
 
@@ -47,8 +47,13 @@ if __name__ == '__main__':
         use_gui=True, 
         num_seconds=1000,
         collision_action="warn",
-        use_render_pipeline=False,
+        # 下面是用于渲染的参数
         render_mode="onscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
+        sensor_config={
+            # 'vehicle': ['front_all', 'back_all'],
+            'aircraft': ['aircraft_all', 'aircraft_vehicle'],
+            # 'tls': ['junction_front_all']
+        }
     )
 
     for _ in range(3):
@@ -111,15 +116,15 @@ if __name__ == '__main__':
             #     images_per_row=4
             # ) # 展示路口的摄像头
 
-            # show_sensor_images(
-            #     [
-            #         sensor_data.get('a1', {}).get('aircraft_all', None),
-            #         sensor_data.get('a2', {}).get('aircraft_all', None),
+            show_sensor_images(
+                [
+                    sensor_data.get('a1', {}).get('aircraft_all', None),
+                    sensor_data.get('a2', {}).get('aircraft_all', None),
 
-            #         sensor_data.get('a1', {}).get('aircraft_vehicle', None),
-            #         sensor_data.get('a2', {}).get('aircraft_vehicle', None),
-            #     ],
-            #     scale=1,
-            #     images_per_row=2
-            # ) # 展示 Aircraft 的摄像头
+                    sensor_data.get('a1', {}).get('aircraft_vehicle', None),
+                    sensor_data.get('a2', {}).get('aircraft_vehicle', None),
+                ],
+                scale=1,
+                images_per_row=2
+            ) # 展示 Aircraft 的摄像头
     tshub_env3d.close()

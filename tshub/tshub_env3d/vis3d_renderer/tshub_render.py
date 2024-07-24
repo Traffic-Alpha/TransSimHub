@@ -4,11 +4,11 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-23 18:25:41
+@LastEditTime: 2024-07-25 00:47:37
 '''
 import math
 from loguru import logger
-from typing import Collection, Dict, Literal, Optional, Tuple, Union
+from typing import Dict, Literal, Optional, List, Union
 
 from direct.task import Task
 
@@ -41,6 +41,7 @@ class TSHubRenderer(BaseRender):
     def __init__(
         self,
         simid: str,
+        sensor_config:Dict[str, List[str]],
         scenario_glb_dir:str, # 场景 glb 文件夹
         render_mode:str="onscreen", # onscreen or offscreen
         debug_mode: DEBUG_MODE = DEBUG_MODE.ERROR,
@@ -48,7 +49,8 @@ class TSHubRenderer(BaseRender):
     ) -> None:
         super().__init__()
         self.current_file_path = get_abs_path(__file__)
-        self._simid = simid # 仿真的 id 
+        self._simid = simid # 仿真的 id
+        self.sensor_config = sensor_config # 加载传感器
 
         # 场景 node path 记录
         self._is_setup = False # 还没有对场景进行初始化
@@ -110,7 +112,8 @@ class TSHubRenderer(BaseRender):
         # 初始化场景同步器
         self.scene_sync = SceneSync(
             root_np=self._root_np,
-            showbase_instance=self._showbase_instance
+            showbase_instance=self._showbase_instance,
+            sensor_config=self.sensor_config
         )
 
     def _ensure_root(self) -> None:
