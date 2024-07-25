@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-25 01:05:53
+@LastEditTime: 2024-07-26 03:04:38
 '''
 import math
 from loguru import logger
@@ -82,7 +82,7 @@ class TSHubRenderer(BaseRender):
         return self._is_setup
     
     # ---------------- #
-    # Step 1, 初始化场景
+    # Step 1, 初始化场景 (只需要初始化一次, reset 的时候不需要重新加载环境信息)
     # ---------------- #
     def setup(self, scenario_glb_dir:str) -> None:
         """Initialize this renderer. 初始化场景共分为以下的几个步骤:
@@ -198,8 +198,3 @@ class TSHubRenderer(BaseRender):
 
     def __del__(self):
         self.destroy()
-
-    # def remove_buffer(self, buffer):
-    #     """Remove the rendering buffer.
-    #     """
-    #     self._showbase_instance.graphicsEngine.removeWindow(buffer)

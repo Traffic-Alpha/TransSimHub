@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-20 14:36:14
 @Description: 
-@LastEditTime: 2024-07-20 14:38:22
+@LastEditTime: 2024-07-26 03:04:53
 '''
 import numpy as np
 
@@ -16,11 +16,14 @@ from panda3d.core import (
     Texture,
 )
 
+from ......vis3d_renderer._showbase_instance import _ShowBaseInstance
+
 @dataclass
 class _BaseOffCameraMixin:
     camera_np: NodePath
     buffer: GraphicsOutput
     tex: Texture
+    showbase_instance: _ShowBaseInstance
 
     def wait_for_ram_image(self, img_format: str, retries=100):
         """Attempt to acquire a graphics buffer.
@@ -71,11 +74,11 @@ class _BaseOffCameraMixin:
         """
         return np.radians(self.camera_np.getH())
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Clean up internal resources.
         """
         self.camera_np.removeNode()
         region = self.buffer.getDisplayRegion(0)
         region.window.clearRenderTextures()
         self.buffer.removeAllDisplayRegions()
-        getattr(self, "renderer").remove_buffer(self.buffer)
+        self.showbase_instance.graphicsEngine.removeWindow(self.buffer)

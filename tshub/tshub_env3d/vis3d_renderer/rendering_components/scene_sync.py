@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-25 01:01:47
+@LastEditTime: 2024-07-26 03:13:34
 '''
 import math
 from loguru import logger
@@ -59,11 +59,9 @@ class SceneSync(object):
         return True
 
     def reset(self, tshub_init_obs) -> None:
-        # 初始化车辆 & 关闭所有车辆的 sensors
-        for veh_id, veh_info in self._vehicle_elements.items():
-            print(1)
-            
-        self._vehicle_elements = {}
+        # 初始化 & 关闭所有车辆和飞行器的 sensors
+        self.remove_missing_elements(set(), self._vehicle_elements, 'vehicle')
+        self.remove_missing_elements(set(), self._aircraft_elements, 'aircraft')
         
         # 初始化信号灯
         if not self._tls_elements: # 只需要加载一次即可
@@ -157,9 +155,9 @@ class SceneSync(object):
             element.update_sensor(aircraft_info['position'], heading)
 
     def remove_missing_elements(self, current_ids, elements, element_type):
-        missing_ids = set(elements) - current_ids
+        missing_ids = set(elements) - current_ids # 计算减少的 id
         for id in missing_ids:
-            elements[id].remove_node()
+            elements[id].remove_node() # tarffic element 中调用 remove node
             del elements[id]
             logger.info(f'SIM: 3D, Del {element_type} {id} since it leaves the scenario.')
 
