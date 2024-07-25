@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 00:32:12
 @Description: 单路口 3D 可视化
-@LastEditTime: 2024-07-25 01:02:02
+@LastEditTime: 2024-07-26 03:17:06
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -45,18 +45,20 @@ if __name__ == '__main__':
         tls_ids=['htddj_gsndj'],
         vehicle_action_type='lane_continuous_speed',
         use_gui=True, 
-        num_seconds=1000,
+        num_seconds=200,
         collision_action="warn",
         # 下面是用于渲染的参数
-        render_mode="onscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
+        render_mode="offscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
+        debuger_print_node=False,
+        debugr_spin_camera=True,
         sensor_config={
-            # 'vehicle': ['front_all', 'back_all'],
-            'aircraft': ['aircraft_all', 'aircraft_vehicle'],
+            'vehicle': ['bev_all', 'bev_vehicle'],
+            # 'aircraft': ['aircraft_all', 'aircraft_vehicle'],
             # 'tls': ['junction_front_all']
         }
     )
 
-    for _ in range(3):
+    for _ in range(10):
         obs = tshub_env3d.reset()
         done = False
         i_steps = 0
@@ -72,33 +74,30 @@ if __name__ == '__main__':
             obs, reward, info, done, sensor_data = tshub_env3d.step(actions=actions)
             i_steps += 1
 
-            # 将 sensor_data 的数据保存为图片, 文件夹为 element_id, 然后是每一个 element 中的 camera type
+            show_sensor_images(
+                [
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_left_all', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_all', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_right_all', None),
 
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_left_all', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_all', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_right_all', None),
 
-            # show_sensor_images(
-            #     [
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_left_all', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_all', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_right_all', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_left_vehicle', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_vehicle', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('front_right_vehicle', None),
 
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_left_all', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_all', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_right_all', None),
-
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_left_vehicle', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_vehicle', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('front_right_vehicle', None),
-
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_left_vehicle', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_vehicle', None),
-            #         # sensor_data.get('ego_gsndj_s4', {}).get('back_right_vehicle', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_left_vehicle', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_vehicle', None),
+                    # sensor_data.get('ego_gsndj_s4', {}).get('back_right_vehicle', None),
                     
-            #         sensor_data.get('ego_gsndj_s4', {}).get('bev_all', None),
-            #         sensor_data.get('ego_gsndj_s4', {}).get('bev_vehicle', None)
-            #     ],
-            #     scale=0.5,
-            #     images_per_row=2
-            # ) # 展示 ego 车辆的视角
+                    sensor_data.get('ego_gsndj_s4', {}).get('bev_all', None),
+                    sensor_data.get('ego_gsndj_s4', {}).get('bev_vehicle', None)
+                ],
+                scale=0.5,
+                images_per_row=2
+            ) # 展示 ego 车辆的视角
 
             # show_sensor_images(
             #     [
@@ -116,15 +115,15 @@ if __name__ == '__main__':
             #     images_per_row=4
             # ) # 展示路口的摄像头
 
-            show_sensor_images(
-                [
-                    sensor_data.get('a1', {}).get('aircraft_all', None),
-                    sensor_data.get('a2', {}).get('aircraft_all', None),
+            # show_sensor_images(
+            #     [
+            #         sensor_data.get('a1', {}).get('aircraft_all', None),
+            #         sensor_data.get('a2', {}).get('aircraft_all', None),
 
-                    sensor_data.get('a1', {}).get('aircraft_vehicle', None),
-                    sensor_data.get('a2', {}).get('aircraft_vehicle', None),
-                ],
-                scale=1,
-                images_per_row=2
-            ) # 展示 Aircraft 的摄像头
+            #         sensor_data.get('a1', {}).get('aircraft_vehicle', None),
+            #         sensor_data.get('a2', {}).get('aircraft_vehicle', None),
+            #     ],
+            #     scale=1,
+            #     images_per_row=2
+            # ) # 展示 Aircraft 的摄像头
     tshub_env3d.close()
