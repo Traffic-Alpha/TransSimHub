@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-07-26 05:14:41
+ * @LastEditTime: 2024-07-26 05:18:42
 -->
 # Change Log
 
@@ -18,8 +18,13 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Removed
 ### Security
 
+1.1
+
+- 加入 test, 对于环境的测试, 是否成功安装的测试
+- 加入 channel model
+
 <!-- v1.0 -->
-## [v1.0 🚀] - July 26, 2024
+## [v1.0 🚀] - 2024-07-26
 
 ### News
 
