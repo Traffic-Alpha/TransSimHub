@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-07-19 18:52:33
+ * @LastEditTime: 2024-07-26 05:14:41
 -->
 # Change Log
 
@@ -19,16 +19,33 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Security
 
 <!-- v1.0 -->
-## [v1.0] - 2024-07-09
+## [v1.0 🚀] - July 26, 2024
+
+### News
+
+It is indeed a delight to announce the upgraded iteration of TransSimHub (TSHub) to version 1.0. Noteworthy in this rendition is the integration of 3D rendering capabilities, a salient feature enhancing the essence of this edition.
+
+In comparison to Carla:
+1. TSHub3D swiftly transmutes sumonet into 3D files.
+2. TSHub3D boasts a more streamlined nature, ensuring expeditious rendering.
+3. TShub3D excels in user-friendliness, facilitating the effortless addition of various sensor types onto diverse objects within the scene through simple parameter configurations.
 
 ### Added
 
-- 添加了 3D 可视化
-  - [sumonet_to_tshub3d.py](./tshub/tshub_env3d/sumonet_to_tshub3d.py) 可以快速将 SUMO Network 转换为 glb 文件，用于 3D 的展示。
+- **Highlight**: Introduction of 3D Visualization
+  - Automating the transformation of sumonet into 3D, [sumonet_to_tshub3d.py](./tshub/tshub_env3d/sumonet_to_tshub3d.py) expedites the conversion of SUMO Network to glb format for 3D display.
+  - Rendering SUMO environments into 3D, [tshub_env3d.py](./tshub/tshub_env3d/tshub_env3d.py), in conjunction with TSHub, concurrently rendering the sumo simulation information into a 3D scene.
+  - For insights into various sensors, the Chinese version can be found [here](https://transsimhub.readthedocs.io/en/latest/locales/zh_CN/tshub3d_sensors/index.html), and the English version [here](https://transsimhub.readthedocs.io/en/latest/locales/en/tshub3d_sensors/index.html).
+- Enhanced [base_tls.py](./tshub/traffic_light/tls_type/base_tls.py) by integrating the entry road ID, angle, and position for each intersection.
 
 ### Fixed
 
-- 修复了多功能车道无法获得数据的问题，之前由于 connection 只有 r，s，l，但是实际会存在 rs 导致无法正确获得数据
+- Addressed the issue where the multifunctional lanes were unable to acquire data. Previously, this anomaly stemmed from the presence of d multifunctional lanes alongside r, s, l connections, such as rs, which led to erroneous data retrieval.
+- Integrated stop line extraction within tls to discern and calculate the coordinates for placing intersection cameras.
+
+### Deprecated
+
+- The abandonment of leveraging render_pipline to enhance rendering effects, with a renewed focus on rendering efficiency.
 
 <!-- v0.9.9 -->
 ## [v0.9.9] - 2024-07-06
