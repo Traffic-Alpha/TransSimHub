@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 22:14:31
 @Description: 仿真器中飞行器的可视化 (在飞行器上安装摄像头)
-@LastEditTime: 2024-07-21 04:06:07
+@LastEditTime: 2024-07-26 02:06:22
 '''
 from typing import Tuple
 
@@ -34,9 +34,6 @@ class Aircraft3DElement(BaseElement):
         pass
 
     def update_node(self) -> None:
-        pass
-
-    def remove_node(self) -> None:
         pass
         
     def begin_rendering_node(self) -> None:
