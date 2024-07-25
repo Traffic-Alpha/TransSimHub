@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-26 03:13:34
+@LastEditTime: 2024-07-26 04:02:33
 '''
 import math
 from loguru import logger
@@ -64,7 +64,7 @@ class SceneSync(object):
         self.remove_missing_elements(set(), self._aircraft_elements, 'aircraft')
         
         # 初始化信号灯
-        if not self._tls_elements: # 只需要加载一次即可
+        if (not self._tls_elements) and ("tls" in tshub_init_obs): # 只需要加载一次即可
             for tls_id, tls_info in tshub_init_obs['tls'].items():
                 self._initialize_tls_elements(tls_id, tls_info)
 
@@ -105,11 +105,11 @@ class SceneSync(object):
 
     def update_elements(self, tshub_obs):
         veh_ids, aircraft_ids = set(), set()
-        for veh_id, veh_info in tshub_obs['vehicle'].items():
+        for veh_id, veh_info in tshub_obs.get('vehicle', {}).items():
             veh_ids.add(veh_id)
-            self._manage_vehicle_element(veh_id, veh_info) #控制场景内的 vehicle
+            self._manage_vehicle_element(veh_id, veh_info)
 
-        for aircraft_id, aircraft_info in tshub_obs['aircraft'].items():
+        for aircraft_id, aircraft_info in tshub_obs.get('aircraft', {}).items():
             aircraft_ids.add(aircraft_id)
             self._manage_aircraft_element(aircraft_id, aircraft_info)
 
