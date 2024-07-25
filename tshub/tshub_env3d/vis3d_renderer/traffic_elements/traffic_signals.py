@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-07 10:01:04
 @Description: 
-@LastEditTime: 2024-07-21 03:21:49
+@LastEditTime: 2024-07-26 02:06:03
 '''
 from typing import Tuple
 
@@ -36,9 +36,6 @@ class TLS3DElement(BaseElement):
         pass
 
     def update_node(self) -> None:
-        pass
-
-    def remove_node(self) -> None:
         pass
 
     def begin_rendering_node(self) -> None:

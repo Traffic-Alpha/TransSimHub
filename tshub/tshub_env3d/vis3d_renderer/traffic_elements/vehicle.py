@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-21 07:06:01
+@LastEditTime: 2024-07-26 03:13:24
 '''
 import random
 from loguru import logger
@@ -87,6 +87,7 @@ class Vehicle3DElement(BaseElement):
         pose = self.get_element_pose_from_bumper() # 坐标转换
         pos, heading = pose.as_panda3d()
         self.veh_node_path.setPosHpr(*pos, heading, 0, 0)
+        self.update_sensor() # 顺便更新传感器的位置
 
     def remove_node(self) -> None:
         """Remove a vehicle node
@@ -94,8 +95,12 @@ class Vehicle3DElement(BaseElement):
         if not self.veh_node_path:
             logger.warning(f"SIM: Renderer ignoring invalid vehicle id: {self.element_id}")
             return
+        logger.info(f"SIM: Remove Renderer vehicle id: {self.element_id}")
         self.veh_node_path.removeNode()
-        # TODO, 同时删除所有的 sensor
+        # 删除车辆上面的传感器
+        for _, _sensor in self.sensors.items():
+            _sensor.teardown() # 删除挂载在车上的传感器
+        self.sensors = None
         
     def begin_rendering_node(self) -> None:
         """Add the vehicle node to the scene graph

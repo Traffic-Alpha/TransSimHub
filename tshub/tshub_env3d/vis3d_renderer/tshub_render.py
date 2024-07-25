@@ -4,48 +4,21 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-21 03:21:59
+@LastEditTime: 2024-07-26 03:04:38
 '''
 import math
 from loguru import logger
-from typing import Collection, Dict, Literal, Optional, Tuple, Union
+from typing import Dict, Literal, Optional, List, Union
 
 from direct.task import Task
-from panda3d.core import (
-    Camera,
-    CardMaker,
-    FrameBufferProperties,
-    Geom,
-    GeomLinestrips,
-    GeomNode,
-    GeomTrifans,
-    GeomVertexData,
-    GeomVertexFormat,
-    GeomVertexReader,
-    GeomVertexWriter,
-    GraphicsOutput,
-    GraphicsPipe,
-    NodePath,
-    OrthographicLens,
-    Shader,
-    ShaderInput,
-    Texture,
-    WindowProperties,
-    loadPrcFileData,
-    Vec4,
-    AmbientLight, 
-    DirectionalLight
-)
 
 from ..vis3d_utils.colors import Colors, SceneColors
-from ..vis3d_utils.coordinates import Pose, Heading, Point
 
+from ..vis3d_utils.masks import CamMask
 from ..vis3d_renderer._showbase_instance import _ShowBaseInstance
 from ..vis3d_renderer.base_render import BaseRender, DEBUG_MODE
 
 from ...utils.get_abs_path import get_abs_path
-
-from ..vis3d_utils.masks import CamMask
 
 # 场景渲染步骤
 from .rendering_components import (
@@ -68,26 +41,24 @@ class TSHubRenderer(BaseRender):
     def __init__(
         self,
         simid: str,
+        sensor_config:Dict[str, List[str]],
         scenario_glb_dir:str, # 场景 glb 文件夹
-        use_render_pipeline:bool=False, # 使用 render_pipeline 此时就是 onscreen 渲染
         render_mode:str="onscreen", # onscreen or offscreen
         debug_mode: DEBUG_MODE = DEBUG_MODE.ERROR,
         rendering_backend: BACKEND_LITERALS = "pandagl",
     ) -> None:
         super().__init__()
         self.current_file_path = get_abs_path(__file__)
-        self._simid = simid # 仿真的 id 
+        self._simid = simid # 仿真的 id
+        self.sensor_config = sensor_config # 加载传感器
 
         # 场景 node path 记录
         self._is_setup = False # 还没有对场景进行初始化
         self._root_np = None
         self._vehicles_np = None # 车辆节点, 在上面加入新的车辆
         self._signals_np = None # 信号灯节点
-
-        self.use_render_pipeline = use_render_pipeline
         
         # 设置 showbase 的参数
-        _ShowBaseInstance.set_use_render_pipeline(use_render_pipeline)
         _ShowBaseInstance.set_render_mode(render_mode)
         _ShowBaseInstance.set_rendering_verbosity(debug_mode=debug_mode)
         _ShowBaseInstance.set_rendering_backend(rendering_backend=rendering_backend)
@@ -111,7 +82,7 @@ class TSHubRenderer(BaseRender):
         return self._is_setup
     
     # ---------------- #
-    # Step 1, 初始化场景
+    # Step 1, 初始化场景 (只需要初始化一次, reset 的时候不需要重新加载环境信息)
     # ---------------- #
     def setup(self, scenario_glb_dir:str) -> None:
         """Initialize this renderer. 初始化场景共分为以下的几个步骤:
@@ -135,13 +106,14 @@ class TSHubRenderer(BaseRender):
             map_road_lane_glsl_dir=self.current_file_path("../_assets_3d/map_road_lines/"),
         )
         # 完成了场景的初始化
-        self.map_radius, self.map_center = scene_loader.initialize_scene(self.use_render_pipeline)
+        self.map_radius, self.map_center = scene_loader.initialize_scene()
         self._is_setup = True # 完成初始化
 
         # 初始化场景同步器
         self.scene_sync = SceneSync(
             root_np=self._root_np,
-            showbase_instance=self._showbase_instance
+            showbase_instance=self._showbase_instance,
+            sensor_config=self.sensor_config
         )
 
     def _ensure_root(self) -> None:
@@ -180,6 +152,7 @@ class TSHubRenderer(BaseRender):
         cameraZ = self.map_center[2] + height
         self._showbase_instance.camera.setPos(cameraX, cameraY, cameraZ)
         self._showbase_instance.camera.lookAt(*self.map_center)  # Adjust the camera to look at the center of the model
+        self._showbase_instance.camLens.set_fov(90)
 
         # 获取 Camera 节点
         camera_node = self._showbase_instance.cam
@@ -225,8 +198,3 @@ class TSHubRenderer(BaseRender):
 
     def __del__(self):
         self.destroy()
-
-    # def remove_buffer(self, buffer):
-    #     """Remove the rendering buffer.
-    #     """
-    #     self._showbase_instance.graphicsEngine.removeWindow(buffer)

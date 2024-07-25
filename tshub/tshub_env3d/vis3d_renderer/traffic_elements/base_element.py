@@ -9,7 +9,7 @@
 --> begin render node
 -> 在 node 上添加传感器
 这里 Element 可以是 vehicles, aircrsaft, 或是 traffic signal light
-@LastEditTime: 2024-07-20 16:01:59
+@LastEditTime: 2024-07-26 02:05:24
 '''
 import numpy as np
 from typing import Tuple, List
@@ -95,9 +95,11 @@ class BaseElement(ABC):
     def update_node(self):
         raise NotImplementedError
 
-    @abstractmethod
-    def remove_node(self):
-        raise NotImplementedError
+    def remove_node(self) -> None:
+        # 删除传感器 (一个 node 可以挂载多个传感器)
+        for _, _sensor in self.sensors.items():
+            _sensor.teardown() # 删除传感器
+        self.sensors = None
 
     @abstractmethod
     def begin_rendering_node(self):

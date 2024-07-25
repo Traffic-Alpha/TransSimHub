@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-15 11:53:11
 @Description: 创建不同类型的 Offscreen Camera Type
-@LastEditTime: 2024-07-21 03:19:06
+@LastEditTime: 2024-07-26 03:03:51
 '''
 from panda3d.core import (
     FrameBufferProperties,
@@ -82,15 +82,10 @@ def build_offscreen_camera(
         tex, GraphicsOutput.RTM_copy_ram, GraphicsOutput.RTP_color
     )
 
-    # setup camera (人眼的视角, 有 3D 效果)
-    lens = PerspectiveLens()
+    # setup camera
+    lens = PerspectiveLens() # 人眼的视角, 有 3D 效果
+    # lens = OrthographicLens() # 这一类的 camera 没有 3D 的效果
     lens.setFov(90)  # Set the field of view to 45 degrees, or another value as needed
-    # lens.setNearFar(0.1, 1000)  # Set near and far clipping planes
-
-    # ------
-
-    # setup camera (没有 3D 的效果)
-    # lens = OrthographicLens()
     lens.setFilmSize(width * resolution, height * resolution)
 
     camera_np = showbase_instance.makeCamera(
@@ -109,29 +104,29 @@ def build_offscreen_camera(
     # 跟车的视角
     _camera_type = OffscreenCameraType(camera_type)
     if _camera_type == OffscreenCameraType.BEV:
-        camera = OffscreenBEVCamera(camera_np=camera_np, buffer=buffer, tex=tex)
+        camera = OffscreenBEVCamera(camera_np=camera_np, buffer=buffer, tex=tex, showbase_instance=showbase_instance)
     # 路口的摄像头
     elif _camera_type == OffscreenCameraType.Junction_Front: # 正对路口
-        camera = OffscreenJunctionFrontCamera(camera_np, buffer, tex)
+        camera = OffscreenJunctionFrontCamera(camera_np, buffer, tex, showbase_instance)
     elif _camera_type == OffscreenCameraType.Junction_Back: # 对着道路出口
-        camera = OffscreenJunctionBackCamera(camera_np, buffer, tex)
+        camera = OffscreenJunctionBackCamera(camera_np, buffer, tex, showbase_instance)
     # 前拍
     elif _camera_type == OffscreenCameraType.Front:
-        camera = OffscreenFrontCamera(camera_np, buffer, tex)
+        camera = OffscreenFrontCamera(camera_np, buffer, tex, showbase_instance)
     elif _camera_type == OffscreenCameraType.Front_LEFT: # 前拍 (左侧)
-        camera = OffscreenFrontLeftCamera(camera_np, buffer, tex)
+        camera = OffscreenFrontLeftCamera(camera_np, buffer, tex, showbase_instance)
     elif _camera_type == OffscreenCameraType.Front_RIGHT: # 前拍 (右侧)
-        camera = OffscreenFrontRightCamera(camera_np, buffer, tex)
+        camera = OffscreenFrontRightCamera(camera_np, buffer, tex, showbase_instance)
     # 后拍
     elif _camera_type == OffscreenCameraType.Back:
-        camera = OffscreenBackCamera(camera_np, buffer, tex)
+        camera = OffscreenBackCamera(camera_np, buffer, tex, showbase_instance)
     elif _camera_type == OffscreenCameraType.Back_LEFT: # 后拍 (左侧)
-        camera = OffscreenBackLeftCamera(camera_np, buffer, tex)
+        camera = OffscreenBackLeftCamera(camera_np, buffer, tex, showbase_instance)
     elif _camera_type == OffscreenCameraType.Back_RIGHT: # 后拍 (右侧)
-        camera = OffscreenBackRightCamera(camera_np, buffer, tex)
+        camera = OffscreenBackRightCamera(camera_np, buffer, tex, showbase_instance)
     # 无人机的视角
     elif _camera_type == OffscreenCameraType.Aircraft: # 无人机从上往下拍摄
-        camera = OffscreenAircraftCamera(camera_np, buffer, tex)  
+        camera = OffscreenAircraftCamera(camera_np, buffer, tex, showbase_instance)  
     else:
         raise ValueError(f"请你确认 camera 的名字, 没有 {camera_type}.")
     return camera

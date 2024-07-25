@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 19:43:50
 @Description: RGB Sensor, 绑定在场景的 obejct 上
-@LastEditTime: 2024-07-20 15:48:13
+@LastEditTime: 2024-07-26 02:20:56
 '''
 import numpy as np
 from typing import Tuple
@@ -62,3 +62,10 @@ class RGBSensor(CameraSensor):
         image.shape = (height, width, 3)
         image = np.flipud(image)
         return image
+
+    def teardown(self) -> None:
+        """销毁 sensor 和其绑定的 camera，释放资源。
+        """
+        if self.camera:
+            self.camera.teardown()  # 移除 camera 节点
+            self.camera = None  # 清除 camera 引用，便于垃圾回收
