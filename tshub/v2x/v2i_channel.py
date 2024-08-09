@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-08-09 11:30:10
 @Description: V2I Channel Model
-@LastEditTime: 2024-08-09 21:41:06
+@LastEditTime: 2024-08-09 23:02:30
 '''
 import math
 import numpy as np
@@ -18,6 +18,7 @@ class V2IChannel(V2XChannel):
         super().__init__(**kwargs)
         self.BS_position = BS_position # 基站位置 (2D)
         self.v2i_shadowing = np.random.normal(0, self.shadow_std)
+        self.distance = None # 记录 position 和 bs 的距离
 
     def get_channels_with_fastfading(
             self, 
@@ -82,14 +83,14 @@ class V2IChannel(V2XChannel):
             - PL(d) = 20*log10(d) + 20*log10(f) + 20*log10(4pi/c) - antrenna_gain_ms - antrenna_gain_bs
             - where distance is the 3D distance to the base station.
         """
-        distance = math.hypot(
+        self.distance = math.hypot(
             current_position_obj[0] - self.BS_position[0], 
             current_position_obj[1] - self.BS_position[1],
             self.h_bs - self.h_ms # 基站高度 - 车辆高度
         ) # 距离 m
 
         # 20*np.log10(4*np.pi/3e8) = -147.5582278139513
-        return 20*np.log10(distance) + 20*np.log10(self.fc*1e9) - 147.5582278139513 - self.antrenna_gain_bs - self.antrenna_gain_ms
+        return 20*np.log10(self.distance) + 20*np.log10(self.fc*1e9) - 147.5582278139513 - self.antrenna_gain_bs - self.antrenna_gain_ms
 
     def _get_shadowing(self, previous_position_obj: Tuple[float, float], current_position_obj: Tuple[float, float]) -> float:
         """Calculate the shadowing effect for multiple vehicles based on the change in distance.

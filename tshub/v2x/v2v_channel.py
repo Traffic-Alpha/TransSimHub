@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-08-09 11:40:50
 @Description: V2V Channel Model
-@LastEditTime: 2024-08-09 21:53:03
+@LastEditTime: 2024-08-09 23:06:42
 '''
 import math
 import numpy as np
@@ -21,6 +21,7 @@ class V2VChannel(V2XChannel):
             decorrelation_distance=10, shadow_std=3, **kwargs
         )
         self.v2v_shadowing = np.random.normal(0, self.shadow_std)
+        self.distance = None
 
     def get_channels_with_fastfading(
             self, 
@@ -108,7 +109,7 @@ class V2VChannel(V2XChannel):
             - where n_j is the environment factor, d_a and d_b are the distances.
         """
         # Calculate Euclidean distance
-        d = math.hypot(
+        self.distance = math.hypot(
             position_A[0] - position_B[0], 
             position_A[1] - position_B[1]
         ) + 0.001 # 计算两个点的距离
@@ -134,7 +135,7 @@ class V2VChannel(V2XChannel):
 
         # Determine if the path is LOS or NLOS
         if min(position_A[0] - position_B[0], position_A[1] - position_B[1]) < 7:
-            PL = PL_Los(d)
+            PL = PL_Los(self.distance)
         else:
             PL = min(PL_NLos(position_A[0], position_B[1]), PL_NLos(position_A[1], position_B[0]))
         return PL
