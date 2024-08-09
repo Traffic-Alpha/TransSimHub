@@ -2,10 +2,11 @@
 @Author: WANG Maonan
 @Date: 2024-08-09 11:30:10
 @Description: V2I Channel Model
-@LastEditTime: 2024-08-09 21:24:49
+@LastEditTime: 2024-08-09 21:41:06
 '''
 import math
 import numpy as np
+from loguru import logger
 from typing import List, Tuple
 from .v2x_channel import V2XChannel
 
@@ -13,10 +14,65 @@ class V2IChannel(V2XChannel):
     """
     V2I (Vehicle-to-Infrastructure) channel model.
     """
-    def __init__(self,BS_position: List[float], **kwargs) -> None:
+    def __init__(self, BS_position: List[float], **kwargs) -> None:
         super().__init__(**kwargs)
         self.BS_position = BS_position # 基站位置 (2D)
         self.v2i_shadowing = np.random.normal(0, self.shadow_std)
+
+    def get_channels_with_fastfading(
+            self, 
+            previous_position_obj: List[float], 
+            current_position_obj: List[float],
+        )->float:
+        free_path_loss = self._get_path_loss(current_position_obj)
+        shadowing = self._get_shadowing(previous_position_obj, current_position_obj)
+        noise = np.random.normal(0, 1)
+        return (free_path_loss + shadowing + noise)
+    
+    def get_received_power(
+            self, 
+            previous_position_obj: List[float], 
+            current_position_obj: List[float],
+            is_ms_transmit:bool = True, # 是否是 ms 作为发送, V2X
+            is_ms_received:bool = True # 是否是 ms 作为接收, X2V
+        )->float:
+        channels_with_fastfading = self.get_channels_with_fastfading(
+            previous_position_obj, current_position_obj
+        )
+
+        noise_figure = self.noise_figure_ms if is_ms_received else self.noise_figure_bs
+        if is_ms_transmit: # ms->bs/ms, 所以使用 power_ms
+            received_power = self.power_ms - channels_with_fastfading - noise_figure
+        else: # bs -> ms
+            received_power = self.power_bs - channels_with_fastfading - noise_figure
+            
+        return received_power
+    
+    def get_snr(
+            self, 
+            previous_position_obj: List[float], 
+            current_position_obj: List[float],
+            is_ms_transmit:bool = True, # 是否是 ms 作为发送, V2X
+            is_ms_received:bool = True # 是否是 ms 作为接收, X2V
+        )->float:
+        if is_ms_transmit and is_ms_received:
+            logger.info('SIM: Calculate **V2V** SNR')
+        elif is_ms_transmit and not is_ms_received:
+            logger.info('SIM: Calculate **V2I** SNR')
+        elif not is_ms_transmit and is_ms_received:
+            logger.info('SIM: Calculate **I2V** SNR')
+        else:
+            raise ValueError("Invalid combination of transmission and reception for SNR calculation.")
+
+        received_power = self.get_received_power(
+            previous_position_obj, 
+            current_position_obj,
+            is_ms_transmit=is_ms_transmit,
+            is_ms_received=is_ms_received,
+        )
+
+        noise_power_dbm = self.sig2_dB_ms if is_ms_transmit else self.sig2_dB_bs
+        return 10*np.log10(V2XChannel.dbm2w(received_power)/V2XChannel.dbm2w(noise_power_dbm))
     
     def _get_path_loss(self, current_position_obj: Tuple[float, float]):
         """
