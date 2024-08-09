@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-08-09 11:30:10
 @Description: V2I Channel Model
-@LastEditTime: 2024-08-09 20:53:25
+@LastEditTime: 2024-08-09 21:24:49
 '''
 import math
 import numpy as np
@@ -17,49 +17,6 @@ class V2IChannel(V2XChannel):
         super().__init__(**kwargs)
         self.BS_position = BS_position # 基站位置 (2D)
         self.v2i_shadowing = np.random.normal(0, self.shadow_std)
-
-    def get_channels_with_fastfading(
-            self, 
-            previous_position_obj: List[float], 
-            current_position_obj: List[float],
-        )->float:
-        free_path_loss = self._get_path_loss(current_position_obj)
-        shadowing = self._get_shadowing(previous_position_obj, current_position_obj)
-        noise = np.random.normal(0, 1)
-        return (free_path_loss + shadowing + noise)
-    
-    def get_received_power(
-            self, 
-            previous_position_obj: List[float], 
-            current_position_obj: List[float],
-            is_power_ms:bool = True
-        )->float:
-        channels_with_fastfading = self.get_channels_with_fastfading(
-            previous_position_obj, current_position_obj
-        )
-    
-        if is_power_ms: # ms->bs, 所以使用 power_ms 和 noise_figure_bs
-            received_power = self.power_ms - channels_with_fastfading - self.noise_figure_bs
-        else: # bs -> ms
-            received_power = self.power_bs - channels_with_fastfading - self.noise_figure_ms
-            
-        return received_power
-    
-    def get_snr(
-            self, 
-            previous_position_obj: List[float], 
-            current_position_obj: List[float],
-            is_power_ms:bool = True
-        )->float:
-        received_power = self.get_received_power(
-            previous_position_obj, current_position_obj,
-            is_power_ms=is_power_ms,
-        )
-
-        noise_power_dbm = self.sig2_dB_ms if is_power_ms else self.sig2_dB_bs
-        return 10*np.log10(V2XChannel.dbm2w(received_power)/V2XChannel.dbm2w(noise_power_dbm))
-    
-    # ---
     
     def _get_path_loss(self, current_position_obj: Tuple[float, float]):
         """
