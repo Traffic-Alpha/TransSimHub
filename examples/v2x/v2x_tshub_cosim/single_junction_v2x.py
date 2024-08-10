@@ -4,7 +4,7 @@
 @Description: 单路口, 只包含两个车辆的测试
 1. RSU 设置在路口中心
 2. 只有两个车辆, 不同方向行驶
-@LastEditTime: 2024-08-09 23:53:35
+@LastEditTime: 2024-08-10 15:45:54
 '''
 import matplotlib.pyplot as plt
 from tshub.utils.init_log import set_logger
@@ -60,7 +60,7 @@ def run_simulation(tshub_env, v2i_channel, v2v_channel):
         obs, reward, info, done = tshub_env.step(actions=actions)
         
         prev_pos_A, curr_pos_A = update_position(obs['vehicle'], 'gsndj_n7__0.3', current_positions)
-        prev_pos_B, curr_pos_B = update_position(obs['vehicle'], 'gsndj_n7__0.4', current_positions)
+        prev_pos_B, curr_pos_B = update_position(obs['vehicle'], 'gsndj_s4__0.3', current_positions)
 
         # 更新 V2I 的 SNR
         if prev_pos_A is not None:
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     # 初始化 V2X Channel Model
     v2i_channel = V2IChannel(BS_position=(1779.29, 931.97))
-    v2v_channel = V2VChannel()
+    v2v_channel = V2VChannel(power_ms=-35)
 
     # 开始仿真
     run_simulation(tshub_env, v2i_channel, v2v_channel)

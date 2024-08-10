@@ -2,9 +2,8 @@
  * @Author: WANG Maonan
  * @Date: 2024-08-09 14:47:43
  * @Description: V2X Channel Model
- * @LastEditTime: 2024-08-10 14:27:33
+ * @LastEditTime: 2024-08-10 15:45:33
 -->
-
 # V2X 通信信道模型计算指南
 
 TSHub 中实现了 V2X（Vehicle-to-Everything）通信中的信道模型计算方法。V2X 通信包括 V2I（Vehicle-to-Infrastructure）和 V2V（Vehicle-to-Vehicle）两种情况，它们在路径损耗的计算上有所不同。计算流程主要包括：
