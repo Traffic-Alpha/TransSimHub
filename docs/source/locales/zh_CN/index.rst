@@ -10,4 +10,5 @@ TransSimHub 中文文档
     sumo_tools/index
     object/index
     tshub3d_sensors/index
+    v2x/index
     stepbystep_tutorial/index
