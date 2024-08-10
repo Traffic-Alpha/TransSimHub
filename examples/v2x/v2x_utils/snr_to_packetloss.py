@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-08-10 20:22:49
 @Description: 
-@LastEditTime: 2024-08-10 20:30:30
+@LastEditTime: 2024-08-10 21:04:47
 '''
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     print(f"The outage probability is {outage_prob:.4f}")
 
     # 绘制 snr 与 packet loss 的关系
-    snr_values = np.linspace(-10, 20, 300)
+    snr_values = np.linspace(-20, 30, 300)
     outage_probabilities = [calculate_outage_probability(snr) for snr in snr_values]
 
     # Plotting the outage probability against SNR
