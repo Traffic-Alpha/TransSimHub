@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2024-04-13 17:11:26
+@LastEditTime: 2024-08-11 19:18:19
 '''
 import traci
 from typing import Dict, Any
@@ -11,8 +11,11 @@ from dataclasses import dataclass, fields
 from typing import List, Tuple
 
 from .vehicle_action_type import vehicle_action_type
-from .vehicle_type.lane import LaneAction
-from .vehicle_type.lane_with_continuous_speed import LaneWithContinuousSpeedAction
+from .vehicle_type import (
+    LaneAction,
+    SpeedAction,
+    LaneWithContinuousSpeedAction,
+)
 
 @dataclass
 class VehicleInfo:
@@ -46,6 +49,8 @@ class VehicleInfo:
         _action = vehicle_action_type(self.action_type)
         if _action == vehicle_action_type.Lane:
             self.vehicle_action = LaneAction(id=self.id, vehicle_type=self.vehicle_type, sumo=self.sumo)
+        elif _action == vehicle_action_type.Speed:
+            self.vehicle_action = SpeedAction(id=self.id, vehicle_type=self.vehicle_type, sumo=self.sumo)
         elif _action == vehicle_action_type.LaneWithContinuousSpeed:
             self.vehicle_action = LaneWithContinuousSpeedAction(id=self.id, vehicle_type=self.vehicle_type, sumo=self.sumo)
 
@@ -150,11 +155,13 @@ class VehicleInfo:
         return output_dict
 
 
-    def control_vehicle(self, lane_change, target_speed) -> None:
+    def control_vehicle(self, vehicle_actions:Dict[str, float],) -> None:
         current_speed = self.speed # 目前车辆的速度
         current_lane_index = self.lane_index # 目前车辆所在的 index
         current_road_id = self.road_id # 目前所在的 road id
         self.vehicle_action.execute(
-            lane_change=lane_change, target_speed=target_speed, 
-            current_speed=current_speed, current_lane_index=current_lane_index, current_road_id=current_road_id
+            **vehicle_actions,
+            current_speed=current_speed, 
+            current_lane_index=current_lane_index, 
+            current_road_id=current_road_id
         )

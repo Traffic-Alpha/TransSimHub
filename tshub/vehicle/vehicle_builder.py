@@ -2,13 +2,14 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:25:52
 @Description: 初始化一个场景内所有的车辆
-@LastEditTime: 2024-04-13 18:07:08
+@LastEditTime: 2024-08-11 19:26:13
 '''
 from loguru import logger
 from typing import Dict, Any
 
 from .vehicle import VehicleInfo
 from ..tshub_env.base_builder import BaseBuilder
+from ..utils.format_dict import dict_to_str
 
 class VehicleBuilder(BaseBuilder):
     """
@@ -115,14 +116,11 @@ class VehicleBuilder(BaseBuilder):
                      Each action is represented as a tuple (speed, lane_index).
         """
         for vehicle_id, action in actions.items():
-            lane_change, target_speed = action
-            self._log_vehicle_info(vehicle_id, lane_change, target_speed)
-            self.vehicles[vehicle_id].control_vehicle(lane_change, target_speed)
+            self._log_vehicle_info(vehicle_id, **action)
+            self.vehicles[vehicle_id].control_vehicle(action)
             if self.hightlight and (vehicle_id not in self.controled_vehicles):
                 self.sumo.vehicle.highlight(vehicle_id, color=(255, 0, 0, 255), size=-1, alphaMax=-1)
                 self.controled_vehicles.append(vehicle_id)
 
-    def _log_vehicle_info(self, vehicle_id, lane_change, target_speed) -> None:
-        if target_speed == None:
-            target_speed = 'None'
-        logger.debug(f'SIM: {vehicle_id:<20} | Lane Change: {lane_change:<7} | Target Speed: {target_speed:<7}')
+    def _log_vehicle_info(self, vehicle_id, *args, **kwargs) -> None:
+        logger.debug(f'SIM: {vehicle_id:<20} \n{dict_to_str(kwargs)}')

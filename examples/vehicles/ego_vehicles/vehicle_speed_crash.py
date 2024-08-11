@@ -4,7 +4,7 @@
 @Description: 控制车辆进行碰撞, 由于速度引发的碰撞
 => ego_crash_car_following, 追尾测试
 => ego_crash_intersection, 无保护左转撞车测试
-@LastEditTime: 2024-05-05 14:47:40
+@LastEditTime: 2024-08-11 19:40:01
 '''
 import traci
 import sumolib
@@ -32,13 +32,13 @@ while conn.simulation.getMinExpectedNumber() > 0:
 
     actions = {}
     if "ego_1" in data:
-        actions["ego_1"] = (0, 15)
+        actions["ego_1"] = {'lane_change': 0, 'target_speed':12}
     if "ego_2" in data:
-        actions["ego_2"] = (0, 15)
+        actions["ego_2"] = {'lane_change': 0, 'target_speed':12}
     if "ego_3" in data:
-        actions["ego_3"] = (0, 15)
+        actions["ego_3"] = {'lane_change': 0, 'target_speed':12}
     if "ego_4" in data:
-        actions["ego_4"] = (0, 15)
+        actions["ego_4"] = {'lane_change': 0, 'target_speed':12}
     scene_vehicles.control_objects(actions)
 
     conn.simulationStep()

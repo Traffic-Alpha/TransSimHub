@@ -2,11 +2,12 @@
 @Author: WANG Maonan
 @Date: 2024-05-05 14:50:29
 @Description: 控制车辆进行碰撞, 由于换道引发的碰撞
-@LastEditTime: 2024-05-05 15:09:09
+@LastEditTime: 2024-08-11 19:39:46
 '''
 import traci
 import sumolib
 import numpy as np
+
 from tshub.utils.get_abs_path import get_abs_path
 from tshub.vehicle.vehicle_builder import VehicleBuilder
 from tshub.utils.init_log import set_logger
@@ -28,7 +29,7 @@ while conn.simulation.getMinExpectedNumber() > 0:
 
     actions = {}
     if "1" in data:
-        actions["1"] = (np.random.choice([-1,1]), 15)
+        actions["1"] = {'lane_change': np.random.randint(3), 'target_speed':15} 
     print(actions)
     scene_vehicles.control_objects(actions)
 
