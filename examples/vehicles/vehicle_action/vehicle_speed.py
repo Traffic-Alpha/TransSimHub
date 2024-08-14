@@ -1,10 +1,11 @@
 '''
 @Author: WANG Maonan
-@Date: 2023-09-01 14:45:54
-@Description: 使用 Lane 来控制车辆, 只控制是 ego 类型的车
-@LastEditTime: 2023-09-01 15:00:06
+@Date: 2024-08-11 18:50:35
+@Description: 单纯控制车辆的速度
+@LastEditTime: 2024-08-11 19:30:09
 '''
 import traci
+import random
 import numpy as np
 import sumolib
 
@@ -12,30 +13,34 @@ from tshub.utils.get_abs_path import get_abs_path
 from tshub.vehicle.vehicle_builder import VehicleBuilder
 from tshub.utils.init_log import set_logger
 
-def filter_ego_id(vehicle_data):
-    ego_ids = []
-    for _veh_id, _veh_info in vehicle_data.items():
-        if _veh_info['vehicle_type'] == 'ego':
-            ego_ids.append(_veh_id)
-    return ego_ids
+def select_keys(dictionary):
+    keys = list(dictionary.keys())
+    selected_keys = random.sample(keys, k=int(len(keys) * 1))
+    return selected_keys
 
 sumoBinary = sumolib.checkBinary('sumo-gui')
 
 path_convert = get_abs_path(__file__)
 set_logger(path_convert('./'))
 
-sumocfg_file = path_convert("../../sumo_env/three_junctions/env/3junctions.sumocfg")
+sumocfg_file = path_convert("../../sumo_env/single_junction/env/single_junction.sumocfg")
 traci.start([sumoBinary, "-c", sumocfg_file], label='0')
 conn = traci.getConnection('0')
 
-scene_vehicles = VehicleBuilder(sumo=conn, action_type='lane')
+scene_vehicles = VehicleBuilder(sumo=conn, action_type='speed')
 while conn.simulation.getMinExpectedNumber() > 0:
     # 获得车辆的信息
     data = scene_vehicles.get_objects_infos()
 
     # 控制部分车辆, 分别是 lane_change, speed
-    ego_vehicles = filter_ego_id(data)
-    actions = {_veh_id:(np.random.randint(4), None) for _veh_id in ego_vehicles}
+    selected_vehicles = select_keys(data)
+    actions = {
+        _veh_id:{
+            'speed_action': 1, # 0:加速, 1:减速, 2:保持不变
+            'acceleration_rate': 2,
+        } 
+        for _veh_id in selected_vehicles
+    }
     scene_vehicles.control_objects(actions)
 
     conn.simulationStep()

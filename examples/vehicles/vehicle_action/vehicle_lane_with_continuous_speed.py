@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 16:19:47
 @Description: 控制车辆, 同时控制换道和速度
-@LastEditTime: 2024-01-13 19:19:47
+@LastEditTime: 2024-08-11 19:35:45
 '''
 import traci
 import random
@@ -34,7 +34,10 @@ while conn.simulation.getMinExpectedNumber() > 0:
 
     # 控制部分车辆, 分别是 lane_change, speed
     selected_vehicles = select_keys(data)
-    actions = {_veh_id:(np.random.randint(3), 12) for _veh_id in selected_vehicles}
+    actions = {
+        _veh_id:{'lane_change': np.random.randint(3), 'target_speed':12} 
+        for _veh_id in selected_vehicles
+    }
     scene_vehicles.control_objects(actions)
 
     conn.simulationStep()
