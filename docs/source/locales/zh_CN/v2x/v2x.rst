@@ -52,7 +52,11 @@ WINNER II Channel Model
 接收端功率指的是在考虑路径损耗、天线增益和噪声系数后，接收器处的信号功率。计算公式如下：
 
 .. math::
-   P_{rx}(dBm) = P_{tx}(dBm) - L_{path}(dB) - S(dB) - L_{noise}(dB) + G_{v}(dBi) + G_{b}(dBi) - NF_{b}(dB)
+
+   \begin{align}
+   P_{rx}(dBm) &= P_{tx}(dBm) - L_{path}(dB) - S(dB) - L_{noise}(dB) \\
+                &\quad + G_{v}(dBi) + G_{b}(dBi) - NF_{b}(dB)
+   \end{align}
 
 其中，:math:`P_{tx}(dBm)` 是发射功率，:math:`L_{path}(dB)` 是路径损耗，:math:`S(dB)` 是遮蔽值，:math:`L_{noise}(dB)` 是高斯噪声水平，:math:`G_{v}(dBi)` 是车载天线增益，默认为 3 dBi，:math:`G_{b}(dBi)` 是基站天线增益，默认为 8 dBi，:math:`NF_{b}(dB)` 是基站噪声系数。
 

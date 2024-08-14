@@ -6,3 +6,4 @@ V2X 通信
     :caption: Objects
 
     v2x
+    outage_probability
