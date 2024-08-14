@@ -30,3 +30,10 @@
    1 - \exp\left(-\frac{2^{\frac{20 \times 10^3}{30 \times 10^3}} - 1}{10}\right) \approx 0.057
 
 这个结果表明，在当前的信噪比下，有大约 5.7% 的概率会发生中断。
+
+下图展示了在信道带宽为 30 kHz，目标速率为 20 kb/s 的时候，中断概率与 SNR 的关系。可以看到 SNR 越大，中断概率越低。
+
+
+.. figure:: ../../../_static/v2x/packet_loss.png
+   :alt: Packet Loss 和 SNR 的关系
+   :align: center
