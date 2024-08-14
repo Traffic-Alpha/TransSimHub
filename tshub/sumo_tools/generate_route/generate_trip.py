@@ -4,7 +4,7 @@
 @Description: 生成 trip 文件, 这里有两个步骤:
 1. generate_trip_xml, 按照要求给每个 edge 生成 trip
 2. edit_trip_xml, 对 trip 按照时间顺序排序
-@LastEditTime: 2024-05-09 19:52:01
+@LastEditTime: 2024-08-11 18:11:31
 '''
 import os
 import sumolib
@@ -96,6 +96,7 @@ class GenerateTrip(object):
 
             # 在 trip.xml 中添加车辆信息
             KNOWN_ATTRIBUTES = {'color', 'length', 'tau', 'speed'}
+            IGNORE_ATTRIBUTES = {'probability'} # 被忽略的特征
             DEFAULTS = {'color': 'red', 'length': 5, 'tau': 1, 'speed': 17}
             DOC_URL = "https://sumo.dlr.de/docs/Definition_of_Vehicles%2C_Vehicle_Types%2C_and_Routes.html#available_vtype_attributes"
             vehID_prob = {} # 每辆车的概率, {'veh_1':0.7, 'veh_2':0.3}
@@ -107,6 +108,8 @@ class GenerateTrip(object):
                         # Format known attributes with their defaults if necessary
                         value = float(value) if key in {'length', 'tau', 'speed'} else value
                         attributes.append('{}="{}"'.format(key, value))
+                    elif key in IGNORE_ATTRIBUTES:
+                        pass
                     else:
                         # Log a warning for unknown attributes
                         logger.warning(f"SIM: '{key}' is not a known attribute. Check the documentation for valid attributes. {DOC_URL}.")
@@ -133,7 +136,7 @@ class GenerateTrip(object):
                         file.write('    <flow id="{}" begin="{}" end="{}" from="{}" number="{}" type="{}"/> \n'.format(
                             edge_trip_id, 
                             int(begin_time), int(end_time), 
-                            edge_id, int(edge_flow_interval*_vehicle_prob),
+                            edge_id, round(edge_flow_interval*_vehicle_prob),
                             _vehicle_type
                         ))
             file.write("</routes> \n\n")

@@ -3,7 +3,7 @@
 @Date: 2023-08-23 17:03:19
 @Description: Vehicle Action Type
 - 这两种动作都是设置变道和速度，在底层就是直接调用 SUMO 来进行控制的
-@LastEditTime: 2023-08-28 19:49:01
+@LastEditTime: 2024-08-11 18:42:36
 '''
 import enum
 
@@ -16,6 +16,15 @@ class vehicle_action_type(enum.Enum):
     + "slow_down", 
     + "change_lane_left", and 
     + "change_lane_right".
+    """
+
+    Speed = 'speed'
+    """
+    Action= ``str``. Discrete speed action from one of
+    
+    + "accelerate",
+    + "decelerate",
+    + "maintain_speed".
     """
 
     LaneWithContinuousSpeed = 'lane_continuous_speed'
