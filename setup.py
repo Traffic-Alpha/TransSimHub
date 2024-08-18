@@ -46,7 +46,7 @@ extras_require['all'] = all_deps
 
 setup(
     name='tshub',
-    version=1.0,
+    version=1.1,
     description='TransSimHub is a lightweight Python library for simulating and controlling transportation systems.',
     author='Traffic-Alpha',
     license='Apache License, Version 2.0',
