@@ -31,6 +31,7 @@ extras_require={
         'tqdm'
     ],
     '3D': [
+        'shapely',
         'Panda3D',
         'panda3d-gltf',
         'panda3d-simplepbr',
