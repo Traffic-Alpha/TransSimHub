@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-11-01 23:44:45
 @Description: Plot reward curve according to the log file
-@LastEditTime: 2024-06-28 20:33:02
+LastEditTime: 2024-09-23 17:22:56
 '''
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -79,12 +79,13 @@ def plot_multi_reward_curves(dirs_and_labels, output_file, window_size:int=3):
         # Concatenate all rewards and calculate the mean and standard deviation
         rewards = pd.concat(rewards, axis=1)
         rewards = rewards.rolling(window_size).mean().dropna()
-        mean_rewards = rewards.mean(axis=1)
-        std_rewards = rewards.std(axis=1)
+        mean_rewards = rewards.mean(axis=1).reset_index(drop=True)
+        Q1_rewards = rewards.quantile(0.25, axis=1).reset_index(drop=True)
+        Q3_rewards = rewards.quantile(0.75, axis=1).reset_index(drop=True)
 
         # Plot the mean reward and fill between the mean +/- standard deviation
         plt.plot(mean_rewards, label=label)
-        plt.fill_between(range(len(mean_rewards)), mean_rewards - std_rewards, mean_rewards + std_rewards, alpha=0.2)
+        plt.fill_between(range(len(mean_rewards)), Q1_rewards, Q3_rewards, alpha=0.2)
 
     # Add title, labels, legend, and grid
     plt.title('Reward Curve with Standard Deviation')
