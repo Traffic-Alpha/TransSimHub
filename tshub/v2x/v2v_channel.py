@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-08-09 11:40:50
 @Description: V2V Channel Model
-@LastEditTime: 2024-08-09 23:06:42
+@LastEditTime: 2024-08-14 20:07:00
 '''
 import math
 import numpy as np
@@ -39,7 +39,9 @@ class V2VChannel(V2XChannel):
             previous_position_obj_B, current_position_obj_B
         )
         noise = np.random.normal(0, 1)
-        return (free_path_loss + shadowing + noise)
+        channels_with_fastfading = (free_path_loss + shadowing + noise)
+        
+        return channels_with_fastfading
     
     def get_received_power(
             self, 
@@ -62,7 +64,7 @@ class V2VChannel(V2XChannel):
             received_power = self.power_ms - channels_with_fastfading - noise_figure
         else: # bs -> ms
             received_power = self.power_bs - channels_with_fastfading - noise_figure
-            
+        
         return received_power
     
     def get_snr(
@@ -93,7 +95,9 @@ class V2VChannel(V2XChannel):
         )
 
         noise_power_dbm = self.sig2_dB_ms if is_ms_transmit else self.sig2_dB_bs
-        return 10*np.log10(V2XChannel.dbm2w(received_power)/V2XChannel.dbm2w(noise_power_dbm))
+        v2v_snr = 10*np.log10(V2XChannel.dbm2w(received_power)/V2XChannel.dbm2w(noise_power_dbm))
+        
+        return v2v_snr
     
     def _get_path_loss(self, position_A:List[float], position_B:List[float]):
         """
@@ -113,31 +117,29 @@ class V2VChannel(V2XChannel):
             position_A[0] - position_B[0], 
             position_A[1] - position_B[1]
         ) + 0.001 # 计算两个点的距离
-        
-        # breakpoint distance, which defines a boundary between different propagation loss behaviors.
-        d_bp = 4 * (self.h_bs - 1) * (self.h_ms - 1) * self.fc * (10 ** 9) / (3 * 10 ** 8)
 
-        def PL_Los(d):
-            # Path loss for LOS
-            if d <= 3:
-                return 22.7 * np.log10(3) + 41 + 20 * np.log10(self.fc / 5)
-            else:
-                if d < d_bp:
-                    return 22.7 * np.log10(d) + 41 + 20 * np.log10(self.fc / 5)
-                else:
-                    return (40.0 * np.log10(d) + 9.45 - 17.3 * np.log10(self.h_bs) -
-                            17.3 * np.log10(self.h_ms) + 2.7 * np.log10(self.fc / 5))
+        # Constants for WINNER II Model (example values, should be adjusted based on specific scenario)
+        light_speed = 3e8  # Speed of light in vacuum (m/s)
+        n_los = 3.0  # Path loss exponent for NLOS
+        n_los_factor = 20  # Additional NLOS factor in dB
 
-        def PL_NLos(d_a, d_b):
-            # Path loss for NLOS
-            n_j = max(2.8 - 0.0024 * d_b, 1.84)
-            return PL_Los(d_a) + 20 - 12.5 * n_j + 10 * n_j * np.log10(d_b) + 3 * np.log10(self.fc / 5)
+        def PL_Los():
+            # Free space path loss (FSPL) formula
+            fspl = 20*math.log10(self.distance) + 20*math.log10(self.fc*1e9) + 20 * math.log10(4*math.pi/light_speed) - 2*self.antrenna_gain_bs
+            return fspl
 
-        # Determine if the path is LOS or NLOS
-        if min(position_A[0] - position_B[0], position_A[1] - position_B[1]) < 7:
-            PL = PL_Los(self.distance)
+        def PL_NLos():
+            # NLOS path loss, typically higher than LOS
+            pl_nlos = PL_Los() + n_los_factor + 10*n_los*math.log10(self.distance)
+            return pl_nlos
+
+        # Example condition to determine if the path is LOS or NLOS
+        # This should be replaced with a real condition based on environmental data
+        if self.distance < 100:  # Assuming LOS if distance is less than 100 meters
+            PL = PL_Los()
         else:
-            PL = min(PL_NLos(position_A[0], position_B[1]), PL_NLos(position_A[1], position_B[0]))
+            PL = PL_NLos()
+
         return PL
 
     def _get_shadowing(

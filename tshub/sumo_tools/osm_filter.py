@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-05-27 15:18:49
 @Description: 根据 *.net.xml 和 *.poly.xml 文件过滤原始的 osm 文件
-@LastEditTime: 2024-05-27 15:27:04
+LastEditTime: 2024-09-02 14:30:47
 '''
 from loguru import logger
 import xml.etree.ElementTree as ET
@@ -76,3 +76,4 @@ def filter_osm(ways_to_keep, input_osm, output_osm):
 
     # Write the output OSM file
     tree.write(output_osm)
+    logger.info(f'SIM: 成功生成简化后的 OSM 文件, {output_osm}')
