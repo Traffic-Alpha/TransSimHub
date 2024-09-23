@@ -14,7 +14,6 @@ Welcome to TransSimHub's documentation!
    locales/zh_CN/index
 
 
-
 Indices and tables
 ==================
 
