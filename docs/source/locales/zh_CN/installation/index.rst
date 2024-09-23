@@ -15,7 +15,7 @@ TransSimHub 安装
       git clone https://github.com/Traffic-Alpha/TransSimHub.git
       cd TransSimHub
 
-2. 使用pip安装：
+2. 使用 pip 安装：
 
    .. code-block:: bash
 
@@ -32,16 +32,22 @@ TransSimHub 安装
 特殊版本
 ~~~~~~~~~~~~
 
-如果您希望启用TransSimHub的额外功能并安装相关依赖，请使用以下方法：
+如果您希望启用 TransSimHub 的额外功能并安装相关依赖，请添加额外的参数。例如加上 doc 可以启动 TransSimHub 的文档编辑：
 
 .. code-block:: bash
 
    # 安装Sphinx和相关包
    pip install -U -e ".[doc]"
 
-这将安装 Sphinx 和其他相关包，以启用 TransSimHub 的额外功能。请注意，这可能需要一些额外的时间和资源来安装和构建所需的依赖项。
+如果希望一次性将 **所有的依赖** 全部安装完毕，强烈建议使用参数 **all**，如下所示：
 
-通过按照上述步骤，您将成功安装TransSimHub，并准备好在Python环境中使用它。
+.. code-block:: bash
+
+   pip install -U -e ".[all]"
+
+请注意，这可能需要一些额外的时间和资源来安装和构建所需的依赖项。
+
+通过按照上述步骤，您将成功安装 TransSimHub，并准备好在Python环境中使用它。
 
 .. note::
    如果在安装过程中遇到任何问题，请参考项目的GitHub仓库进行故障排除，或向项目的社区寻求帮助。

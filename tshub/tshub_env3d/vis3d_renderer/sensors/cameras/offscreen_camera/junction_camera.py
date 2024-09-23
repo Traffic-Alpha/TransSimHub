@@ -23,12 +23,16 @@ class OffscreenJunctionFrontCamera(_BaseOffCameraMixin, BaseOffscreenCamera):
         heading += 180 # 这里的朝向需要相反, 相当于看向路的出口
 
         # Calculate the front position based on the vehicle's heading
-        self.camera_np.setPos(pos[0],pos[1],height)
+        self.camera_np.setPos(
+            pos[0],
+            pos[1],
+            height
+        ) # 設置攝像頭的位置, 這裏有高度
 
         self.camera_np.lookAt(
-            pos[0] + 10 * np.cos(np.radians(heading)),
-            pos[1] + 10 * np.sin(np.radians(heading)),
-            2
+            pos[0] + 20 * np.cos(np.radians(heading)),
+            pos[1] + 20 * np.sin(np.radians(heading)),
+            0
         )
         self.camera_np.setH(heading) # 航向角
     
