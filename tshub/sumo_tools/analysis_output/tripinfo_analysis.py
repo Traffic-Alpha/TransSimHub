@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-06-25 22:01:24
 @Description: 分析 tripinfo 文件
-LastEditTime: 2024-10-02 16:54:08
+LastEditTime: 2024-10-02 16:55:44
 '''
 import numpy as np
 from loguru import logger
@@ -49,7 +49,7 @@ class TripInfoAnalysis:
             
             emissions = tripinfo.find('emissions')
             metrics['CO_abs'].append(float(emissions.get('CO_abs')) / 1000)  # Convert mg to g
-            metrics['CO2_abs'].append(float(emissions.get('CO2_abs')))  # g, no conversion needed
+            metrics['CO2_abs'].append(float(emissions.get('CO2_abs')) / 1000)  # Convert mg to g
             metrics['HC_abs'].append(float(emissions.get('HC_abs')) / 1000)  # Convert mg to g
             metrics['PMx_abs'].append(float(emissions.get('PMx_abs')) / 1000)  # Convert mg to g
             metrics['NOx_abs'].append(float(emissions.get('NOx_abs')) / 1000)  # Convert mg to g
