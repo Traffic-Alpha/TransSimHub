@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 20:41:24
 @Description: TransSimHub Documentation
-@LastEditTime: 2023-11-02 14:44:44
+@LastEditTime: 2024-08-10 20:49:36
 '''
 # Configuration file for the Sphinx documentation builder.
 #
@@ -23,7 +23,7 @@ release = '0.9'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.githubpages'
+    'sphinx.ext.githubpages',
 ]
 
 templates_path = ['_templates']
