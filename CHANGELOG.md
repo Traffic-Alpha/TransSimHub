@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-07-26 05:18:42
+ * @LastEditTime: 2024-11-24 22:17:17
 -->
 # Change Log
 
@@ -18,10 +18,32 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Removed
 ### Security
 
-1.1
+<!-- v1.1 -->
+## [v1.1] - 2024-11-24
 
-- 加入 test, 对于环境的测试, 是否成功安装的测试
-- 加入 channel model
+### News
+
+- Due to my internship at **Nokia Bell Labs**, updates to this project have been slower. However, the repository will continue to be maintained in the future.
+- Congratulations! Our two papers based on TransSimHub have been accepted by **IEEE Transactions on Intelligent Transportation Systems**.
+    - The first paper discusses RL-based traffic signal control under varying intervention frequencies: [Traffic Signal Cycle Control With Centralized Critic and Decentralized Actors Under Varying Intervention Frequencies](https://ieeexplore.ieee.org/document/10696929)
+    - The second paper addresses vehicle platooning coordination in networks: [An Approximate Dynamic Programming Approach to Vehicle Platooning Coordination in Networks](https://ieeexplore.ieee.org/abstract/document/10591414)
+- Congratulations to Team TSC-Master from CUHKSZ for winning the second prize (fourth place overall) in the 2024 Tencent Kaiwu Global AI Competition under the Intelligent Traffic Signal Scheduling track, competing against 2,038 teams from 388 universities worldwide. [Winners List](https://aiarena.tencent.com/aiarena/zh/match/open-competition-2024?tab=score)
+
+<div align=center>
+   <img src="./assets/kaiwu_match.jpg" width="65%" >
+</div>
+<p align="center">2024 Tencent Kaiwu Global AI Competition Rankings.</p>
+
+### Added
+
+- Added tests for environment setup and installation verification.
+- Introduced a channel model for quick calculations of Path Loss, Shadowing, Received Power, and Signal-to-Noise Ratio (SNR), as well as fast computation of Outage Probability.
+
+### Fixed
+
+- Fixed alignment issues in `plot_multi_reward_curves` where the mean and lower/upper bounds were not aligned.
+- Updated the base detector file to prevent multiple occurrences in one direction and multiple lane connections for a single lane.
+
 
 <!-- v1.0 -->
 ## [v1.0 🚀] - 2024-07-26

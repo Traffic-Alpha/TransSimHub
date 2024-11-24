@@ -25,7 +25,7 @@ if __name__ == '__main__':
         tls_ids=['htddj_gsndj'],
         vehicle_action_type='lane_continuous_speed',
         use_gui=True, 
-        num_seconds=200,
+        num_seconds=500,
         collision_action="warn",
         # 下面是用于渲染的参数
         render_mode="offscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen

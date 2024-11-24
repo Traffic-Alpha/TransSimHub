@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 00:32:12
 @Description: 单路口 3D 可视化
-@LastEditTime: 2024-07-26 03:17:06
+@LastEditTime: 2024-08-12 14:55:04
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -33,7 +33,7 @@ aircraft_inits = {
 
 if __name__ == '__main__':
     sumo_cfg = path_convert(f"../sumo_env/single_junction/env/single_junction.sumocfg")
-    scenario_glb_dir = path_convert(f"./map_model/")
+    scenario_glb_dir = path_convert(f"./map_model_single/")
     tshub_env3d = Tshub3DEnvironment(
         sumo_cfg=sumo_cfg,
         scenario_glb_dir=scenario_glb_dir,
@@ -101,15 +101,15 @@ if __name__ == '__main__':
 
             # show_sensor_images(
             #     [
-            #         sensor_data.get('htddj_gsndj_0', {}).get('junction_back_all', None),
-            #         sensor_data.get('htddj_gsndj_1', {}).get('junction_back_all', None),
-            #         sensor_data.get('htddj_gsndj_2', {}).get('junction_back_all', None),
-            #         sensor_data.get('htddj_gsndj_3', {}).get('junction_back_all', None),
+            #         sensor_data.get('htddj_gsndj_0', {}).get('junction_front_all', None),
+            #         sensor_data.get('htddj_gsndj_1', {}).get('junction_front_all', None),
+            #         sensor_data.get('htddj_gsndj_2', {}).get('junction_front_all', None),
+            #         sensor_data.get('htddj_gsndj_3', {}).get('junction_front_all', None),
 
-            #         sensor_data.get('htddj_gsndj_0', {}).get('junction_back_vehicle', None),
-            #         sensor_data.get('htddj_gsndj_1', {}).get('junction_back_vehicle', None),
-            #         sensor_data.get('htddj_gsndj_2', {}).get('junction_back_vehicle', None),
-            #         sensor_data.get('htddj_gsndj_3', {}).get('junction_back_vehicle', None),
+            #         # sensor_data.get('htddj_gsndj_0', {}).get('junction_back_vehicle', None),
+            #         # sensor_data.get('htddj_gsndj_1', {}).get('junction_back_vehicle', None),
+            #         # sensor_data.get('htddj_gsndj_2', {}).get('junction_back_vehicle', None),
+            #         # sensor_data.get('htddj_gsndj_3', {}).get('junction_back_vehicle', None),
             #     ],
             #     scale=1,
             #     images_per_row=4
