@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-11-24 22:17:17
+ * @LastEditTime: 2024-12-30 19:44:18
 -->
 # Change Log
 
@@ -17,6 +17,18 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v1.2 -->
+**Happy New Year 2025!**
+
+## Added
+
+- Uploaded 10+ real road networks, including those from South Korea, Hong Kong, France, etc., to facilitate future testing. This includes:
+  - OpenStreetMap data
+  - Network data
+  - Route data
+  - Additional files: poly, tls, detector
+  - Corresponding satellite images
 
 <!-- v1.1 -->
 ## [v1.1] - 2024-11-24
