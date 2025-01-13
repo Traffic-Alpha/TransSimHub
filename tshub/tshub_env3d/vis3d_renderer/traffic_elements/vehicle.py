@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-26 03:13:24
+LastEditTime: 2025-01-13 19:39:23
 '''
 import random
 from loguru import logger
@@ -52,7 +52,9 @@ class Vehicle3DElement(BaseElement):
         return True
 
     def _select_vehicle_model(self) -> str:
-        """随机选择车辆的模型, ego vehicle 和 soical vehicle 的模型是不一样的
+        """随机选择车辆的模型, 
+        1. ego vehicle, 自动驾驶车辆
+        2. soical vehicle 背景车
         """
         if 'ego' in self.veh_type:
             veh_list = ['AudiTT', 'FerrariF355']
@@ -60,6 +62,8 @@ class Vehicle3DElement(BaseElement):
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 ego vehicle 模型.")
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego_vehicles/{selected_model}.bam")
+        elif 'police' in self.veh_type:
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/PoliceSkodaOctavia.bam")
         else:
             veh_list = [
                 'BMWZ4', 'HyundaiKona', 'KiaXceed', 
