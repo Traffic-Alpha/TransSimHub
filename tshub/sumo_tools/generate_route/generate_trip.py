@@ -4,7 +4,7 @@
 @Description: 生成 trip 文件, 这里有两个步骤:
 1. generate_trip_xml, 按照要求给每个 edge 生成 trip
 2. edit_trip_xml, 对 trip 按照时间顺序排序
-@LastEditTime: 2024-08-11 18:11:31
+LastEditTime: 2025-01-13 19:35:20
 '''
 import os
 import sumolib
@@ -97,7 +97,7 @@ class GenerateTrip(object):
             # 在 trip.xml 中添加车辆信息
             KNOWN_ATTRIBUTES = {'color', 'length', 'tau', 'speed'}
             IGNORE_ATTRIBUTES = {'probability'} # 被忽略的特征
-            DEFAULTS = {'color': 'red', 'length': 5, 'tau': 1, 'speed': 17}
+            DEFAULTS = {'color': 'yellow', 'length': 5, 'tau': 1, 'speed': 17}
             DOC_URL = "https://sumo.dlr.de/docs/Definition_of_Vehicles%2C_Vehicle_Types%2C_and_Routes.html#available_vtype_attributes"
             vehID_prob = {} # 每辆车的概率, {'veh_1':0.7, 'veh_2':0.3}
            
