@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-LastEditTime: 2025-01-16 14:45:14
+LastEditTime: 2025-01-16 19:45:50
 '''
 import math
 from loguru import logger
@@ -27,7 +27,7 @@ from .rendering_components import (
 )
 
 BACKEND_LITERALS = Literal[
-    "pandagl",      # 使用 OpenGL 渲染
+    "pandagl",      # 使用 OpenGL 渲染 (推荐)
     "pandadx9",     # 使用 DirectX 9 渲染
     "pandagles",    # 使用 OpenGL ES 渲染，适用于较旧的移动设备
     "pandagles2",   # 使用 OpenGL ES 2 渲染，适用于较新的移动设备
