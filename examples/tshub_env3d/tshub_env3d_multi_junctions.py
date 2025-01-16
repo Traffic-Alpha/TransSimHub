@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-26 03:49:43
 @Description: 多路口的 3D 可视化
-@LastEditTime: 2024-07-26 04:19:35
+LastEditTime: 2025-01-16 14:37:00
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         # 下面是用于渲染的参数
         render_mode="onscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
         debuger_print_node=False,
-        debugr_spin_camera=True,
+        debuger_spin_camera=True,
         sensor_config={
             # 'vehicle': ['bev_all', 'bev_vehicle'],
             # 'aircraft': ['aircraft_all', 'aircraft_vehicle'],

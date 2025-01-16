@@ -30,7 +30,7 @@ if __name__ == '__main__':
         # 下面是用于渲染的参数
         render_mode="offscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
         debuger_print_node=False,
-        debugr_spin_camera=True,
+        debuger_spin_camera=True,
         sensor_config={
             'tls': ['junction_front_all']
         }
