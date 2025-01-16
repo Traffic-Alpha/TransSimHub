@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-@LastEditTime: 2024-07-15 10:48:32
+LastEditTime: 2025-01-13 18:59:42
 '''
 from __future__ import division
 from __future__ import print_function
@@ -31,7 +31,9 @@ extras_require={
         'tqdm'
     ],
     '3D': [
+        'rtree',
         'shapely',
+        'trimesh',
         'Panda3D',
         'panda3d-gltf',
         'panda3d-simplepbr',
