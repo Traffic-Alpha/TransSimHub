@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-LastEditTime: 2025-01-16 14:36:18
+LastEditTime: 2025-01-16 14:45:46
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -78,13 +78,17 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             sensor_config=sensor_config,
             render_mode=render_mode,
         )
-
         
     def reset(self):
         state_infos = self.tshub_env.reset() # 重置 sumo 环境
         logger.info(f'SIM: 完成 TSHub 初始化, 得到地图和信号灯信息.')
 
         self.tshub_render.reset(state_infos) # 重置 render, 需要将信号灯的信息传入, 辅助进行路口 camera 的初始化
+
+        # 加入一个简单任务, 避免 userExit 出错
+        self.tshub_render._showbase_instance.taskMgr.add(
+            self.tshub_render.dummyTask, "dummyTask"
+        )
 
         # 重置后打印 node path (查看每次 reset 是否会重置所有 node 和 camera)
         if self.debuger_print_node:
