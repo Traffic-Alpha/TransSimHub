@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-@LastEditTime: 2024-07-26 03:04:38
+LastEditTime: 2025-01-16 14:45:14
 '''
 import math
 from loguru import logger
@@ -140,6 +140,11 @@ class TSHubRenderer(BaseRender):
     # ----------- #
     # 场景测试工具
     # ----------- #
+    def dummyTask(self, task):
+        """添加任务避免 userExit 出错
+        """
+        return task.cont
+    
     def test_spin_camera_task(self, task):
         """用于测试场景加载是否正确, 使得 camera 在 map 的中心
         """
