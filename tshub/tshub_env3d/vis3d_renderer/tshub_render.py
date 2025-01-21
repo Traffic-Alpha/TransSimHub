@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-LastEditTime: 2025-01-16 19:45:50
+LastEditTime: 2025-01-21 18:34:38
 '''
 import math
 from loguru import logger
@@ -109,7 +109,7 @@ class TSHubRenderer(BaseRender):
         self.map_radius, self.map_center = scene_loader.initialize_scene()
         self._is_setup = True # 完成初始化
 
-        # 初始化场景同步器
+        # 初始化场景同步器 (sensor 在这里进行设置)
         self.scene_sync = SceneSync(
             root_np=self._root_np,
             showbase_instance=self._showbase_instance,
