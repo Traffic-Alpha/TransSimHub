@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 17:34:14
 @Description: 将 dict 转换为字符串, 带有环行
-LastEditTime: 2025-01-22 19:25:30
+LastEditTime: 2025-03-21 11:21:05
 '''
 import json
 import numpy as np
@@ -24,4 +24,4 @@ def save_str_to_json(my_dict, file_path:str, indent:int=4) -> None:
     """
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(my_dict, f, ensure_ascii=False, indent=indent)
-    logger.info('SIM: 字典已成功保存到 {file_path}')
+    logger.info(f'SIM: 字典已成功保存到 {file_path}')
