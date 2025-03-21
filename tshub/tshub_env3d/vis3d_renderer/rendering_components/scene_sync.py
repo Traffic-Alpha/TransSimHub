@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-@LastEditTime: 2024-07-26 04:02:33
+LastEditTime: 2025-03-21 11:01:15
 '''
 import math
 from loguru import logger
@@ -30,10 +30,35 @@ VALID_SENSORS = {
 
 
 class SceneSync(object):
-    def __init__(self, root_np, showbase_instance, sensor_config:Dict[str, List[str]]) -> None:
+    def __init__(
+            self, root_np, showbase_instance, 
+            sensor_config:Dict[str, List[str]],
+            preset:str='480p', resolution:float=1.0,
+        ) -> None:
+        """同步场景内的 object
+
+        Args:
+            root_np: 场景的 Node
+            showbase_instance: Pnada3D ShowBase
+            sensor_config (Dict[str, List[str]]): 需要渲染的物体和对应的摄像头
+            preset (str, optional): 预设分辨率名称（如 '720x480', '360x240' 等）. Defaults to '480p'.
+            resolution (float, optional): 缩放因子（默认 1.0 表示原尺寸, 0.5 表示半尺寸）. Defaults to 1.0.
+        """
         self.root_np = root_np
         self.showbase_instance = showbase_instance
         self.sensor_config = sensor_config # 不同 object 加载的传感器类型
+
+        # 获得传感器输出的图像的分辨率和大小
+        presets = {
+            '320P': (320, 240),   # 320x240（类 NTSC 标清）
+            '480P': (720, 480),   # 720x480（标准 480P）
+            '720P': (1280, 720),  # 1280x720（HD 标清）
+            '1080P': (1920, 1080) # 1920x1080（Full HD）
+        }
+        if preset not in presets:
+            raise ValueError(f"Invalid preset: {preset}. Valid presets are: {list(presets.keys())}")
+        self.fig_width, self.fig_height = presets.get(preset) # 获得图像的长和宽
+        self.resolution = resolution
 
         if not SceneSync.validate_sensor_config(sensor_config):
             logger.info("SIM: Sensor configuration validation failed. Please check the errors above.")
@@ -78,6 +103,9 @@ class SceneSync(object):
             position = calculate_center_point(tls_info['in_road_stop_line'][road_id])
             heading = tls_info['in_roads_heading'][road_id]
             element = TLS3DElement(
+                fig_width = self.fig_width,
+                fig_height = self.fig_height,
+                fig_resolution = self.resolution,
                 element_id = tls_element_id, 
                 element_position = position, 
                 element_heading = heading, 
@@ -121,6 +149,9 @@ class SceneSync(object):
         element = self._vehicle_elements.get(veh_id)
         if not element: # 如果车辆不存在
             element = Vehicle3DElement(
+                fig_width = self.fig_width,
+                fig_height = self.fig_height,
+                fig_resolution = self.resolution,
                 veh_id=veh_id, 
                 veh_type=veh_info['vehicle_type'], 
                 veh_pos=veh_info['position'], 
@@ -143,6 +174,9 @@ class SceneSync(object):
         element = self._aircraft_elements.get(aircraft_id)
         if not element:
             element = Aircraft3DElement(
+                fig_width = self.fig_width,
+                fig_height = self.fig_height,
+                fig_resolution = self.resolution,
                 aircraft_id=aircraft_id, 
                 aircraft_pos=aircraft_info['position'], 
                 aircraft_heading=heading, 
