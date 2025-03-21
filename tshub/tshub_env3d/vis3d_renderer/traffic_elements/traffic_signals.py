@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-07 10:01:04
 @Description: 
-@LastEditTime: 2024-07-26 02:06:03
+LastEditTime: 2025-03-21 10:53:43
 '''
 from typing import Tuple
 
@@ -13,6 +13,8 @@ from ...vis3d_utils.masks import CamMask
 class TLS3DElement(BaseElement):
     def __init__(
             self, 
+            fig_width: float, fig_height: float, 
+            fig_resolution:float,
             element_id: str, 
             element_position: Tuple[float, float], 
             element_heading: float = None, 
@@ -23,6 +25,8 @@ class TLS3DElement(BaseElement):
         """模拟路口摄像头
 
         Args:
+            fig_width (float): 传感器输出的图片的宽度
+            fig_height (float): 传感器输出的图片的高度
             element_id (str): 信号灯 ID
             element_position (Tuple[float, float]): 信号灯的位置
             element_heading (float, optional): 路口摄像头朝向. Defaults to None.
@@ -30,7 +34,10 @@ class TLS3DElement(BaseElement):
             root_np (_type_, optional): panda3d root path. Defaults to None.
             showbase_instance (_type_, optional): panda3d showbase instance. Defaults to None.
         """
-        super().__init__(element_id, element_position, element_heading, element_length, root_np, showbase_instance)
+        super().__init__(
+            fig_width, fig_height, fig_resolution, 
+            element_id, element_position, element_heading, element_length, root_np, showbase_instance
+        )
     
     def create_node(self) -> None:
         pass
@@ -79,9 +86,9 @@ class TLS3DElement(BaseElement):
             root_np=self.root_np,
             init_element_pose=self.get_element_pose_from_center(),
             element_dimensions=(self.length, self.width, self.height),
-            fig_width=360, # 480
-            fig_height=240, # 320
-            fig_resolution=0.2,
+            fig_width=self.fig_width, # 480, 360, 720
+            fig_height=self.fig_height, # 320, 240, 480
+            fig_resolution=self.fig_resolution,
             camera_type=config['camera_type']
         )
         self.sensors[sensor_type] = veh_rgb_sensor

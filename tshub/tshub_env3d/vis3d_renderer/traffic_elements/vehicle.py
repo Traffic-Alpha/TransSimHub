@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-01-13 19:39:23
+LastEditTime: 2025-03-21 10:57:05
 '''
 import random
 from loguru import logger
@@ -20,6 +20,8 @@ class Vehicle3DElement(BaseElement):
 
     def __init__(
             self, 
+            fig_width: float, fig_height: float, 
+            fig_resolution:float,
             veh_id: str,
             veh_type: str,
             veh_pos: Tuple[float, float],
@@ -28,7 +30,10 @@ class Vehicle3DElement(BaseElement):
             root_np, # showbase 的根节点
             showbase_instance # panda3d showbase, 单例模式 
         ) -> None:
-        super().__init__(veh_id, veh_pos, veh_heading, veh_length, root_np, showbase_instance)
+        super().__init__(
+            fig_width, fig_height, fig_resolution,
+            veh_id, veh_pos, veh_heading, veh_length, root_np, showbase_instance
+        )
         self.veh_type = veh_type # 车辆的类型, 对 ego 车辆特殊处理
         self.veh_node_path = None # 记录这辆车的 node path
     
@@ -201,9 +206,9 @@ class Vehicle3DElement(BaseElement):
             root_np=self.root_np,
             init_element_pose=self.get_element_pose_from_bumper(),
             element_dimensions=(self.length, self.width, self.height),
-            fig_width=360, # 360, 480
-            fig_height=240, # 240, 320
-            fig_resolution=0.2,
+            fig_width=self.fig_width, # 360, 480
+            fig_height=self.fig_height, # 240, 320
+            fig_resolution=self.fig_resolution,
             camera_type=config['camera_type']
         )
         self.sensors[sensor_type] = veh_rgb_sensor
