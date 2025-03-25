@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 19:43:50
 @Description: RGB Sensor, 绑定在场景的 obejct 上
-@LastEditTime: 2024-07-26 02:20:56
+LastEditTime: 2025-03-25 15:55:37
 '''
 import numpy as np
 from typing import Tuple
@@ -24,6 +24,7 @@ class RGBSensor(CameraSensor):
         fig_height:int=600,
         fig_resolution:float=0.1,
         camera_type:str='Off_BEV_Camera',
+        *args, **kwargs,
     ) -> None:
         super().__init__()
         self.init_element_pose = init_element_pose
@@ -38,12 +39,14 @@ class RGBSensor(CameraSensor):
             root_np=root_np,
             camera_type=camera_type
         ) # 创建相机, 这个相机是绑定在 sensor 上面的
-        self.init_actor(self.init_element_pose) # 初始化相机镜头
+        
+        # 初始化相机镜头 (这里可以传入其他参数, 例如传感器的高度)
+        self.init_actor(element_pose=self.init_element_pose, *args, **kwargs)
 
-    def init_actor(self, element_pose) -> None:
+    def init_actor(self, element_pose, *args, **kwargs) -> None:
         """初始化相机的位置
         """
-        self.camera.init_pos(element_pose)
+        self.camera.init_pos(pose=element_pose, *args, **kwargs)
 
     def step(self, element_pose) -> None:
         """更新 camera 的位置, 确保可以获得指定 element 的信息
