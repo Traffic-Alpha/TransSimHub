@@ -1,8 +1,8 @@
 '''
 @Author: WANG Maonan
 @Date: 2024-07-08 00:32:12
-@Description: 单路口 3D 可视化, 查看信號燈的可視化
-@LastEditTime: 2024-08-12 14:55:04
+@Description: 单路口 3D 可视化, 对信号灯四个方向的可视化 (分别是前拍和后拍)
+LastEditTime: 2025-03-25 18:01:47
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -28,11 +28,21 @@ if __name__ == '__main__':
         num_seconds=500,
         collision_action="warn",
         # 下面是用于渲染的参数
+        preset="320P",
         render_mode="offscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
         debuger_print_node=False,
         debuger_spin_camera=True,
         sensor_config={
-            'tls': ['junction_front_all']
+            'tls': {
+                "htddj_gsndj":{
+                    'sensor_types': [
+                        'junction_front_all', 'junction_front_vehicle',
+                        'junction_back_all', 'junction_back_vehicle'
+                    ],
+                    'tls_camera_height': 15,
+                }
+
+            } # 每个路口设置不同的传感器
         }
     )
 
@@ -54,6 +64,21 @@ if __name__ == '__main__':
                     sensor_data.get('htddj_gsndj_1', {}).get('junction_front_all', None),
                     sensor_data.get('htddj_gsndj_2', {}).get('junction_front_all', None),
                     sensor_data.get('htddj_gsndj_3', {}).get('junction_front_all', None),
+
+                    sensor_data.get('htddj_gsndj_0', {}).get('junction_front_vehicle', None),
+                    sensor_data.get('htddj_gsndj_1', {}).get('junction_front_vehicle', None),
+                    sensor_data.get('htddj_gsndj_2', {}).get('junction_front_vehicle', None),
+                    sensor_data.get('htddj_gsndj_3', {}).get('junction_front_vehicle', None),
+
+                    sensor_data.get('htddj_gsndj_0', {}).get('junction_back_all', None),
+                    sensor_data.get('htddj_gsndj_1', {}).get('junction_back_all', None),
+                    sensor_data.get('htddj_gsndj_2', {}).get('junction_back_all', None),
+                    sensor_data.get('htddj_gsndj_3', {}).get('junction_back_all', None),
+
+                    sensor_data.get('htddj_gsndj_0', {}).get('junction_back_vehicle', None),
+                    sensor_data.get('htddj_gsndj_1', {}).get('junction_back_vehicle', None),
+                    sensor_data.get('htddj_gsndj_2', {}).get('junction_back_vehicle', None),
+                    sensor_data.get('htddj_gsndj_3', {}).get('junction_back_vehicle', None),
                 ],
                 scale=1,
                 images_per_row=4

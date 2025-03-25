@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-26 03:49:43
 @Description: 多路口的 3D 可视化
-LastEditTime: 2025-01-16 14:37:00
+LastEditTime: 2025-03-25 18:08:02
 '''
 from tshub.utils.init_log import set_logger
 from tshub.utils.get_abs_path import get_abs_path
@@ -32,13 +32,21 @@ if __name__ == '__main__':
         num_seconds=200,
         collision_action="warn",
         # 下面是用于渲染的参数
+        preset="480P", resolution=1,
         render_mode="onscreen", # 如果设置了 use_render_pipeline, 此时只能是 onscreen
         debuger_print_node=False,
         debuger_spin_camera=True,
         sensor_config={
-            # 'vehicle': ['bev_all', 'bev_vehicle'],
-            # 'aircraft': ['aircraft_all', 'aircraft_vehicle'],
-            'tls': ['junction_front_all']
+            'tls': {
+                "25663405":{
+                    'sensor_types': ['junction_front_all'],
+                    'tls_camera_height': 15,
+                },
+                "25663436":{
+                    'sensor_types': ['junction_back_all'],
+                    'tls_camera_height': 10,
+                },
+            } # 每个路口设置不同的传感器
         }
     )
 
@@ -60,18 +68,18 @@ if __name__ == '__main__':
 
             show_sensor_images(
                 [
+                    # 十字路口
                     sensor_data.get('25663405_0', {}).get('junction_front_all', None),
                     sensor_data.get('25663405_1', {}).get('junction_front_all', None),
                     sensor_data.get('25663405_2', {}).get('junction_front_all', None),
                     sensor_data.get('25663405_3', {}).get('junction_front_all', None),
 
-                    # 丁字路口有四个相机
-                    sensor_data.get('25663436_0', {}).get('junction_front_all', None),
-                    sensor_data.get('25663436_1', {}).get('junction_front_all', None),
-                    sensor_data.get('25663436_2', {}).get('junction_front_all', None),
-                    sensor_data.get('25663436_3', {}).get('junction_front_all', None),
+                    # 丁字路口
+                    sensor_data.get('25663436_0', {}).get('junction_back_all', None),
+                    sensor_data.get('25663436_1', {}).get('junction_back_all', None),
+                    sensor_data.get('25663436_2', {}).get('junction_back_all', None),
                 ],
-                scale=1,
+                scale=0.5,
                 images_per_row=4
             ) # 展示路口的摄像头
 
