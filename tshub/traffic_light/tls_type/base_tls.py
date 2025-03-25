@@ -2,10 +2,9 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-LastEditTime: 2025-01-21 19:24:57
+LastEditTime: 2025-03-25 12:24:41
 '''
 import sumolib
-from itertools import groupby
 from abc import ABC, abstractmethod
 from ...sumo_tools.sumo_infos.tls_connections import tls_connection
 
@@ -54,7 +53,7 @@ class BaseTLS(ABC):
         self.in_road_stop_line = {_road_id:list() for _road_id in self.in_roads}
         for _lane_id in self.in_lanes:
             _road_name = self.sumo.lane.getEdgeID(_lane_id)
-            _lane_end_position = self.sumo.lane.getShape(_lane_id)[-1] # 距离路口的为 lane 的 end
+            _lane_end_position = self.sumo.lane.getShape(_lane_id)[-1] # 这个是 lane 出口中心的点
             self.in_road_stop_line[_road_name].append(_lane_end_position)
 
         self.program_id = self.sumo.trafficlight.getProgram(self.id) # 获得这个信号的当前的 program id

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-15 11:53:11
 @Description: 创建不同类型的 Offscreen Camera Type
-@LastEditTime: 2024-07-26 03:03:51
+LastEditTime: 2025-03-25 15:27:40
 '''
 from panda3d.core import (
     FrameBufferProperties,
