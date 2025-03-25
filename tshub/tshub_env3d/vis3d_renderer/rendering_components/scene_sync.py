@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-03-21 11:01:15
+LastEditTime: 2025-03-25 16:36:48
 '''
 import math
 from loguru import logger
@@ -33,6 +33,7 @@ class SceneSync(object):
     def __init__(
             self, root_np, showbase_instance, 
             sensor_config:Dict[str, List[str]],
+            tls_camera_height:float=10, # 路口摄像头高度
             preset:str='480p', resolution:float=1.0,
         ) -> None:
         """同步场景内的 object
@@ -47,6 +48,7 @@ class SceneSync(object):
         self.root_np = root_np
         self.showbase_instance = showbase_instance
         self.sensor_config = sensor_config # 不同 object 加载的传感器类型
+        self.tls_camera_height = tls_camera_height # 路口摄像头的高度
 
         # 获得传感器输出的图像的分辨率和大小
         presets = {
@@ -110,7 +112,8 @@ class SceneSync(object):
                 element_position = position, 
                 element_heading = heading, 
                 root_np = self.root_np, 
-                showbase_instance = self.showbase_instance
+                showbase_instance = self.showbase_instance,
+                tls_camera_height=self.tls_camera_height
             ) # 初始化路口信号灯的 element
             element.attach_sensors_to_element(sensor_types)
             self._tls_elements[tls_element_id] = element      

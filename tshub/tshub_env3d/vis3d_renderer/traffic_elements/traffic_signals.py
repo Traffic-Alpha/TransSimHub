@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-07 10:01:04
 @Description: 
-LastEditTime: 2025-03-21 10:53:43
+LastEditTime: 2025-03-25 16:01:17
 '''
 from typing import Tuple
 
@@ -20,7 +20,8 @@ class TLS3DElement(BaseElement):
             element_heading: float = None, 
             element_length: float = None, 
             root_np=None, 
-            showbase_instance=None
+            showbase_instance=None,
+            tls_camera_height:int=10,
         ) -> None:
         """模拟路口摄像头
 
@@ -38,6 +39,7 @@ class TLS3DElement(BaseElement):
             fig_width, fig_height, fig_resolution, 
             element_id, element_position, element_heading, element_length, root_np, showbase_instance
         )
+        self.tls_camera_height = tls_camera_height # 路口摄像头的高度
     
     def create_node(self) -> None:
         pass
@@ -89,7 +91,8 @@ class TLS3DElement(BaseElement):
             fig_width=self.fig_width, # 480, 360, 720
             fig_height=self.fig_height, # 320, 240, 480
             fig_resolution=self.fig_resolution,
-            camera_type=config['camera_type']
+            camera_type=config['camera_type'],
+            height=self.tls_camera_height, # 设置路口摄像机的高度
         )
         self.sensors[sensor_type] = veh_rgb_sensor
         
