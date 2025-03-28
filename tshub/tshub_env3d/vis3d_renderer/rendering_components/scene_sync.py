@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-03-28 17:14:13
+LastEditTime: 2025-03-28 18:51:28
 '''
 import math
 from loguru import logger
@@ -33,7 +33,7 @@ class SceneSync(object):
     def __init__(
             self, root_np, showbase_instance, 
             sensor_config:Dict[str, List[str]],
-            preset:str='480p', resolution:float=1.0,
+            preset:str='480P', resolution:float=1.0,
         ) -> None:
         """同步场景内的 object
 
@@ -137,6 +137,7 @@ class SceneSync(object):
         # 更新 camera
         self.showbase_instance.taskMgr.step()
         
+        # 获得 camera 的数据
         _sensors = {
             **self.collect_sensors(self._tls_elements), 
             **self.collect_sensors(self._vehicle_elements), 
