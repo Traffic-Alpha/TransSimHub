@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-LastEditTime: 2025-03-25 18:01:17
+LastEditTime: 2025-03-28 17:13:57
 '''
 import math
 from loguru import logger
@@ -136,10 +136,9 @@ class TSHubRenderer(BaseRender):
     # Step 2, step (include sync), reset
     # ---------------------------------- #
     def step(self, tshub_obs):
-        """使用 `.taskMgr.step()` 进行单步的渲染. 从而可以和 sumo 同步
+        """将 sumo 的画面同步渲染为 3D
         """
-        sensor_data = self.scene_sync._sync(tshub_obs) # 首先更新 panda3d 中的物体
-        self._showbase_instance.taskMgr.step()
+        sensor_data = self.scene_sync._sync(tshub_obs) # 更新 panda3d 中的物体 & 更新 camera
         return sensor_data # 返回传感器的数据
     
 

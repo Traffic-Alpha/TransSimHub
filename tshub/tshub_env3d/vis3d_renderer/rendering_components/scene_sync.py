@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-03-25 19:38:08
+LastEditTime: 2025-03-28 17:14:13
 '''
 import math
 from loguru import logger
@@ -133,6 +133,9 @@ class SceneSync(object):
         # 管理离开的 vehicle 和 aircraft
         self.remove_missing_elements(veh_ids, self._vehicle_elements, 'vehicle')
         self.remove_missing_elements(aircraft_ids, self._aircraft_elements, 'aircraft')
+        
+        # 更新 camera
+        self.showbase_instance.taskMgr.step()
         
         _sensors = {
             **self.collect_sensors(self._tls_elements), 
