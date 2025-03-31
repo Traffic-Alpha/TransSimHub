@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-03-28 18:51:28
+LastEditTime: 2025-03-31 14:35:58
 '''
 import math
 from loguru import logger
@@ -129,14 +129,18 @@ class SceneSync(object):
     def _sync(self, tshub_obs):
         # 更新车辆和飞行器
         veh_ids, aircraft_ids = self.update_elements(tshub_obs)
-
+        
         # 管理离开的 vehicle 和 aircraft
         self.remove_missing_elements(veh_ids, self._vehicle_elements, 'vehicle')
         self.remove_missing_elements(aircraft_ids, self._aircraft_elements, 'aircraft')
         
         # 更新 camera
+        logger.info(f'SIM: Update All Sensors Positions.')
         self.showbase_instance.taskMgr.step()
         
+        # 所有传感器渲染
+        self.showbase_instance.graphicsEngine.renderFrame()
+
         # 获得 camera 的数据
         _sensors = {
             **self.collect_sensors(self._tls_elements), 
@@ -223,4 +227,10 @@ class SceneSync(object):
             logger.info(f'SIM: 3D, Del {element_type} {id} since it leaves the scenario.')
 
     def collect_sensors(self, elements):
-        return {id: element.get_sensor() for id, element in elements.items() if element.get_sensor()}
+        # 获得传感器数据
+        sensor_outputs = {} # 获得传感器的输出
+        for id, element in elements.items():
+            _sensor_output = element.get_sensor()
+            if _sensor_output:
+                sensor_outputs[id] = _sensor_output
+        return sensor_outputs

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-20 14:36:14
 @Description: 
-@LastEditTime: 2024-07-26 03:04:53
+LastEditTime: 2025-03-31 14:39:06
 '''
 import numpy as np
 
@@ -37,13 +37,13 @@ class _BaseOffCameraMixin:
         # To deal with this, we can try to force a render and block until
         # we are fairly certain we have an image in ram to return to the user
         for i in range(retries):
-            if self.tex.mightHaveRamImage():
+            region = self.buffer.getDisplayRegion(0)
+            region.window.engine.renderFrame()
+            if self.tex.mightHaveRamImage(): # 检查 RAM 是否有图像
                 break
             logger.debug(
                 f"SIM: No image available (attempt {i}/{retries}), forcing a render"
             )
-            region = self.buffer.getDisplayRegion(0)
-            region.window.engine.renderFrame()
 
         assert self.tex.mightHaveRamImage()
         ram_image = self.tex.getRamImageAs(img_format)

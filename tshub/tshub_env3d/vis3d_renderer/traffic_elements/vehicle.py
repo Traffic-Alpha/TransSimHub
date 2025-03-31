@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-03-21 10:57:05
+LastEditTime: 2025-03-31 13:36:59
 '''
 import random
 from loguru import logger
@@ -223,6 +223,6 @@ class Vehicle3DElement(BaseElement):
     def get_sensor(self):
         sensor_data = {}
         for _sensor_id, _sensor in self.sensors.items():
-            ego_rgb = _sensor()
+            ego_rgb = _sensor() # 调用 call 获得传感器数据
             sensor_data[_sensor_id] = ego_rgb
         return sensor_data

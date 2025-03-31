@@ -2,8 +2,10 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 19:43:50
 @Description: RGB Sensor, 绑定在场景的 obejct 上
-LastEditTime: 2025-03-25 15:55:37
+LastEditTime: 2025-03-31 12:12:30
 '''
+from loguru import logger
+
 import numpy as np
 from typing import Tuple
 from .base_sensors.base_camera_sensor import CameraSensor
