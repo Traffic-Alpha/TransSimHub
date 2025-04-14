@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-03-31 13:36:59
+LastEditTime: 2025-04-14 15:23:25
 '''
 import random
 from loguru import logger
@@ -61,25 +61,25 @@ class Vehicle3DElement(BaseElement):
         1. ego vehicle, 自动驾驶车辆
         2. soical vehicle 背景车
         """
-        if 'ego' in self.veh_type:
-            veh_list = ['AudiTT', 'FerrariF355']
-            weights = [0, 1]
-            selected_model = random.choices(veh_list, weights=weights, k=1)[0]
-            logger.info(f"随机选择 {selected_model} 作为 ego vehicle 模型.")
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego_vehicles/{selected_model}.bam")
-        elif 'police' in self.veh_type:
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/PoliceSkodaOctavia.bam")
-        else:
+        if 'ego' in self.veh_type: # 自动驾驶车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego/ego_suv.glb")
+        elif 'police' in self.veh_type: # 警车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/police.glb")
+        elif 'emergency' in self.veh_type: # 救护车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/emergency.glb")
+        elif 'fire_engine' in self.veh_type: # 消防车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/fire_engine.glb")
+        elif 'taxi' in self.veh_type: # 出租车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/taxi.glb")
+        else: # 普通车辆
             veh_list = [
-                'BMWZ4', 'HyundaiKona', 'KiaXceed', 
-                'LamborghiniUrus', 'MercedesCL', 'NIssanMurano', 
-                'Peugeot208', 'volkswagenT-Roc'
+                'suv_blue', 'suv_grey', 'suv_orange', 
+                'vehicle_blue', 'vehicle_pink', 'vehicle_white',
             ]
-            weights = [1/14, 1/14, 1/14, 1/2, 1/14, 1/14, 1/14, 1/14]
+            weights = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/social_vehicles/{selected_model}.bam")
-
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/background/{selected_model}.glb")
 
     def update_node(
             self, 
