@@ -1,0 +1,19 @@
+可以使用下面的程序将 blender 转换为 bam 文件, 记得首先需要在 blender 调整模型的大小位置等:
+```
+blend2bam --blender-dir='/home/wmn/software/blender-4.1.1-linux-x64/' --textures copy --no-srgb volkswagenT-Roc.blend volkswagenT-Roc.bam
+```
+
+首先生成 3D 模型
+
+接着将模型转换为指定的长度和宽度
+
+不同模型的车辆大小:
+
+- 特种车辆
+    - 消防车
+    - 救护车
+    - 警车
+- 普通车辆
+    - 普通轿车
+    - SUV
+
