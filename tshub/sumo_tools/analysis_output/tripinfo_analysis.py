@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-06-25 22:01:24
 @Description: 分析 tripinfo 文件
-LastEditTime: 2024-10-02 16:55:44
+LastEditTime: 2024-10-02 16:58:11
 '''
 import numpy as np
 from loguru import logger
@@ -89,8 +89,14 @@ class TripInfoAnalysis:
         """将指标以表格形式输出, 使用逗号隔开, 方便粘贴到 CSV 文件
         """
         all_stats = self.get_all_stats()
-        header = "Metric,Mean,Variance,Max,Min,25th,50th,75th"
+        stat_names = ['mean', 'variance', 'max', 'min', 'percentile_25', 'percentile_50', 'percentile_75']
+        
+        # Print header
+        header = "Statistic," + ",".join(all_stats.keys())
         print(header)
-        for metric, stats in all_stats.items():
-            row = f"{metric},{stats['mean']:.2f},{stats['variance']:.2f},{stats['max']:.2f},{stats['min']:.2f},{stats['percentile_25']:.2f},{stats['percentile_50']:.2f},{stats['percentile_75']:.2f}"
+        
+        # Print each row
+        for stat_name in stat_names:
+            row = stat_name.capitalize() + ","
+            row += ",".join(f"{all_stats[metric][stat_name]:.2f}" for metric in all_stats.keys())
             print(row)

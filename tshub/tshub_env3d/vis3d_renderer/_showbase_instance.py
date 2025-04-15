@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-03 23:43:42
 @Description: 继承 ShowBase, Panda3D 的主界面
-@LastEditTime: 2024-07-23 18:22:19
+LastEditTime: 2025-01-16 19:46:14
 '''
 from ...utils.get_abs_path import get_abs_path
 current_file_path = get_abs_path(__file__)

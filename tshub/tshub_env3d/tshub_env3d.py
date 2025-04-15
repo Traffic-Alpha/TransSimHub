@@ -5,10 +5,10 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-LastEditTime: 2025-01-16 14:45:46
+LastEditTime: 2025-04-15 15:37:57
 '''
 from loguru import logger
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Callable
 
 from .base_env3d import BaseSumoEnvironment3D
 
@@ -46,10 +46,13 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             remote_port: int = None, 
             num_clients: int = 1,
             # TSHubRenderer 的参数
+            preset:str = '480P', 
+            resolution:float = 0.5,
             render_mode: str = "onscreen",
             debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
             debuger_spin_camera:bool = False, # 是否显示 spin camera
             sensor_config: Dict[str, List[str]] = None,
+            modify_states:Callable[[Any],Any]=None, # 对 tshub 返回的 state 进行修改
         ) -> None:
 
         self.debuger_print_node = debuger_print_node
@@ -76,8 +79,12 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             simid=f"tshub-{self.tshub_env.CONNECTION_LABEL}", # 场景的 ID
             scenario_glb_dir=scenario_glb_dir,
             sensor_config=sensor_config,
+            preset=preset,
+            resolution=resolution,
             render_mode=render_mode,
         )
+
+        self.modify_states = modify_states
         
     def reset(self):
         state_infos = self.tshub_env.reset() # 重置 sumo 环境
@@ -106,10 +113,15 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
     def step(self, actions):
         # 1. 与 SUMO 进行交互
         states, rewards, infos, dones = self.tshub_env.step(actions)
-        # 2. 渲染 3D 的场景
+        
+        # 2. 可以对 states 进行修改 (例如添加新的车辆用于渲染)
+        if self.modify_states:
+            states = self.modify_states(states)
+
+        # 3. 渲染 3D 的场景
         sensor_data = self.tshub_render.step(states) # 运行 panda3d
         
-        # TODO, sensor_data 需要放在 state 里面返回，而不是单独返回
+        # 将 image 的信息通过 sensor_data 进行返回
         return states, rewards, infos, dones, sensor_data
 
     def close(self) -> None:
