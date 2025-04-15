@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-24 16:21:40
 @Description: 定义一些生成探测器的基础功能
-@LastEditTime: 2023-08-24 16:33:52
+LastEditTime: 2024-09-16 15:36:05
 '''
 import sumolib
 from abc import ABC, abstractmethod
@@ -91,7 +91,8 @@ class detector_base(ABC):
             for lane_info in tls_connection:
                 direction = lane_info[5] # 转向
                 fromLane_id = lane_info[2]
-                lane2direction[fromLane_id] += direction
+                if direction not in lane2direction[fromLane_id]: # 避免出现 sss, 及一个车道连接多个车道的情况
+                    lane2direction[fromLane_id] += direction
         return lane2direction
 
     

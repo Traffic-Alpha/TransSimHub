@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-@LastEditTime: 2024-07-26 04:17:12
+LastEditTime: 2025-03-25 12:24:41
 '''
 import sumolib
 from abc import ABC, abstractmethod
@@ -42,15 +42,18 @@ class BaseTLS(ABC):
 
         # 获得 road 相关信息 (edge info)
         self.in_roads = self.lanes_to_edges(self.in_lanes)
+        self.out_roads = self.lanes_to_edges(self.out_lanes)
+        self.roads_lanes = self.extract_from_lanes() # 每个 roads 包含的 lanes
 
         # 计算进入 road 的角度（可以用于将摄像头按这个角度布置）
         self.in_roads_heading = {_road_id:self.sumo.edge.getAngle(_road_id) for _road_id in self.in_roads}
+        self.out_roads_heading = {_road_id:self.sumo.edge.getAngle(_road_id) for _road_id in self.out_roads}
 
         # 获得每一个 in road 的 stop line 的坐标
         self.in_road_stop_line = {_road_id:list() for _road_id in self.in_roads}
         for _lane_id in self.in_lanes:
             _road_name = self.sumo.lane.getEdgeID(_lane_id)
-            _lane_end_position = self.sumo.lane.getShape(_lane_id)[-1] # 距离路口的为 lane 的 end
+            _lane_end_position = self.sumo.lane.getShape(_lane_id)[-1] # 这个是 lane 出口中心的点
             self.in_road_stop_line[_road_name].append(_lane_end_position)
 
         self.program_id = self.sumo.trafficlight.getProgram(self.id) # 获得这个信号的当前的 program id
@@ -276,3 +279,36 @@ class BaseTLS(ABC):
             _road_id = self.sumo.lane.getEdgeID(lane_id)
             road_ids.add(_road_id)
         return sorted(list(road_ids)) # 确保环境里面的 road_ids 顺序是一样的
+
+    def extract_from_lanes(self):
+        """根据下面的嵌套列表，提取出每个 edge 包含的 lane
+        [
+            [fromEdge, toEdge, fromLane, toLane, internalLane, direction, fromLane_length], 
+            [fromEdge, toEdge, fromLane, toLane, internalLane, direction, fromLane_length],
+            ...
+        ]
+        """
+        # Step 1: Filter out any sublists containing None
+        filtered_list = [item for item in self.tls_connections if None not in item]
+        
+        # Step 2: Initialize a dictionary to hold lanes for each edge
+        edge_lanes = {}
+        
+        # Step 3: Process each item in the filtered list
+        for item in filtered_list:
+            from_edge, to_edge, from_lane, to_lane = item[0], item[1], item[2], item[3]
+            
+            # Add fromLane to fromEdge
+            if from_edge not in edge_lanes:
+                edge_lanes[from_edge] = set()
+            edge_lanes[from_edge].add(from_lane)
+            
+            # Add toLane to toEdge
+            if to_edge not in edge_lanes:
+                edge_lanes[to_edge] = set()
+            edge_lanes[to_edge].add(to_lane)
+        
+        # Step 4: Convert sets to sorted lists
+        result = {edge: sorted(lanes) for edge, lanes in edge_lanes.items()}
+        
+        return result

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-15 11:53:11
 @Description: 创建不同类型的 Offscreen Camera Type
-@LastEditTime: 2024-07-26 03:03:51
+LastEditTime: 2025-03-25 19:51:54
 '''
 from panda3d.core import (
     FrameBufferProperties,
@@ -57,11 +57,13 @@ def build_offscreen_camera(
     win_props = WindowProperties.size(width, height)
     fb_props = FrameBufferProperties()
     fb_props.setRgbColor(True)
-    fb_props.setRgbaBits(8, 8, 8, 1)
+    fb_props.setRgbaBits(8, 8, 8, 8)
     # XXX: Though we don't need the depth buffer returned, setting this to 0
     #      causes undefined behavior where the ordering of meshes is random.
-    fb_props.setDepthBits(8)
-
+    fb_props.setDepthBits(24)         # 深度缓冲位数
+    fb_props.setAuxRgba(1)            # 添加辅助通道（用于阴影）
+    fb_props.setStencilBits(8)        # 启用模板缓冲（某些阴影技术需要）
+    
     buffer = showbase_instance.win.engine.makeOutput(
         showbase_instance.pipe,
         "{}-buffer".format(name),

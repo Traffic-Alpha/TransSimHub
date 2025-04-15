@@ -1,3 +1,4 @@
 include tshub/aircraft/aircraft.png
 include tshub/sumo_tools/osm_build_type/net.typ.xml
 include tshub/sumo_tools/osm_build_type/poly.typ.xml
+recursive-include tshub/tshub_env3d/_assets_3d/ *

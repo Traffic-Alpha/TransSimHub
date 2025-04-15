@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-@LastEditTime: 2024-07-21 00:23:32
+LastEditTime: 2025-01-21 19:19:39
 '''
 from __future__ import annotations
 
@@ -36,10 +36,13 @@ class TrafficLightInfo:
     last_phase: List[bool]
     next_phase: List[bool]
     sumo: traci.connection.Connection # 与 sumo 的 connection
-    # 初始化的时候会生成
+    # 初始化的时候会生成, 不需要在 create 的时候初始化
+    roads_lanes: Dict[str, List[str]] = None # 每个 edge 包含的 lanes
     in_roads: List[str] = None # 路口的进入车道的 id
+    out_roads: List[str] = None # 出口的 edge id
     in_road_stop_line: Dict[str, List[Tuple[float, float]]] = None # 路口进入 road 的 point 的坐标, {'161701303#7.248': [(1777.55, 911.8), (1775.26, 914.04), (1772.97, 916.28), (1770.68, 918.51)], ...}
     in_roads_heading: Dict[str, List[float]] = None # 路口进入车道的 angle 角度
+    out_roads_heading: Dict[str, List[float]] = None # 路口出口车道的 angle 角度
     fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
     movement_lane_numbers: List[int] = None, # 每一个 movement 包含的车道数
@@ -70,9 +73,12 @@ class TrafficLightInfo:
             raise ValueError(f'SIM: 信号灯动作只支持 choose_next_phase 和 next_or_not, 现在是 {self.action_type}.')
         self.tls_action.build_phases()
         
+        self.roads_lanes = self.tls_action.roads_lanes
         self.in_roads = self.tls_action.in_roads
+        self.out_roads = self.tls_action.out_roads
         self.in_road_stop_line = self.tls_action.in_road_stop_line
         self.in_roads_heading = self.tls_action.in_roads_heading
+        self.out_roads_heading = self.tls_action.out_roads_heading
         self.movement_ids = self.tls_action.movement_ids
         self.movement_directions = self.tls_action.movement_directions
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers

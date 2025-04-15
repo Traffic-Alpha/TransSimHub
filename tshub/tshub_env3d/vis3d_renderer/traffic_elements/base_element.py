@@ -9,7 +9,7 @@
 --> begin render node
 -> 在 node 上添加传感器
 这里 Element 可以是 vehicles, aircrsaft, 或是 traffic signal light
-@LastEditTime: 2024-07-26 02:05:24
+LastEditTime: 2025-03-21 10:52:49
 '''
 import numpy as np
 from typing import Tuple, List
@@ -20,6 +20,8 @@ from ...vis3d_utils.coordinates import Pose, Heading
 class BaseElement(ABC):
     def __init__(
             self,
+            fig_width: float, fig_height: float, 
+            fig_resolution:float,
             element_id:str,
             element_position:Tuple[float, float],
             element_heading:float = None,
@@ -28,6 +30,11 @@ class BaseElement(ABC):
             showbase_instance = None
         ) -> None:
         super().__init__()
+        # 传感器输出相关
+        self.fig_width = fig_width
+        self.fig_height = fig_height
+        self.fig_resolution = fig_resolution
+
         self.element_id = element_id
         self.element_position = element_position
         self.element_heading = element_heading

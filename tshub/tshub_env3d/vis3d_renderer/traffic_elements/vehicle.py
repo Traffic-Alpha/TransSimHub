@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-@LastEditTime: 2024-07-26 03:13:24
+LastEditTime: 2025-04-14 15:23:25
 '''
 import random
 from loguru import logger
@@ -20,6 +20,8 @@ class Vehicle3DElement(BaseElement):
 
     def __init__(
             self, 
+            fig_width: float, fig_height: float, 
+            fig_resolution:float,
             veh_id: str,
             veh_type: str,
             veh_pos: Tuple[float, float],
@@ -28,7 +30,10 @@ class Vehicle3DElement(BaseElement):
             root_np, # showbase 的根节点
             showbase_instance # panda3d showbase, 单例模式 
         ) -> None:
-        super().__init__(veh_id, veh_pos, veh_heading, veh_length, root_np, showbase_instance)
+        super().__init__(
+            fig_width, fig_height, fig_resolution,
+            veh_id, veh_pos, veh_heading, veh_length, root_np, showbase_instance
+        )
         self.veh_type = veh_type # 车辆的类型, 对 ego 车辆特殊处理
         self.veh_node_path = None # 记录这辆车的 node path
     
@@ -52,25 +57,29 @@ class Vehicle3DElement(BaseElement):
         return True
 
     def _select_vehicle_model(self) -> str:
-        """随机选择车辆的模型, ego vehicle 和 soical vehicle 的模型是不一样的
+        """随机选择车辆的模型, 
+        1. ego vehicle, 自动驾驶车辆
+        2. soical vehicle 背景车
         """
-        if 'ego' in self.veh_type:
-            veh_list = ['AudiTT', 'FerrariF355']
-            weights = [0, 1]
-            selected_model = random.choices(veh_list, weights=weights, k=1)[0]
-            logger.info(f"随机选择 {selected_model} 作为 ego vehicle 模型.")
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego_vehicles/{selected_model}.bam")
-        else:
+        if 'ego' in self.veh_type: # 自动驾驶车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego/ego_suv.glb")
+        elif 'police' in self.veh_type: # 警车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/police.glb")
+        elif 'emergency' in self.veh_type: # 救护车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/emergency.glb")
+        elif 'fire_engine' in self.veh_type: # 消防车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/fire_engine.glb")
+        elif 'taxi' in self.veh_type: # 出租车
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/taxi.glb")
+        else: # 普通车辆
             veh_list = [
-                'BMWZ4', 'HyundaiKona', 'KiaXceed', 
-                'LamborghiniUrus', 'MercedesCL', 'NIssanMurano', 
-                'Peugeot208', 'volkswagenT-Roc'
+                'suv_blue', 'suv_grey', 'suv_orange', 
+                'vehicle_blue', 'vehicle_pink', 'vehicle_white',
             ]
-            weights = [1/14, 1/14, 1/14, 1/2, 1/14, 1/14, 1/14, 1/14]
+            weights = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/social_vehicles/{selected_model}.bam")
-
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/background/{selected_model}.glb")
 
     def update_node(
             self, 
@@ -197,9 +206,9 @@ class Vehicle3DElement(BaseElement):
             root_np=self.root_np,
             init_element_pose=self.get_element_pose_from_bumper(),
             element_dimensions=(self.length, self.width, self.height),
-            fig_width=360, # 360, 480
-            fig_height=240, # 240, 320
-            fig_resolution=0.2,
+            fig_width=self.fig_width, # 360, 480
+            fig_height=self.fig_height, # 240, 320
+            fig_resolution=self.fig_resolution,
             camera_type=config['camera_type']
         )
         self.sensors[sensor_type] = veh_rgb_sensor
@@ -214,6 +223,6 @@ class Vehicle3DElement(BaseElement):
     def get_sensor(self):
         sensor_data = {}
         for _sensor_id, _sensor in self.sensors.items():
-            ego_rgb = _sensor()
+            ego_rgb = _sensor() # 调用 call 获得传感器数据
             sensor_data[_sensor_id] = ego_rgb
         return sensor_data

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-06-25 22:01:24
 @Description: 分析 tripinfo 文件
-@LastEditTime: 2024-06-25 22:12:50
+LastEditTime: 2024-10-02 16:58:11
 '''
 import numpy as np
 from loguru import logger
@@ -25,6 +25,7 @@ class TripInfoAnalysis:
 
         metrics = {
             'travelTime': [],
+            'routeLength': [],
             'waitingTime': [],
             'waitingCount': [],
             'stopTime': [],
@@ -40,18 +41,19 @@ class TripInfoAnalysis:
 
         for tripinfo in root.findall('tripinfo'):
             metrics['travelTime'].append(float(tripinfo.get('duration')))
+            metrics['routeLength'].append(float(tripinfo.get('routeLength')))
             metrics['waitingTime'].append(float(tripinfo.get('waitingTime')))
             metrics['waitingCount'].append(int(tripinfo.get('waitingCount')))
             metrics['stopTime'].append(float(tripinfo.get('stopTime')))
             metrics['timeLoss'].append(float(tripinfo.get('timeLoss')))
             
             emissions = tripinfo.find('emissions')
-            metrics['CO_abs'].append(float(emissions.get('CO_abs')))
-            metrics['CO2_abs'].append(float(emissions.get('CO2_abs')))
-            metrics['HC_abs'].append(float(emissions.get('HC_abs')))
-            metrics['PMx_abs'].append(float(emissions.get('PMx_abs')))
-            metrics['NOx_abs'].append(float(emissions.get('NOx_abs')))
-            metrics['fuel_abs'].append(float(emissions.get('fuel_abs')))
+            metrics['CO_abs'].append(float(emissions.get('CO_abs')) / 1000)  # Convert mg to g
+            metrics['CO2_abs'].append(float(emissions.get('CO2_abs')) / 1000)  # Convert mg to g
+            metrics['HC_abs'].append(float(emissions.get('HC_abs')) / 1000)  # Convert mg to g
+            metrics['PMx_abs'].append(float(emissions.get('PMx_abs')) / 1000)  # Convert mg to g
+            metrics['NOx_abs'].append(float(emissions.get('NOx_abs')) / 1000)  # Convert mg to g
+            metrics['fuel_abs'].append(float(emissions.get('fuel_abs')) / (750 * 1000))  # Convert mg to L
             metrics['electricity_abs'].append(float(emissions.get('electricity_abs')))
 
         return metrics
@@ -82,3 +84,19 @@ class TripInfoAnalysis:
             for stat_name, value in stats.items():
                 print(f"  {stat_name.capitalize()}: {value:.2f}")
             print()  # Blank line for better readability
+    
+    def print_stats_as_table(self) -> None:
+        """将指标以表格形式输出, 使用逗号隔开, 方便粘贴到 CSV 文件
+        """
+        all_stats = self.get_all_stats()
+        stat_names = ['mean', 'variance', 'max', 'min', 'percentile_25', 'percentile_50', 'percentile_75']
+        
+        # Print header
+        header = "Statistic," + ",".join(all_stats.keys())
+        print(header)
+        
+        # Print each row
+        for stat_name in stat_names:
+            row = stat_name.capitalize() + ","
+            row += ",".join(f"{all_stats[metric][stat_name]:.2f}" for metric in all_stats.keys())
+            print(row)

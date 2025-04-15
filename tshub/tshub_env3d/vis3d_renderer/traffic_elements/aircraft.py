@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 22:14:31
 @Description: 仿真器中飞行器的可视化 (在飞行器上安装摄像头)
-@LastEditTime: 2024-07-26 02:06:22
+LastEditTime: 2025-03-21 10:56:41
 '''
 from typing import Tuple
 
@@ -11,13 +11,12 @@ from .base_element import BaseElement
 # 导入传感器
 from ..sensors.rgb_sensor import RGBSensor
 from ...vis3d_utils.masks import CamMask
-from ....utils.get_abs_path import get_abs_path
 
 class Aircraft3DElement(BaseElement):
-    current_file_path = get_abs_path(__file__)
-
     def __init__(
             self, 
+            fig_width: float, fig_height: float, 
+            fig_resolution:float,
             aircraft_id: str,
             aircraft_pos: Tuple[float, float],
             aircraft_heading: float,
@@ -25,7 +24,10 @@ class Aircraft3DElement(BaseElement):
             root_np = None, # showbase 的根节点
             showbase_instance = None, # panda3d showbase, 单例模式 
         ) -> None:
-        super().__init__(aircraft_id, aircraft_pos, aircraft_heading, aircraft_length, root_np, showbase_instance)
+        super().__init__(
+            fig_width, fig_height, fig_resolution,
+            aircraft_id, aircraft_pos, aircraft_heading, aircraft_length, root_np, showbase_instance
+        )
     
     # ###########################################
     # Aircraft Node 的更新 (暂时没有 Aircraft 的模型)
@@ -70,9 +72,9 @@ class Aircraft3DElement(BaseElement):
             root_np=self.root_np,
             init_element_pose=self.get_element_pose_from_center(),
             element_dimensions=(self.length, self.width, self.height),
-            fig_width=360, # 360, 480
-            fig_height=240, # 240, 320
-            fig_resolution=0.2,
+            fig_width=self.fig_width, # 360, 480
+            fig_height=self.fig_height, # 240, 320
+            fig_resolution=self.fig_resolution,
             camera_type=config['camera_type']
         )
         self.sensors[sensor_type] = veh_rgb_sensor
