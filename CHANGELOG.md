@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2024-12-30 19:44:18
+ * @LastEditTime: 2025-04-15 16:13:15
 -->
 # Change Log
 
@@ -18,7 +18,40 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Removed
 ### Security
 
+<!-- v1.3 -->
+## [v1.3] - 2025-04-15
+
+### News
+
+- Congratulations! Our paper based on TransSimHub, [A Multi-Agent Rollout Approach for Highway Bottleneck Decongestion in Mixed Autonomy](https://ieeexplore.ieee.org/document/10920050), has been published in the ​**​2024 IEEE 27th International Conference on Intelligent Transportation Systems (ITSC)​**​.
+- Currently working at ​**​Shanghai AI Lab​**​ on ​**​VLM + TSC​**​ related research. Expect more frequent updates to TransSimHub in the near future.
+
+### Added
+- Added the following features to TLS for sensor configuration:
+  - Out road IDs and angles
+  - Lanes contained in each road
+- In TShub3D, added preset sensor output resolutions: 320P, 480P, 720P, 1080P;
+- New customization options in TShub3D:
+  - Intersection cameras;
+  - Aircraft height settings;
+- [Highlight] TShub3D now supports mounting sensors to specified objects for faster simulation;
+
+### Changed
+- Updated vehicle types in TShub3D:
+  - Added various vehicle types
+  - Matched vehicle lengths with SUMO specifications
+  - Added new 3D models: Police cars, Ambulances, Fire Engine, Taxi
+  - For details, see [TSHub3D Vehicles](./tshub/tshub_env3d/_assets_3d/vehicles/README.md)
+- Changed default vehicle color to yellow
+
+### Fixed
+- Fixed junction camera positioning in TShub3D to properly face lanes (previously had offset issues)
+- Resolved synchronization issues between TShub3D rendering and SUMO information (rendering was lagging behind SUMO)
+- Added a new test example for 3D and SUMO synchronization, Single vehicle lane change scenario: [Vehicle Lane Change Example](./examples/tshub_env3d/map_model_merge/)
+
 <!-- v1.2 -->
+## [v1.2] - 2024-12-30 - Happy New Year 2025!
+
 **Happy New Year 2025!**
 
 ## Added
@@ -39,7 +72,7 @@ Copy and pasting the git commit messages is **NOT** enough.
 - Congratulations! Our two papers based on TransSimHub have been accepted by **IEEE Transactions on Intelligent Transportation Systems**.
     - The first paper discusses RL-based traffic signal control under varying intervention frequencies: [Traffic Signal Cycle Control With Centralized Critic and Decentralized Actors Under Varying Intervention Frequencies](https://ieeexplore.ieee.org/document/10696929)
     - The second paper addresses vehicle platooning coordination in networks: [An Approximate Dynamic Programming Approach to Vehicle Platooning Coordination in Networks](https://ieeexplore.ieee.org/abstract/document/10591414)
-- Congratulations to Team TSC-Master from CUHKSZ for winning the second prize (fourth place overall) in the 2024 Tencent Kaiwu Global AI Competition under the Intelligent Traffic Signal Scheduling track, competing against 2,038 teams from 388 universities worldwide. [Winners List](https://aiarena.tencent.com/aiarena/zh/match/open-competition-2024?tab=score)
+- Congratulations to Team **TSC-Master** from CUHKSZ for winning the second prize (fourth place overall) in the 2024 Tencent Kaiwu Global AI Competition under the Intelligent Traffic Signal Scheduling track, competing against 2,038 teams from 388 universities worldwide. [Winners List](https://aiarena.tencent.com/aiarena/zh/match/open-competition-2024?tab=score)
 
 <div align=center>
    <img src="./assets/kaiwu_match.jpg" width="65%" >
@@ -129,7 +162,8 @@ The `TSHub` project has been undergoing numerous updates recently, with new feat
 - Vehicle Updates
   - Added `lane_position` attribute to the `vehicle` features, which allows for the determination of the current vehicle's distance from the starting point of the lane. This feature can be utilized to divide the lane into cells and calculate vehicle metrics within each cell.
   - In `vehicle`, if the type is `ego`, collision support is now available during control, such as collisions caused by speed ([vehicle_speed_crash.py](./examples/vehicles/vehicle_action/vehicle_speed_crash.py)) or lane changes ([vehicle_laneChange_crash.py](./examples/vehicles/vehicle_action/vehicle_laneChange_crash.py)). Collision settings are completed in [base_vehicle_action.py](./tshub/vehicle/vehicle_type/base_vehicle_action.py).
-- Traffic Light Updates
+- Traffic Light UpdatYear: 2023 | Conference Paper | Publisher: IEEE
+es
   - Added a new action for traffic light control tasks, `Choose Next Phase (Synchronize)`. This action allows all agents in multi-agent control tasks to act together, preventing interval changes between different agents' actions and facilitating multi-agent training. See example in [tls_choosenextphase_syn.py](./examples/traffic_light/traffic_light_action/tls_choosenextphase_syn.py).
   - Introduced a new action, `Adjust Cycle Durations`, which modifies the duration of each phase of the traffic light in each cycle. This allows RL to control the traffic light less frequently, making the entire system more stable. See example in [tls_adjustCycleDuration.py](./examples/traffic_light/traffic_light_action/tls_adjustCycleDuration.py).
 - Map Updates
