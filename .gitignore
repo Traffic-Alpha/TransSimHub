@@ -10,7 +10,6 @@ __pycache__/
 
 gitpage/*
 examples/tshub_env3d/env3d_images/*
-
 # C extensions
 *.so
 
