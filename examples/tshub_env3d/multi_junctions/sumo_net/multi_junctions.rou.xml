@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-04-15 15:20:08 by Eclipse SUMO jtrrouter Version 1.22.0
+<jtrrouterConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/jtrrouterConfiguration.xsd">
+
+    <input>
+        <net-file value="/home/wmn/TransSimHub/examples/tshub_env3d/multi_junctions/sumo_net/./multi_junctions.net.xml"/>
+        <route-files value="/home/wmn/TransSimHub/examples/tshub_env3d/multi_junctions/sumo_net/./testflow.trip.xml"/>
+        <turn-ratio-files value="/home/wmn/TransSimHub/examples/tshub_env3d/multi_junctions/sumo_net/./testflow.turndefs.xml"/>
+    </input>
+
+    <output>
+        <output-file value="/home/wmn/TransSimHub/examples/tshub_env3d/multi_junctions/sumo_net/./multi_junctions.rou.xml"/>
+    </output>
+
+    <processing>
+        <randomize-flows value="True"/>
+        <accept-all-destinations value="True"/>
+    </processing>
+
+    <defaults>
+        <departlane value="random"/>
+    </defaults>
+
+    <report>
+        <no-warnings value="true"/>
+    </report>
+
+    <random_number>
+        <seed value="777"/>
+    </random_number>
+
+</jtrrouterConfiguration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="background" length="5.00" color="220,220,220" tau="1.0"/>
+    <vehicle id="-E8__0__background.0" type="background" depart="0.03" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="E5__0__background.0" type="background" depart="0.84" departLane="random">
+        <route edges="E5 -E3 -E1"/>
+    </vehicle>
+    <vType id="police" length="5.00" color="blue" tau="1.0"/>
+    <vehicle id="-E7__0__police.0" type="police" depart="1.54" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vType id="fire_engine" length="7.10" color="red" tau="1.0"/>
+    <vehicle id="-E7__0__fire_engine.0" type="fire_engine" depart="3.43" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="E1__0__background.0" type="background" depart="3.58" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="E5__0__background.1" type="background" depart="4.16" departLane="random">
+        <route edges="E5 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E8__0__background.1" type="background" depart="4.54" departLane="random">
+        <route edges="-E8 -E4 -E5"/>
+    </vehicle>
+    <vType id="emergency" length="6.50" color="255,165,0" tau="1.0"/>
+    <vehicle id="-E2__0__emergency.0" type="emergency" depart="5.68" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.0" type="background" depart="5.99" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E1__0__background.1" type="background" depart="6.54" departLane="random">
+        <route edges="E1 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="E1__0__police.0" type="police" depart="6.80" departLane="random">
+        <route edges="E1 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.0" type="background" depart="7.71" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="E5__0__emergency.0" type="emergency" depart="7.95" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="-E8__0__background.2" type="background" depart="9.31" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.1" type="background" depart="10.82" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="E0__0__emergency.0" type="emergency" depart="10.88" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="E1__0__background.2" type="background" depart="11.03" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E8__0__emergency.0" type="emergency" depart="11.26" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="E1__0__emergency.0" type="emergency" depart="12.32" departLane="random">
+        <route edges="E1 E3 -E5"/>
+    </vehicle>
+    <vType id="taxi" length="5.00" color="yellow" tau="1.0"/>
+    <vehicle id="-E7__0__taxi.0" type="taxi" depart="13.67" departLane="random">
+        <route edges="-E7 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__0__police.0" type="police" depart="15.08" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.0" type="background" depart="15.59" departLane="random">
+        <route edges="-E7 -E4 -E3 E2"/>
+    </vehicle>
+    <vehicle id="-E2__0__fire_engine.0" type="fire_engine" depart="15.68" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="E0__0__background.0" type="background" depart="15.93" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E7__0__emergency.0" type="emergency" depart="16.46" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="E5__0__background.2" type="background" depart="16.75" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="E1__0__background.3" type="background" depart="17.37" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.1" type="background" depart="18.84" departLane="random">
+        <route edges="-E7 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.2" type="background" depart="19.28" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="E1__0__fire_engine.0" type="fire_engine" depart="20.32" departLane="random">
+        <route edges="E1 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="E5__0__background.3" type="background" depart="23.35" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.1" type="background" depart="25.22" departLane="random">
+        <route edges="-E6 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="E1__0__background.4" type="background" depart="25.90" departLane="random">
+        <route edges="E1 E3 E4 E8"/>
+    </vehicle>
+    <vehicle id="-E6__0__police.0" type="police" depart="26.23" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E6__0__emergency.0" type="emergency" depart="26.40" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E0__0__background.1" type="background" depart="26.70" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="E1__0__taxi.0" type="taxi" depart="26.95" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="E5__0__taxi.0" type="taxi" depart="28.29" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="E0__0__fire_engine.0" type="fire_engine" depart="28.79" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.2" type="background" depart="29.83" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E6__0__fire_engine.0" type="fire_engine" depart="30.89" departLane="random">
+        <route edges="-E6 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.2" type="background" depart="31.08" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="E5__0__fire_engine.0" type="fire_engine" depart="33.66" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.3" type="background" depart="35.91" departLane="random">
+        <route edges="-E2 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="E0__0__background.2" type="background" depart="36.79" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.3" type="background" depart="39.15" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E0__0__background.3" type="background" depart="40.54" departLane="random">
+        <route edges="E0 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="E1__0__background.5" type="background" depart="40.85" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.4" type="background" depart="41.30" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.3" type="background" depart="42.87" departLane="random">
+        <route edges="-E7 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.4" type="background" depart="43.19" departLane="random">
+        <route edges="-E6 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.4" type="background" depart="43.28" departLane="random">
+        <route edges="-E7 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="E0__0__taxi.0" type="taxi" depart="44.46" departLane="random">
+        <route edges="E0 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E7__0__background.5" type="background" depart="45.90" departLane="random">
+        <route edges="-E7 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E2__0__taxi.0" type="taxi" depart="46.02" departLane="random">
+        <route edges="-E2 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="E5__0__police.0" type="police" depart="46.02" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E0__0__background.4" type="background" depart="47.92" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E6__0__background.5" type="background" depart="48.14" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="-E2__0__background.5" type="background" depart="48.23" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__0__background.3" type="background" depart="49.14" departLane="random">
+        <route edges="-E8 -E4 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__0__fire_engine.0" type="fire_engine" depart="51.42" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="E5__0__background.4" type="background" depart="51.52" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E0__0__background.5" type="background" depart="52.13" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="E5__0__background.5" type="background" depart="53.45" departLane="random">
+        <route edges="E5 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E8__0__taxi.0" type="taxi" depart="53.47" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E8__0__background.4" type="background" depart="54.52" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="E0__0__police.0" type="police" depart="54.94" departLane="random">
+        <route edges="E0 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E2__0__police.0" type="police" depart="56.15" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__0__background.5" type="background" depart="57.89" departLane="random">
+        <route edges="-E8 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__0__taxi.0" type="taxi" depart="59.78" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E7__1__fire_engine.0" type="fire_engine" depart="60.02" departLane="random">
+        <route edges="-E7 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="E1__1__taxi.0" type="taxi" depart="60.09" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.0" type="background" depart="60.19" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.0" type="background" depart="60.29" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E7__1__police.0" type="police" depart="61.48" departLane="random">
+        <route edges="-E7 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="E0__1__fire_engine.0" type="fire_engine" depart="61.72" departLane="random">
+        <route edges="E0 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.0" type="background" depart="62.31" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="E0__1__background.0" type="background" depart="63.47" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.1" type="background" depart="64.84" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.0" type="background" depart="68.46" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E6__1__emergency.0" type="emergency" depart="68.53" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E7__1__emergency.0" type="emergency" depart="69.59" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="E0__1__police.0" type="police" depart="70.17" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="E0__1__background.1" type="background" depart="72.29" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="E0__1__background.2" type="background" depart="72.41" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="E1__1__background.0" type="background" depart="74.01" departLane="random">
+        <route edges="E1 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E6__1__taxi.0" type="taxi" depart="74.15" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E5__1__emergency.0" type="emergency" depart="74.36" departLane="random">
+        <route edges="E5 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="E5__1__background.0" type="background" depart="76.26" departLane="random">
+        <route edges="E5 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="E0__1__background.3" type="background" depart="76.73" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.1" type="background" depart="77.86" departLane="random">
+        <route edges="-E8 -E4 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.1" type="background" depart="79.11" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E7__1__taxi.0" type="taxi" depart="79.40" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.1" type="background" depart="79.56" departLane="random">
+        <route edges="-E6 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="E0__1__background.4" type="background" depart="80.50" departLane="random">
+        <route edges="E0 E3 E4 E8"/>
+    </vehicle>
+    <vehicle id="E1__1__background.1" type="background" depart="83.16" departLane="random">
+        <route edges="E1 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.2" type="background" depart="83.38" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.2" type="background" depart="84.00" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="E5__1__background.1" type="background" depart="84.69" departLane="random">
+        <route edges="E5 -E3 E2"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.3" type="background" depart="85.38" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.2" type="background" depart="85.80" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.3" type="background" depart="85.85" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="E1__1__police.0" type="police" depart="85.86" departLane="random">
+        <route edges="E1 E3 -E5"/>
+    </vehicle>
+    <vehicle id="E0__1__taxi.0" type="taxi" depart="87.35" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.2" type="background" depart="88.54" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E5__1__fire_engine.0" type="fire_engine" depart="90.51" departLane="random">
+        <route edges="E5 -E3 E2"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.4" type="background" depart="91.41" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="-E6__1__fire_engine.0" type="fire_engine" depart="91.76" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="E1__1__fire_engine.0" type="fire_engine" depart="91.85" departLane="random">
+        <route edges="E1 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.3" type="background" depart="91.94" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.4" type="background" depart="92.29" departLane="random">
+        <route edges="-E6 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__1__police.0" type="police" depart="93.35" departLane="random">
+        <route edges="-E8 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__1__taxi.0" type="taxi" depart="93.66" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E8__1__fire_engine.0" type="fire_engine" depart="94.35" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.4" type="background" depart="95.15" departLane="random">
+        <route edges="-E8 -E4 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="E1__1__background.2" type="background" depart="95.70" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="E5__1__background.2" type="background" depart="97.85" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E0__1__background.5" type="background" depart="97.85" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.3" type="background" depart="99.52" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="E5__1__background.3" type="background" depart="99.82" departLane="random">
+        <route edges="E5 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.4" type="background" depart="102.11" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__1__emergency.0" type="emergency" depart="102.53" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__1__background.5" type="background" depart="102.62" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E2__1__police.0" type="police" depart="103.32" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E7__1__background.5" type="background" depart="103.50" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="-E2__1__taxi.0" type="taxi" depart="103.99" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="E5__1__background.4" type="background" depart="104.08" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="-E8__1__emergency.0" type="emergency" depart="104.42" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="E1__1__background.3" type="background" depart="104.98" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E2__1__fire_engine.0" type="fire_engine" depart="105.08" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="E5__1__taxi.0" type="taxi" depart="105.09" departLane="random">
+        <route edges="E5 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="E5__1__background.5" type="background" depart="107.20" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E1__1__background.4" type="background" depart="107.92" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E6__1__police.0" type="police" depart="109.49" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E1__1__emergency.0" type="emergency" depart="110.44" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="E0__1__emergency.0" type="emergency" depart="110.49" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="E1__1__background.5" type="background" depart="112.24" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="E5__1__police.0" type="police" depart="113.82" departLane="random">
+        <route edges="E5 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="-E6__1__background.5" type="background" depart="117.22" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="-E2__1__background.5" type="background" depart="118.72" departLane="random">
+        <route edges="-E2 E3 -E5"/>
+    </vehicle>
+    <vehicle id="E1__2__background.0" type="background" depart="121.00" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__2__emergency.0" type="emergency" depart="121.21" departLane="random">
+        <route edges="-E8 -E4 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="E5__2__background.0" type="background" depart="123.60" departLane="random">
+        <route edges="E5 -E3 E2"/>
+    </vehicle>
+    <vehicle id="E0__2__fire_engine.0" type="fire_engine" depart="125.41" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__2__taxi.0" type="taxi" depart="127.55" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E2__2__emergency.0" type="emergency" depart="128.79" departLane="random">
+        <route edges="-E2 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.0" type="background" depart="128.82" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="E5__2__police.0" type="police" depart="129.26" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E0__2__taxi.0" type="taxi" depart="129.59" departLane="random">
+        <route edges="E0 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="E1__2__police.0" type="police" depart="133.75" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.0" type="background" depart="135.95" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="E0__2__background.0" type="background" depart="136.61" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="E0__2__emergency.0" type="emergency" depart="137.09" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.0" type="background" depart="137.41" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.1" type="background" depart="138.20" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.1" type="background" depart="138.82" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.2" type="background" depart="141.15" departLane="random">
+        <route edges="-E2 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.3" type="background" depart="141.25" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.2" type="background" depart="142.06" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+    <vehicle id="E5__2__taxi.0" type="taxi" depart="142.40" departLane="random">
+        <route edges="E5 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.0" type="background" depart="143.58" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.1" type="background" depart="144.84" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.1" type="background" depart="145.07" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="E1__2__background.1" type="background" depart="145.18" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E6__2__emergency.0" type="emergency" depart="146.74" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.2" type="background" depart="147.54" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="-E7__2__police.0" type="police" depart="148.08" departLane="random">
+        <route edges="-E7 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.3" type="background" depart="149.73" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="E0__2__background.1" type="background" depart="150.15" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E6__2__taxi.0" type="taxi" depart="151.72" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E1__2__background.2" type="background" depart="153.16" departLane="random">
+        <route edges="E1 E3 E4 E6"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.2" type="background" depart="153.39" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="E5__2__background.1" type="background" depart="154.31" departLane="random">
+        <route edges="E5 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__2__fire_engine.0" type="fire_engine" depart="154.60" departLane="random">
+        <route edges="-E2 E3 E4 E7"/>
+    </vehicle>
+    <vehicle id="E5__2__background.2" type="background" depart="156.68" departLane="random">
+        <route edges="E5 -E3 E2"/>
+    </vehicle>
+    <vehicle id="E5__2__background.3" type="background" depart="157.11" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.3" type="background" depart="157.22" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.4" type="background" depart="157.26" departLane="random">
+        <route edges="-E6 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__2__police.0" type="police" depart="157.41" departLane="random">
+        <route edges="-E6 -E4 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.3" type="background" depart="157.44" departLane="random">
+        <route edges="-E8 E7"/>
+    </vehicle>
+    <vehicle id="-E8__2__police.0" type="police" depart="159.01" departLane="random">
+        <route edges="-E8 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="E0__2__background.2" type="background" depart="159.77" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E7__2__taxi.0" type="taxi" depart="159.97" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="E1__2__taxi.0" type="taxi" depart="160.90" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.4" type="background" depart="161.40" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="-E2__2__taxi.0" type="taxi" depart="164.11" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.4" type="background" depart="164.49" departLane="random">
+        <route edges="-E2 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E6__2__fire_engine.0" type="fire_engine" depart="164.76" departLane="random">
+        <route edges="-E6 E8"/>
+    </vehicle>
+    <vehicle id="E5__2__background.4" type="background" depart="165.63" departLane="random">
+        <route edges="E5 E4 E8"/>
+    </vehicle>
+    <vehicle id="E1__2__fire_engine.0" type="fire_engine" depart="165.73" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E7__2__fire_engine.0" type="fire_engine" depart="166.09" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="E0__2__background.3" type="background" depart="168.77" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="-E2__2__background.5" type="background" depart="168.93" departLane="random">
+        <route edges="-E2 E3 -E5"/>
+    </vehicle>
+    <vehicle id="-E7__2__emergency.0" type="emergency" depart="170.50" departLane="random">
+        <route edges="-E7 E8"/>
+    </vehicle>
+    <vehicle id="E1__2__background.3" type="background" depart="170.83" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="E5__2__background.5" type="background" depart="171.29" departLane="random">
+        <route edges="E5 E4 E7"/>
+    </vehicle>
+    <vehicle id="E0__2__background.4" type="background" depart="171.40" departLane="random">
+        <route edges="E0 E3 -E5"/>
+    </vehicle>
+    <vehicle id="E1__2__emergency.0" type="emergency" depart="171.75" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E6__2__background.5" type="background" depart="172.22" departLane="random">
+        <route edges="-E6 E7"/>
+    </vehicle>
+    <vehicle id="E1__2__background.4" type="background" depart="172.84" departLane="random">
+        <route edges="E1 E2"/>
+    </vehicle>
+    <vehicle id="E0__2__background.5" type="background" depart="173.90" departLane="random">
+        <route edges="E0 -E1"/>
+    </vehicle>
+    <vehicle id="E0__2__police.0" type="police" depart="173.95" departLane="random">
+        <route edges="E0 E2"/>
+    </vehicle>
+    <vehicle id="-E2__2__police.0" type="police" depart="174.15" departLane="random">
+        <route edges="-E2 -E0"/>
+    </vehicle>
+    <vehicle id="E5__2__emergency.0" type="emergency" depart="175.70" departLane="random">
+        <route edges="E5 -E3 -E1"/>
+    </vehicle>
+    <vehicle id="E5__2__fire_engine.0" type="fire_engine" depart="175.99" departLane="random">
+        <route edges="E5 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.4" type="background" depart="176.58" departLane="random">
+        <route edges="-E8 -E4 -E3 -E0"/>
+    </vehicle>
+    <vehicle id="E1__2__background.5" type="background" depart="177.52" departLane="random">
+        <route edges="E1 -E0"/>
+    </vehicle>
+    <vehicle id="-E8__2__fire_engine.0" type="fire_engine" depart="177.53" departLane="random">
+        <route edges="-E8 -E4 -E5"/>
+    </vehicle>
+    <vehicle id="-E8__2__background.5" type="background" depart="177.56" departLane="random">
+        <route edges="-E8 E6"/>
+    </vehicle>
+    <vehicle id="-E7__2__background.5" type="background" depart="179.25" departLane="random">
+        <route edges="-E7 E6"/>
+    </vehicle>
+</routes>
