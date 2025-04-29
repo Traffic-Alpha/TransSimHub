@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 11:03:44
 @Description: TransSimHub Install
-LastEditTime: 2025-01-13 18:59:42
+LastEditTime: 2025-04-29 16:42:39
 '''
 from __future__ import division
 from __future__ import print_function
@@ -49,7 +49,7 @@ extras_require['all'] = all_deps
 
 setup(
     name='tshub',
-    version=1.1,
+    version=1.3,
     description='TransSimHub is a lightweight Python library for simulating and controlling transportation systems.',
     author='Traffic-Alpha',
     license='Apache License, Version 2.0',
