@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-06-25 22:01:24
 @Description: 分析 tripinfo 文件
-LastEditTime: 2025-04-29 17:17:28
+LastEditTime: 2025-04-30 13:36:01
 '''
 import numpy as np
 import pandas as pd
@@ -60,7 +60,7 @@ class TripInfoAnalysis:
             return all_results
         return None
 
-    def statistics_by_vehicle_type(self, metrics:List[str]):
+    def statistics_by_vehicle_type(self, metrics: List[str]):
         if self.df is not None:
             valid_metrics = [metric for metric in metrics if metric in self.df.columns]
             if valid_metrics:
@@ -69,12 +69,12 @@ class TripInfoAnalysis:
                     self.df[metric] = pd.to_numeric(self.df[metric])
                     grouped = self.df.groupby('vType')[metric]
                     stats = grouped.agg([
-                        'mean', 'var', 'max', 'min',
+                        'mean', 'var', 'max', 'min', 'count',
                         lambda x: np.percentile(x, 25),
                         lambda x: np.percentile(x, 50),
                         lambda x: np.percentile(x, 75)
                     ])
-                    stats.columns = ['mean', 'variance', 'max', 'min', 'percentile_25', 'percentile_50', 'percentile_75']
+                    stats.columns = ['mean', 'variance', 'max', 'min', 'count', 'percentile_25', 'percentile_50', 'percentile_75']
                     result[metric] = stats
                 return result
             else:

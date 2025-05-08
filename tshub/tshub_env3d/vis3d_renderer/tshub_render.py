@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-LastEditTime: 2025-03-28 17:13:57
+LastEditTime: 2025-05-08 19:36:20
 '''
 import math
 from loguru import logger
@@ -135,11 +135,25 @@ class TSHubRenderer(BaseRender):
     # ---------------------------------- #
     # Step 2, step (include sync), reset
     # ---------------------------------- #
-    def step(self, tshub_obs):
+    def step(self, tshub_obs, should_count_vehicles=False):
         """将 sumo 的画面同步渲染为 3D
         """
         sensor_data = self.scene_sync._sync(tshub_obs) # 更新 panda3d 中的物体 & 更新 camera
-        return sensor_data # 返回传感器的数据
+
+        # 是否统计车辆信息
+        if should_count_vehicles:
+            veh_infos = {}
+            for veh_id, veh_element in self.scene_sync._vehicle_elements.items():
+                _veh_pose = veh_element.get_element_pose_from_bumper()
+                _veh_model = veh_element.veh_model_name
+                veh_infos[veh_id] = {
+                    'pos': _veh_pose.position,
+                    'heading': _veh_pose.heading_,
+                    'model': _veh_model
+                }
+            return {'image': sensor_data, 'veh_elements': veh_infos} # 返回 (传感器的数据, 车辆统计信息)
+        
+        return sensor_data # 返回 (传感器的数据, )
     
 
     # ----------- #

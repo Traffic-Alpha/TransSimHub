@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-LastEditTime: 2025-04-15 15:37:57
+LastEditTime: 2025-05-08 19:29:35
 '''
 from loguru import logger
 from typing import Any, Dict, List, Callable
@@ -49,6 +49,7 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             preset:str = '480P', 
             resolution:float = 0.5,
             render_mode: str = "onscreen",
+            should_count_vehicles: bool = False, # 是否返回的时候获得车辆信息, 将车辆信息保存为 JSON 进行额外的渲染
             debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
             debuger_spin_camera:bool = False, # 是否显示 spin camera
             sensor_config: Dict[str, List[str]] = None,
@@ -57,6 +58,7 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
 
         self.debuger_print_node = debuger_print_node
         self.debuger_spin_camera = debuger_spin_camera
+        self.should_count_vehicles = should_count_vehicles
 
         # 初始化 tshub 环境与 sumo 交互
         self.tshub_env = TshubEnvironment(
@@ -119,7 +121,7 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             states = self.modify_states(states)
 
         # 3. 渲染 3D 的场景
-        sensor_data = self.tshub_render.step(states) # 运行 panda3d
+        sensor_data = self.tshub_render.step(states, should_count_vehicles=self.should_count_vehicles) # 运行 panda3d
         
         # 将 image 的信息通过 sensor_data 进行返回
         return states, rewards, infos, dones, sensor_data

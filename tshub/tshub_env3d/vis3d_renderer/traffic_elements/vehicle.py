@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-04-14 15:23:25
+LastEditTime: 2025-05-08 18:59:19
 '''
 import random
 from loguru import logger
@@ -36,6 +36,7 @@ class Vehicle3DElement(BaseElement):
         )
         self.veh_type = veh_type # 车辆的类型, 对 ego 车辆特殊处理
         self.veh_node_path = None # 记录这辆车的 node path
+        self.veh_model_name = None # 记录车辆加载的模型名称
     
     # ###################
     # Vehicle Node 的更新
@@ -62,15 +63,20 @@ class Vehicle3DElement(BaseElement):
         2. soical vehicle 背景车
         """
         if 'ego' in self.veh_type: # 自动驾驶车
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/ego/ego_suv.glb")
+            self.veh_model_name = "ego/ego_suv.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         elif 'police' in self.veh_type: # 警车
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/police.glb")
+            self.veh_model_name = "public_transport/police.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         elif 'emergency' in self.veh_type: # 救护车
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/emergency.glb")
+            self.veh_model_name = "public_transport/emergency.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         elif 'fire_engine' in self.veh_type: # 消防车
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/fire_engine.glb")
+            self.veh_model_name = "public_transport/fire_engine.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         elif 'taxi' in self.veh_type: # 出租车
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/public_transport/taxi.glb")
+            self.veh_model_name = "public_transport/taxi.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         else: # 普通车辆
             veh_list = [
                 'suv_blue', 'suv_grey', 'suv_orange', 
@@ -79,7 +85,8 @@ class Vehicle3DElement(BaseElement):
             weights = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/background/{selected_model}.glb")
+            self.veh_model_name = f"background/{selected_model}.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
 
     def update_node(
             self, 
