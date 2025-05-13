@@ -4,7 +4,7 @@
 @Description: TSHub 渲染 3D 的场景, 这里所有物体都是只添加在场景中, 不添加在 BulletWorld, 不进行碰撞检测
     -> TSHubRenderer 主要由以下的组成:
         -> rendering_components, 
-LastEditTime: 2025-05-08 19:36:20
+LastEditTime: 2025-05-08 21:12:28
 '''
 import math
 from loguru import logger
@@ -147,8 +147,8 @@ class TSHubRenderer(BaseRender):
                 _veh_pose = veh_element.get_element_pose_from_bumper()
                 _veh_model = veh_element.veh_model_name
                 veh_infos[veh_id] = {
-                    'pos': _veh_pose.position,
-                    'heading': _veh_pose.heading_,
+                    'pos': _veh_pose.position.tolist(),
+                    'heading': _veh_pose.heading_.real,
                     'model': _veh_model
                 }
             return {'image': sensor_data, 'veh_elements': veh_infos} # 返回 (传感器的数据, 车辆统计信息)
