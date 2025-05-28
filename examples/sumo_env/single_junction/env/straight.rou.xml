@@ -35,14 +35,16 @@
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="car_1" length="5.00" color="26,188,156" tau="1.0"/>
     <vType id="car_2" length="5.00" color="155,89,182" tau="1.0"/>
+    <vType id="ego" length="5.00" color="210,30,30" tau="1.0"/>
+
     <vehicle id="gsndj_s4__0.0" type="car_2" depart="9.22" departLane="random">
         <route edges="gsndj_s4 gsndj_s5"/>
     </vehicle>
     <vehicle id="gsndj_s4__0.1" type="car_2" depart="9.29" departLane="random">
         <route edges="gsndj_s4 gsndj_s5"/>
     </vehicle>
-    <vType id="car_1" length="7.00" color="26,188,156" tau="1.0"/>
     <vehicle id="gsndj_n7__0.0" type="car_1" depart="9.37" departLane="random">
         <route edges="gsndj_n7 gsndj_n6"/>
     </vehicle>
@@ -177,6 +179,15 @@
     </vehicle>
     <vehicle id="gsndj_s4__1.11" type="car_2" depart="100.26" departLane="random">
         <route edges="gsndj_s4 gsndj_s5"/>
+    </vehicle>
+    <vehicle id="ego_gsndj_s4" type="ego" depart="102.26" departLane="random">
+        <route edges="gsndj_s4 gsndj_s5"/>
+    </vehicle>
+    <vehicle id="ego_gsndj_n7" type="ego" depart="103.39" departLane="random">
+        <route edges="gsndj_n7 gsndj_n6"/>
+    </vehicle>
+    <vehicle id="ego_161701303#7.248" type="ego" depart="104.39" departLane="random">
+        <route edges="161701303#7.248 161701303#10"/>
     </vehicle>
     <vehicle id="gsndj_s4__1.12" type="car_2" depart="105.13" departLane="random">
         <route edges="gsndj_s4 gsndj_s5"/>
