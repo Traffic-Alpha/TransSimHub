@@ -19,6 +19,7 @@ from panda3d.core import (
     GeomVertexWriter,
     AmbientLight,
     CardMaker,
+    Vec3,
     Vec4,
     DirectionalLight
 )
@@ -181,38 +182,56 @@ class SceneLoader(object):
         node_path.addGeom(geom)
         return node_path
 
-
     def setup_lighting(
             self, 
-            ambient_color: Vec4 = Vec4(0.25, 0.25, 0.25, 1), 
-            directional_color: Vec4 = Vec4(1, 1, 1, 1), 
-            light_temperature: int = 6000, 
-            light_height: int = 200
+            ambient_color: Vec4 = Vec4(0.4, 0.4, 0.4, 1),  # 提高环境光
+            directional_color: Vec4 = Vec4(0.9, 0.9, 0.9, 1),  # 略降低直接光
+            light_temperature: int = 6500,  # 主光更高色温
+            ambient_temperature: int = 6000,  # 环境光单独色温
+            light_height: int = 200,
+            light_direction: Vec3 = None  # 可选光照方向
         ) -> None:
         """设置光照
         """
         logger.info("SIM: 设置光照.")
-        # Set up ambient light
+        
+        # 确保 map_center 是 Vec3 类型
+        if isinstance(self.map_center, tuple):
+            map_center = Vec3(*self.map_center)  # 将 tuple 转换为 Vec3
+        else:
+            map_center = Vec3(self.map_center)  # 确保是 Vec3
+        
+        # 环境光
         ambient_light = AmbientLight('ambientLight')
         ambient_light.setColor(ambient_color)
-        ambient_light.set_color_temperature(light_temperature)
+        ambient_light.set_color_temperature(ambient_temperature)
         ambient_light_node_path = self._root_np.attachNewNode(ambient_light)
         self._root_np.setLight(ambient_light_node_path)
         
-        # Set up directional light
+        # 定向光
         directional_light = DirectionalLight('directionalLight')
         directional_light.setColor(directional_color)
         directional_light.set_color_temperature(light_temperature)
         directional_light_node_path = self._root_np.attachNewNode(directional_light)
-        directional_light_node_path.setPos(
-            self.map_center[0]-self.map_radius,
-            self.map_center[1]-self.map_radius,
-            light_height
-        )
-        directional_light_node_path.lookAt(self.map_center) # 照向地图中心
-        self._root_np.setLight(directional_light_node_path)
-        self._root_np.setShaderAuto() # 场景开启阴影接收
         
+        # 设置光源位置
+        if light_direction is None:
+            light_direction = Vec3(-1, -1, -0.5)  # 默认斜45度方向
+        light_direction.normalize()
+        
+        # 计算光源位置（确保所有运算在 Vec3 上进行）
+        light_pos = map_center - light_direction * self.map_radius
+        light_pos.z = light_height  # 设置高度
+        
+        directional_light_node_path.setPos(light_pos)
+        directional_light_node_path.lookAt(map_center)  # 朝向场景中心
+        
+        # 阴影设置
+        directional_light.setShadowCaster(True, 2048, 2048)  # 添加阴影贴图
+        
+        self._root_np.setLight(directional_light_node_path)
+        self._root_np.setShaderAuto()
+
     def load_sky_box(self) -> None:
         """初始化环境的时候, 设置 skybox
         """

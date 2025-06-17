@@ -79,7 +79,7 @@ class Vehicle3DElement(BaseElement):
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
         else: # 普通车辆
             veh_list = [
-                'suv_blue', 'suv_grey', 'suv_orange', 
+                'suv_blue', 'suv_grey', 'suv_golden',
                 'vehicle_blue', 'vehicle_pink', 'vehicle_white',
             ]
             weights = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]
