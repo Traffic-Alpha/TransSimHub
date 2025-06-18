@@ -82,7 +82,7 @@ class Vehicle3DElement(BaseElement):
                 'suv_blue', 'suv_grey', 'suv_golden',
                 'vehicle_blue', 'vehicle_pink', 'vehicle_white',
             ]
-            weights = [1/6, 1/6, 1/6, 1/6, 1/6, 1/6]
+            weights = [1/6, 1/6, 1/12, 1/6, 1/6, 3/12]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
             self.veh_model_name = f"background/{selected_model}.glb"
