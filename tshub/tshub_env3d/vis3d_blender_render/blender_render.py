@@ -3,7 +3,7 @@ Author: WANG Maonan
 Date: 2025-06-18 13:31:20
 LastEditors: WANG Maonan
 Description: 使用 Blender 渲染, 三种渲染模式: (1) rgb; (2) mask; (3) depth;
-LastEditTime: 2025-06-25 18:19:55
+LastEditTime: 2025-06-26 17:39:31
 '''
 import os
 import bpy
@@ -187,7 +187,7 @@ class BlenderRenderer:
         """
         bpy.context.scene.cycles.samples = 64  # RGB高质量
         scene = bpy.context.scene
-        rgb_dir = os.path.join(output_dir, 'rgb')
+        rgb_dir = os.path.join(output_dir, 'high_quality_rgb')
         os.makedirs(rgb_dir, exist_ok=True)
         
         for cam_obj in cameras:
@@ -206,7 +206,7 @@ class BlenderRenderer:
         """
         bpy.context.scene.cycles.samples = 16  # Mask低采样
         scene = bpy.context.scene
-        mask_dir = os.path.join(output_dir, 'mask')
+        mask_dir = os.path.join(output_dir, 'high_quality_mask')
         os.makedirs(mask_dir, exist_ok=True)
         
         # 一次性设置mask环境
@@ -231,7 +231,7 @@ class BlenderRenderer:
             output_dir: 输出目录
         """
         bpy.context.scene.cycles.samples = 16  # Depth 低采样
-        depth_dir = os.path.join(output_dir, 'depth')
+        depth_dir = os.path.join(output_dir, 'high_quality_depth')
         os.makedirs(depth_dir, exist_ok=True)
         
         for cam_obj in cameras:
