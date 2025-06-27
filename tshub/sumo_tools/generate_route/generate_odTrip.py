@@ -1,12 +1,13 @@
 '''
 Author: Maonan Wang
 Date: 2024-09-16 12:15:38
-LastEditTime: 2024-09-16 12:34:30
+LastEditTime: 2025-04-21 18:47:43
 LastEditors: Maonan Wang
 Description: 生成符合 OD Matrix 的 trip 文件
-FilePath: /TransSimHub/tshub/sumo_tools/generate_route_fromOD/generate_odTrip.py
+FilePath: /TransSimHub/tshub/sumo_tools/generate_route/generate_odTrip.py
 '''
 import os
+import random
 import sumolib
 from typing import Dict, List, Tuple
 from xml.dom import pulldom
@@ -135,15 +136,24 @@ class GenerateODTrip(object):
                 for interval_index, od_flow_interval in enumerate(od_flow_list): # edge_flow_interval 为每段时间的车辆
                     begin_time = 60 * sum(self.intervals[:int(interval_index)]) + int(interval_index) * blank_hours # 秒
                     end_time = begin_time + 60 * self.intervals[int(interval_index)]
+
+                    # 生成每一种 vehicle type 的车辆数
+                    vehicle_types = list(vehID_prob.keys()) # 车辆类型
+                    vehicle_weights = list(vehID_prob.values()) # 车辆概览
+                    vehicle_counts = {vehicle_type: 0 for vehicle_type in vehicle_types} # c车辆数量
+                    for _ in range(round(od_flow_interval)): # 车辆数
+                        selected_vehicle = random.choices(vehicle_types, weights=vehicle_weights)[0]
+                        vehicle_counts[selected_vehicle] += 1
+
+                        
                     # 不同的 vehicle type 生成不同的车辆
-                    for _vehicle_type, _vehicle_prob in vehID_prob.items():
+                    for _vehicle_type, count in vehicle_counts.items():
                         od_trip_id = f'{start_edge}__{end_edge}__{interval_index}__{_vehicle_type}' # trip id, edgeID+时间段
                         file.write('    <flow id="{}" begin="{}" end="{}" from="{}" to="{}" number="{}" type="{}"/> \n'.format(
-                            od_trip_id, 
-                            int(begin_time), int(end_time), 
+                            od_trip_id,
+                            int(begin_time), int(end_time),
                             start_edge, end_edge, 
-                            round(od_flow_interval*_vehicle_prob),
-                            _vehicle_type
+                            count, _vehicle_type
                         ))
             file.write("</routes> \n\n")
 

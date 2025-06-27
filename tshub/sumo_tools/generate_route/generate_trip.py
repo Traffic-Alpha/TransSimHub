@@ -4,9 +4,10 @@
 @Description: 生成 trip 文件, 这里有两个步骤:
 1. generate_trip_xml, 按照要求给每个 edge 生成 trip
 2. edit_trip_xml, 对 trip 按照时间顺序排序
-LastEditTime: 2025-01-13 19:35:20
+LastEditTime: 2025-04-21 15:33:10
 '''
 import os
+import random
 import sumolib
 from typing import Dict, List
 from xml.dom import pulldom
@@ -130,13 +131,22 @@ class GenerateTrip(object):
                 for interval_index, edge_flow_interval in enumerate(edge_flow_list): # edge_flow_interval 为每段时间的车辆
                     begin_time = 60 * sum(self.intervals[:int(interval_index)]) + int(interval_index) * blank_hours # 秒
                     end_time = begin_time + 60 * self.intervals[int(interval_index)]
+
+                    # 生成每一种 vehicle type 的车辆数
+                    vehicle_types = list(vehID_prob.keys()) # 车辆类型
+                    vehicle_weights = list(vehID_prob.values()) # 车辆概览
+                    vehicle_counts = {vehicle_type: 0 for vehicle_type in vehicle_types} # c车辆数量
+                    for _ in range(round(edge_flow_interval)): # 车辆数
+                        selected_vehicle = random.choices(vehicle_types, weights=vehicle_weights)[0]
+                        vehicle_counts[selected_vehicle] += 1
+                    
                     # 不同的 vehicle type 生成不同的车辆
-                    for _vehicle_type, _vehicle_prob in vehID_prob.items():
-                        edge_trip_id = f'{edge_id}__{interval_index}__{_vehicle_type}' # trip id, edgeID+时间段
+                    for _vehicle_type, count in vehicle_counts.items():
+                        edge_trip_id = f'{edge_id}__{interval_index}__{_vehicle_type}'
                         file.write('    <flow id="{}" begin="{}" end="{}" from="{}" number="{}" type="{}"/> \n'.format(
-                            edge_trip_id, 
-                            int(begin_time), int(end_time), 
-                            edge_id, round(edge_flow_interval*_vehicle_prob),
+                            edge_trip_id,
+                            int(begin_time), int(end_time),
+                            edge_id, count,
                             _vehicle_type
                         ))
             file.write("</routes> \n\n")
