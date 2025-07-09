@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-05-08 18:59:19
+LastEditTime: 2025-07-09 14:41:28
 '''
 import random
 from loguru import logger
@@ -77,6 +77,9 @@ class Vehicle3DElement(BaseElement):
         elif 'taxi' in self.veh_type: # 出租车
             self.veh_model_name = "public_transport/taxi.glb"
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+        elif 'safety_barriers' in self.veh_type: # 特殊事件, 路障, 车辆无法行驶
+            self.veh_model_name = "event/safety_barriers.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")            
         else: # 普通车辆
             veh_list = [
                 'suv_blue', 'suv_grey', 'suv_golden',
