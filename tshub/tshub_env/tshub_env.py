@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:34:52
 @Description: 整合 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的环境
-@LastEditTime: 2024-07-06 23:13:20
+LastEditTime: 2025-07-09 16:31:06
 '''
 import os
 import sys
@@ -60,7 +60,8 @@ class TshubEnvironment(BaseSumoEnvironment):
                  tls_state_add: List = None, use_gui: bool = False, is_libsumo: bool = False, 
                  begin_time=0, num_seconds=20000, max_depart_delay=100000, time_to_teleport=-1, 
                  sumo_seed: str = 'random', tripinfo_output_unfinished:bool=True, collision_action:str=None,
-                 remote_port: int = None, num_clients: int = 1) -> None:
+                 remote_port: int = None, num_clients: int = 1
+        ) -> None:
         
         super().__init__(sumo_cfg, net_file, route_file, 
                          trip_info, statistic_output, summary, queue_output, 
