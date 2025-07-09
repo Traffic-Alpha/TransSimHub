@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-23 15:20:12
 @Description: VehicleInfo 的数据类，它包含了车辆的各种信息
-@LastEditTime: 2024-08-11 19:18:19
+LastEditTime: 2025-07-09 16:55:40
 '''
 import traci
 from typing import Dict, Any
@@ -58,6 +58,7 @@ class VehicleInfo:
         self.sumo.vehicle.subscribe(
                 self.id,
                 [
+                    traci.constants.VAR_TYPE,
                     traci.constants.VAR_POSITION, traci.constants.VAR_SPEED,
                     traci.constants.VAR_ROAD_ID, traci.constants.VAR_LANE_ID,
                     traci.constants.VAR_EDGES, traci.constants.VAR_LANE_INDEX,
@@ -123,6 +124,7 @@ class VehicleInfo:
             'fuel_consumption': 101,
             'speed_without_traci': 177,
             'leader': 104,
+            'vehicle_type': 79,
         }
         return feature_mapping.get(feature, -1)
     
@@ -143,6 +145,7 @@ class VehicleInfo:
         self.co2_emission=vehicle_info.get(VehicleInfo.get_feature_index('co2_emission'), None)
         self.fuel_consumption=vehicle_info.get(VehicleInfo.get_feature_index('fuel_consumption'), None)
         self.speed_without_traci=vehicle_info.get(VehicleInfo.get_feature_index('speed_without_traci'), None)
+        self.vehicle_type=vehicle_info.get(VehicleInfo.get_feature_index('vehicle_type'), None)
         
         
     def get_features(self):
