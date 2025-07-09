@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-03-31 14:35:58
+LastEditTime: 2025-07-09 16:40:05
 '''
 import math
 from loguru import logger
@@ -196,7 +196,11 @@ class SceneSync(object):
                 element.attach_sensors_to_element(sensor_types)
             self._vehicle_elements[veh_id] = element
         else:
-            element.update_node(veh_info['position'], veh_info['heading'])
+            element.update_node(
+                veh_position=veh_info['position'], 
+                veh_heading=veh_info['heading'], 
+                veh_type=veh_info['vehicle_type']
+            )
 
     def _manage_aircraft_element(self, aircraft_id, aircraft_info) -> None:
         heading = math.degrees(vec_to_radians(vec_2d(aircraft_info['heading']))) % 360
