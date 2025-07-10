@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-LastEditTime: 2025-01-21 19:19:39
+LastEditTime: 2025-07-10 14:39:48
 '''
 from __future__ import annotations
 
@@ -130,7 +130,6 @@ class TrafficLightInfo:
                 
         # 更新 phase 的信息
         self.__update_this_phase(self.tls_action.phase_index)
-        
         # 当前的 traffic light 是否可以执行动作
         self.can_perform_action = (self.tls_action.sim_step == self.tls_action.next_action_time)
 
