@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-05-08 18:59:19
+LastEditTime: 2025-07-09 17:25:42
 '''
 import random
 from loguru import logger
@@ -57,6 +57,13 @@ class Vehicle3DElement(BaseElement):
         
         return True
 
+    def reset_node(self):
+        self.remove_node() # 删除节点
+        self.create_node() # 新增节点
+        self.begin_rendering_node() # 渲染节点
+        self.sensors = {}
+        
+                
     def _select_vehicle_model(self) -> str:
         """随机选择车辆的模型, 
         1. ego vehicle, 自动驾驶车辆
@@ -77,6 +84,9 @@ class Vehicle3DElement(BaseElement):
         elif 'taxi' in self.veh_type: # 出租车
             self.veh_model_name = "public_transport/taxi.glb"
             return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+        elif 'safety_barriers' in self.veh_type: # 特殊事件, 路障, 车辆无法行驶
+            self.veh_model_name = "event/safety_barriers.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")            
         else: # 普通车辆
             veh_list = [
                 'suv_blue', 'suv_grey', 'suv_golden',
@@ -92,6 +102,7 @@ class Vehicle3DElement(BaseElement):
             self, 
             veh_position:Tuple[float],
             veh_heading: float,
+            veh_type:str,
         ) -> None:
         """Move the specified vehicle node (更新车辆的位置)
         """
@@ -99,6 +110,12 @@ class Vehicle3DElement(BaseElement):
             logger.warning(f"SIM: Renderer ignoring invalid vehicle id: {self.element_id}")
             return
 
+        # vehicle type 改变, 则需要重新加载模型
+        if veh_type != self.veh_type:
+            self.veh_type = veh_type # 重新设置 vehicle type
+            self.reset_node()
+        
+        # 更新模型的位置和传感器信息
         self.update_element_position_heading(veh_position, veh_heading) # 更新 vehicle element 的位置
         pose = self.get_element_pose_from_bumper() # 坐标转换
         pos, heading = pose.as_panda3d()
