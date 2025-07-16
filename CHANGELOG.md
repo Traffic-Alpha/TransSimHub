@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2025-04-15 16:13:15
+ * @LastEditTime: 2025-07-16 21:25:45
 -->
 # Change Log
 
@@ -17,6 +17,74 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v1.4 -->
+## [v1.4] - 2025-07-16
+
+### Added
+1. Exposed real-time vehicle coordinates via `tshub3d` for Blender rendering pipeline.
+2. Special vehicle/event generation support (e.g., traffic congestion) through config files.
+```python
+SCENARIO_CONFIGS = {
+    "Hongkong_YMT_NORMAL": {
+        # ================== Base Scenario Parameters ==================
+        "SCENARIO_NAME": "Hongkong_YMT",  # Scenario directory name
+        "SUMOCFG": "ymt_normal.sumocfg",  # Combines route & network configs
+        "NETFILE": "./env_normal/YMT.net.xml",  # Network file for map data
+        "JUNCTION_NAME": "J1",
+        "NUM_SECONDS": 500,
+        "PHASE_NUMBER": 3,  # Number of traffic light phases
+        "MOVEMENT_NUMBER": 6, 
+        "CENTER_COORDINATES": (172, 201, 60),
+        "SENSOR_INDEX_2_PHASE_INDEX": {0: 2, 1: 3, 2: 0, 3: 1},
+        
+        # ==================== Incident Configuration ====================
+        "ACCIDENTS": [
+            {
+                "id": "accident_01",      # Unique incident identifier
+                "depart_time": 20,        # Simulation trigger time (seconds)
+                "edge_id": "30658263#0",   # Target road segment ID
+                "lane_index": 0,          # Affected lane index
+                "position": 99,           # Location on lane (meters), lane_length-1
+                "duration": 50,           # Duration (seconds), 0=permanent
+            },
+            {
+                "id": "accident_02",
+                "depart_time": 100,
+                "edge_id": "30658263#0",
+                "lane_index": 1,
+                "position": 99,
+                "duration": 20,
+            },
+        ],
+        
+        # ================== Special Vehicle Configuration ==================
+        "SPECIAL_VEHICLES": [
+            {
+                "id": "ambulance_01",     # Unique vehicle ID
+                "type": "emergency",       # Vehicle class
+                "depart_time": 10,         # Departure time (sim seconds)
+                "route": ["960661806#0", "102640426#0"],  # Path edge sequence
+            },
+            {
+                "id": "police_01",
+                "type": "police",
+                "depart_time": 100,
+                "route": ["102454134#0", "102640432#0"],
+            }
+        ]
+    },
+}
+```
+3. Integrated Blender rendering pipeline with significantly enhanced visual output.
+4. Added lane-specific mappings for each traffic light movement phase.
+
+### Changed
+1. Refactored route generation to use randomized sampling (replacing overview-based counting) for reliable special vehicle spawning.
+2. Updated tripinfo analyzer to output pandas-compatible DataFrames.
+
+### Fixed
+1. Deduplicated lane IDs in movement statistics collection.
 
 <!-- v1.3 -->
 ## [v1.3] - 2025-04-15
