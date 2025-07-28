@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 17:11:46
 @Description: 基础 TLS 的信息
-LastEditTime: 2025-03-25 12:24:41
+LastEditTime: 2025-07-16 19:18:12
 '''
 import sumolib
 from abc import ABC, abstractmethod
@@ -28,6 +28,7 @@ class BaseTLS(ABC):
         self.movement_ids = set()
         self.movement_directions = {}
         self.movement_lane_numbers = {}
+        self.movement_lane_ids = {} # 每个 movement 包含的 lane ids
         self.phase2movements = {} # 记录每个 phase 由哪些 movement 组成
 
         self.lanes = list(dict.fromkeys(self.sumo.trafficlight.getControlledLanes(self.id)))  # Remove duplicates and keep order
@@ -198,14 +199,21 @@ class BaseTLS(ABC):
         return controled_phase
 
     def collect_movements_infos(self):
+        """统计 movmenet 的信息
+        """
         for item in self.tls_connections:
             if None in item:
                 continue
-            from_edge, _, _, _, _, direction, _ = item
-            movement_id = f"{from_edge}--{direction}"
+            from_edge, toEdge, from_lane, to_lane, _, direction, _ = item
+            movement_id = f"{from_edge}--{direction}" # edge+direction 组成 movement id
             self.movement_ids.add(movement_id)
-            self.movement_directions[movement_id] = direction
-            self.movement_lane_numbers[movement_id] = self.movement_lane_numbers.get(movement_id, 0) + 1
+            self.movement_directions[movement_id] = direction # 记录 movement 的方向
+            self.movement_lane_ids.setdefault(movement_id, []).append(from_lane) # 记录 movement 包含的 lane ids
+        
+        # lane ids 去重 & 统计 lane 的数量
+        for movement_id, lane_ids in self.movement_lane_ids.items():
+            self.movement_lane_ids[movement_id] = list(set(lane_ids))
+            self.movement_lane_numbers[movement_id] = len(self.movement_lane_ids[movement_id]) # 记录 movement 的车道数
 
         self.movement_ids = sorted(self.movement_ids)
 

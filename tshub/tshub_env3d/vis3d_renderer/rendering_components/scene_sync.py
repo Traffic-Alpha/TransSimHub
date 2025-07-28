@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-13 20:53:01
 @Description: 场景的同步, 根据 SUMO 的信息更新 panda3d
-LastEditTime: 2025-07-09 16:40:05
+LastEditTime: 2025-07-28 21:13:10
 '''
 import math
 from loguru import logger
@@ -34,6 +34,7 @@ class SceneSync(object):
             self, root_np, showbase_instance, 
             sensor_config:Dict[str, List[str]],
             preset:str='480P', resolution:float=1.0,
+            vehicle_model:str='low'
         ) -> None:
         """同步场景内的 object
 
@@ -46,6 +47,7 @@ class SceneSync(object):
         """
         self.root_np = root_np
         self.showbase_instance = showbase_instance
+        self.vehicle_model = vehicle_model # 加载不同精度的车辆 3D 模型
         self.sensor_config = sensor_config # 不同 object 加载的传感器类型
 
         # 获得传感器输出的图像的分辨率和大小
@@ -180,6 +182,7 @@ class SceneSync(object):
                 fig_width = self.fig_width,
                 fig_height = self.fig_height,
                 fig_resolution = self.resolution,
+                vehicle_model=self.vehicle_model,
                 veh_id=veh_id, 
                 veh_type=veh_info['vehicle_type'], 
                 veh_pos=veh_info['position'], 

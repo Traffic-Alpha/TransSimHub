@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 11:22:43
 @Description: 定义每一个 traffic light 的信息
-LastEditTime: 2025-07-10 14:39:48
+LastEditTime: 2025-07-16 18:34:18
 '''
 from __future__ import annotations
 
@@ -45,6 +45,7 @@ class TrafficLightInfo:
     out_roads_heading: Dict[str, List[float]] = None # 路口出口车道的 angle 角度
     fromEdge_toEdge: Dict[str, List[str]] = None # {fromEdge_direction: [fromEdge, toEdge, fromLane, toLane], ...}
     movement_directions: Dict[str, str] = None, # 每一个 movement 的方向
+    movement_lane_ids: Dict[str, List[str]] = None, # 每一个 movement 包含的 lane ids
     movement_lane_numbers: List[int] = None, # 每一个 movement 包含的车道数
     movement_ids: List[str] = None # 存储 movement id (fromEdge, toEdge)
     phase2movements: Dict[int, List[str]] = None # 记录每个 phase 控制的 connection
@@ -81,6 +82,7 @@ class TrafficLightInfo:
         self.out_roads_heading = self.tls_action.out_roads_heading
         self.movement_ids = self.tls_action.movement_ids
         self.movement_directions = self.tls_action.movement_directions
+        self.movement_lane_ids = self.tls_action.movement_lane_ids
         self.movement_lane_numbers = self.tls_action.movement_lane_numbers
         self.phase2movements = self.tls_action.phase2movements
         self.fromEdge_toEdge = self.tls_action.fromEdge_toEdge
