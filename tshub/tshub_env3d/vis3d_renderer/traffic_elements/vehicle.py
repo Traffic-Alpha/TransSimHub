@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-07-09 17:25:42
+LastEditTime: 2025-07-28 21:20:08
 '''
 import random
 from loguru import logger
@@ -28,7 +28,8 @@ class Vehicle3DElement(BaseElement):
             veh_heading: float,
             veh_length: float,
             root_np, # showbase 的根节点
-            showbase_instance # panda3d showbase, 单例模式 
+            showbase_instance, # panda3d showbase, 单例模式
+            vehicle_model:str = 'low' # 加载 low poly 或是 high poly 模型, 影响渲染速度
         ) -> None:
         super().__init__(
             fig_width, fig_height, fig_resolution,
@@ -37,6 +38,11 @@ class Vehicle3DElement(BaseElement):
         self.veh_type = veh_type # 车辆的类型, 对 ego 车辆特殊处理
         self.veh_node_path = None # 记录这辆车的 node path
         self.veh_model_name = None # 记录车辆加载的模型名称
+        # 加载 low poly / high poly 的车辆模型
+        if vehicle_model == 'high':
+            self._veh_model_type = 'vehicles_high_poly'
+        else:
+            self._veh_model_type = 'vehicles_low_poly'
     
     # ###################
     # Vehicle Node 的更新
@@ -70,33 +76,32 @@ class Vehicle3DElement(BaseElement):
         2. soical vehicle 背景车
         """
         if 'ego' in self.veh_type: # 自动驾驶车
-            self.veh_model_name = "ego/ego_suv.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            self.veh_model_name = "ego/ego.glb"
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
         elif 'police' in self.veh_type: # 警车
             self.veh_model_name = "public_transport/police.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
         elif 'emergency' in self.veh_type: # 救护车
             self.veh_model_name = "public_transport/emergency.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
         elif 'fire_engine' in self.veh_type: # 消防车
             self.veh_model_name = "public_transport/fire_engine.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
         elif 'taxi' in self.veh_type: # 出租车
             self.veh_model_name = "public_transport/taxi.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
         elif 'safety_barriers' in self.veh_type: # 特殊事件, 路障, 车辆无法行驶
             self.veh_model_name = "event/safety_barriers.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")            
-        else: # 普通车辆
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")            
+        else: # 普通车辆, 普通车辆命名使用 a,b,c,d,e,f
             veh_list = [
-                'suv_blue', 'suv_grey', 'suv_golden',
-                'vehicle_blue', 'vehicle_pink', 'vehicle_white',
+                'a', 'b', 'c', 'd', 'e', 'f',
             ]
             weights = [1/6, 1/6, 1/12, 1/6, 1/6, 3/12]
             selected_model = random.choices(veh_list, weights=weights, k=1)[0]
             logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
             self.veh_model_name = f"background/{selected_model}.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/vehicles/{self.veh_model_name}")
+            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
 
     def update_node(
             self, 

@@ -5,7 +5,7 @@
 - TshubEnvironment 与 SUMO 进行交互, 获得 SUMO 的数据 (这部分利用 TshubEnvironment)
 - TSHubRenderer 对 SUMO 的环境进行渲染 (这部分利用 TSHubRenderer)
 - TShubSensor 获得渲染的场景的数据, 作为新的 state 进行输出
-LastEditTime: 2025-07-09 14:51:31
+LastEditTime: 2025-07-28 21:16:41
 '''
 from loguru import logger
 from typing import Any, Dict, List
@@ -48,6 +48,7 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             # TSHubRenderer 的参数
             preset:str = '480P', 
             resolution:float = 0.5,
+            vehicle_model:str='low', # 车辆加载模型, low 或是 high
             render_mode: str = "onscreen",
             should_count_vehicles: bool = False, # 是否返回的时候获得车辆信息, 将车辆信息保存为 JSON 进行额外的渲染
             debuger_print_node:bool = False, # 是否在 reset 的时候打印 node path
@@ -83,6 +84,7 @@ class Tshub3DEnvironment(BaseSumoEnvironment3D):
             preset=preset,
             resolution=resolution,
             render_mode=render_mode,
+            vehicle_model=vehicle_model,
         )
         
     def reset(self):
