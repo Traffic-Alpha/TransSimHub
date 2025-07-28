@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-12 21:38:26
 @Description: 场景加载相关的方法 (用于初始化场景)
-LastEditTime: 2025-01-16 19:44:45
+LastEditTime: 2025-07-28 22:54:28
 '''
 from pathlib import Path
 from loguru import logger
@@ -64,7 +64,6 @@ class SceneLoader(object):
         self.setup_lighting()
 
         return self.map_radius, self.map_center
-
 
     def load_map(self) -> None:
         """Load map & 并获得中心位置
@@ -188,7 +187,7 @@ class SceneLoader(object):
             directional_color: Vec4 = Vec4(0.9, 0.9, 0.9, 1),  # 略降低直接光
             light_temperature: int = 6500,  # 主光更高色温
             ambient_temperature: int = 6000,  # 环境光单独色温
-            light_height: int = 200,
+            light_height: int = 100,
             light_direction: Vec3 = None  # 可选光照方向
         ) -> None:
         """设置光照
@@ -225,9 +224,6 @@ class SceneLoader(object):
         
         directional_light_node_path.setPos(light_pos)
         directional_light_node_path.lookAt(map_center)  # 朝向场景中心
-        
-        # 阴影设置
-        directional_light.setShadowCaster(True, 2048, 2048)  # 添加阴影贴图
         
         self._root_np.setLight(directional_light_node_path)
         self._root_np.setShaderAuto()
