@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-07-28 21:20:08
+LastEditTime: 2025-08-06 20:03:15
 '''
 import random
 from loguru import logger
@@ -67,41 +67,52 @@ class Vehicle3DElement(BaseElement):
         self.remove_node() # 删除节点
         self.create_node() # 新增节点
         self.begin_rendering_node() # 渲染节点
-        self.sensors = {}
-        
+        self.sensors = {}    
                 
     def _select_vehicle_model(self) -> str:
-        """随机选择车辆的模型, 
-        1. ego vehicle, 自动驾驶车辆
-        2. soical vehicle 背景车
+        """根据车辆类型选择对应的3D模型路径
+        
+        选择优先级：
+        1. 特殊车辆（自动驾驶车、警车等）
+        2. 特殊事件（路障、树枝等）
+        3. 普通背景车辆（随机选择）
         """
-        if 'ego' in self.veh_type: # 自动驾驶车
-            self.veh_model_name = "ego/ego.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
-        elif 'police' in self.veh_type: # 警车
-            self.veh_model_name = "public_transport/police.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
-        elif 'emergency' in self.veh_type: # 救护车
-            self.veh_model_name = "public_transport/emergency.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
-        elif 'fire_engine' in self.veh_type: # 消防车
-            self.veh_model_name = "public_transport/fire_engine.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
-        elif 'taxi' in self.veh_type: # 出租车
-            self.veh_model_name = "public_transport/taxi.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
-        elif 'safety_barriers' in self.veh_type: # 特殊事件, 路障, 车辆无法行驶
-            self.veh_model_name = "event/safety_barriers.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")            
-        else: # 普通车辆, 普通车辆命名使用 a,b,c,d,e,f
-            veh_list = [
-                'a', 'b', 'c', 'd', 'e', 'f',
-            ]
-            weights = [1/6, 1/6, 1/12, 1/6, 1/6, 3/12]
-            selected_model = random.choices(veh_list, weights=weights, k=1)[0]
-            logger.info(f"随机选择 {selected_model} 作为 background vehicle 模型.")
+        # 预定义的车辆类型到模型路径的直接映射
+        MODEL_MAPPING = {
+            # 特殊车辆
+            'ego': "ego/ego.glb",                         # 自动驾驶车
+            'police': "public_transport/police.glb",       # 警车
+            'emergency': "public_transport/emergency.glb", # 救护车
+            'fire_engine': "public_transport/fire_engine.glb", # 消防车
+            'taxi': "public_transport/taxi.glb",            # 出租车
+            # 特殊事件
+            'barrier_A': "event/barrier_A.glb",             # 路障 A
+            'barrier_B': "event/barrier_B.glb",             # 路障 B
+            'barrier_C': "event/barrier_C.glb",             # 路障 C
+            'barrier_D': "event/barrier_D.glb",             # 路障 D
+            'barrier_E': "event/barrier_E.glb",             # 路障 E
+            'tree_branch_1lane': "event/tree_branch_1lane.glb",  # 树枝 1 lane
+            'tree_branch_3lanes': "event/tree_branch_3lanes.glb",  # 树枝 3 lanes
+            'pedestrian': "event/pedestrian.glb",           # 倒地行人
+            'crash_vehicle': "event/crash_vehicle.glb",     # 交通事故 (破损的车辆)
+            'other_accidents': "event/other_accidents.glb", # 其他事故
+        }
+
+        # 优化查找：直接尝试从映射中获取模型路径
+        if self.veh_type in MODEL_MAPPING:
+            self.veh_model_name = MODEL_MAPPING[self.veh_type]
+        else:
+            # 处理普通背景车辆
+            VEHICLE_MODELS = ['a', 'b', 'c', 'd', 'e', 'f']
+            MODEL_WEIGHTS = [1/6, 1/6, 1/12, 1/6, 1/6, 3/12]
+            
+            selected_model = random.choices(VEHICLE_MODELS, weights=MODEL_WEIGHTS, k=1)[0]
+            logger.info(f"随机选择 {selected_model} 作为背景车辆模型")
             self.veh_model_name = f"background/{selected_model}.glb"
-            return Vehicle3DElement.current_file_path(f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}")
+
+        return Vehicle3DElement.current_file_path(
+            f"../../_assets_3d/{self._veh_model_type}/{self.veh_model_name}"
+        )
 
     def update_node(
             self, 

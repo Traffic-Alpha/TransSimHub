@@ -3,7 +3,7 @@ Author: WANG Maonan
 Date: 2025-06-18 13:31:20
 LastEditors: WANG Maonan
 Description: 使用 Blender 渲染, 三种渲染模式: (1) rgb; (2) mask; (3) depth;
-LastEditTime: 2025-06-26 17:39:31
+LastEditTime: 2025-07-30 11:14:45
 '''
 import os
 import bpy
