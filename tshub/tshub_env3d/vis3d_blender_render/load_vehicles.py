@@ -2,7 +2,7 @@
 Author: WANG Maonan
 Date: 2025-06-18 15:40:12
 LastEditors: WANG Maonan
-Description: 
+Description: 加载车辆模型用于渲染
 LastEditTime: 2025-07-29 15:02:38
 '''
 import os
