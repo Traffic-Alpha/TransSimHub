@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-08-06 20:03:15
+LastEditTime: 2025-08-13 21:49:36
 '''
 import random
 from loguru import logger
@@ -51,6 +51,7 @@ class Vehicle3DElement(BaseElement):
         """Create a vehicle node.
         """
         veh_model_path = self._select_vehicle_model() # 随机选择车辆的模型
+        print(veh_model_path)
         self.veh_node_path = self.showbase_instance.loader.loadModel(veh_model_path)
         self.get_node_dimensions(node_path=self.veh_node_path)
         self.veh_node_path.setName(f"vehicle-{self.element_id}")
@@ -94,7 +95,8 @@ class Vehicle3DElement(BaseElement):
             'tree_branch_1lane': "event/tree_branch_1lane.glb",  # 树枝 1 lane
             'tree_branch_3lanes': "event/tree_branch_3lanes.glb",  # 树枝 3 lanes
             'pedestrian': "event/pedestrian.glb",           # 倒地行人
-            'crash_vehicle': "event/crash_vehicle.glb",     # 交通事故 (破损的车辆)
+            'crash_vehicle_1lane': "event/crash_vehicle_1lane.glb", # 交通事故 (破损的车辆)
+            'crash_vehicle_3lanes': "event/crash_vehicle_3lanes.glb", # 交通事故 (破损的车辆)
             'other_accidents': "event/other_accidents.glb", # 其他事故
         }
 
