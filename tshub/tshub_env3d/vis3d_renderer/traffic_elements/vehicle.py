@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-08 22:21:18
 @Description: 3D 场景内的车辆
-LastEditTime: 2025-08-13 21:49:36
+LastEditTime: 2025-09-01 15:36:04
 '''
 import random
 from loguru import logger
@@ -96,7 +96,7 @@ class Vehicle3DElement(BaseElement):
             'tree_branch_3lanes': "event/tree_branch_3lanes.glb",  # 树枝 3 lanes
             'pedestrian': "event/pedestrian.glb",           # 倒地行人
             'crash_vehicle_1lane': "event/crash_vehicle_1lane.glb", # 交通事故 (破损的车辆)
-            'crash_vehicle_3lanes': "event/crash_vehicle_3lanes.glb", # 交通事故 (破损的车辆)
+            'crash_vehicle_3lanes': "event/crash_vehicle_3lanes.glb", # 交通事故 (破损的车辆, 3 lanes)
             'other_accidents': "event/other_accidents.glb", # 其他事故
         }
 
