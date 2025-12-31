@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2025-07-16 21:25:45
+ * @LastEditTime: 2025-12-31 13:07:31
 -->
 # Change Log
 
@@ -17,6 +17,16 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v1.5 -->
+## [v1.5] - 2025-07-16
+
+### Changed
+
+1. Added support for both `low-poly` and `high-poly` vehicle models. Low-poly models can significantly improve rendering speed.
+2. In Blender rendering, vehicles are now loaded only when they are near intersections, enhancing rendering performance.
+3. Vehicle models can share weights during rendering, further optimizing rendering efficiency.
+4. Introduced special intersection events, including trees, and roadblocks, with support for various specific scenarios.
 
 <!-- v1.4 -->
 ## [v1.4] - 2025-07-16
