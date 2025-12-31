@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2025-07-16 21:25:45
+ * @LastEditTime: 2025-12-31 14:46:42
 -->
 # Change Log
 
@@ -17,6 +17,38 @@ Copy and pasting the git commit messages is **NOT** enough.
 ### Fixed
 ### Removed
 ### Security
+
+<!-- v1.6 -->
+## [v1.6] - 2025-12-31 - Happy New Year 2026! 🎉
+
+**Happy New Year 2026!**
+
+### News
+
+This year, we mostly worked on TransimHub's 3D renderer. We added new features for special events and special vehicle models. As I'm also in the final stages of my PhD, updates have been slower than usual. However, this repository will continue to be maintained, with the goal of helping researchers spend less time on simulator setup and more time focusing on algorithm development.
+
+> 新年更上一层楼（Onwards and Upwards）
+
+This year, my colleagues and I have also achieved several milestones in the field of transportation. We participated in and won awards in two major [AI competitions](https://mp.weixin.qq.com/s/l5Ft11umGcA5LhhzH93kTQ):
+- First Prize (1st Place), Regional Traffic Signal Cooperative Control Track, **2025 Pazhou Algorithm Competition**. *Team members: Maonan Wang, Aoyu Pang, Yirong Chen; Advisor: PUN, Simon.*
+- Second Prize, Intelligent Traffic Signal Scheduling Track, **2025 Tencent Kaiwu Global AI Competition**. *Team members: Maonan Wang, Yin Luo, Zhiheng Li, Aoyu Pang, Yuejiao Xie; Advisor: PUN, Simon.*
+
+Furthermore, we explored integrating multimodal into traffic signal control task. Our team's paper, [VLMLight](https://neurips.cc/virtual/2025/poster/120348), was published at NeurIPS 2025, shifting the perspective of TSC from traditional RL-based approaches that rely on statistical features as state representations towards a more general and scalable framework. Ultimately, our method aims to operate much like a human traffic officer, one that is designed not only to maintain efficient flow but also to intelligently respond to a variety of unexpected situations on the road.
+
+### Added
+
+- Added the Traffic Junction VQA Benchmark, encompassing tasks for recognition, spatio-temporal reasoning, and decision-making.
+- Adapted multi-agent algorithms from torchrl for compatibility.
+
+<!-- v1.5 -->
+## [v1.5] - 2025-09-13
+
+### Changed
+
+1. Added support for both `low-poly` and `high-poly` vehicle models. Low-poly models can significantly improve rendering speed.
+2. In Blender rendering, vehicles are now loaded only when they are near intersections, enhancing rendering performance.
+3. Vehicle models can share weights during rendering, further optimizing rendering efficiency.
+4. Introduced special intersection events, including trees, and roadblocks, with support for various specific scenarios.
 
 <!-- v1.4 -->
 ## [v1.4] - 2025-07-16
@@ -122,7 +154,7 @@ SCENARIO_CONFIGS = {
 
 **Happy New Year 2025!**
 
-## Added
+### Added
 
 - Uploaded 10+ real road networks, including those from South Korea, Hong Kong, France, etc., to facilitate future testing. This includes:
   - OpenStreetMap data
