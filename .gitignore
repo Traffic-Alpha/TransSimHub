@@ -4,6 +4,10 @@ __pycache__/
 *$py.class
 .vscode
 
+# 3d models
+vehicles_high_poly/
+vehicles_low_poly/
+
 # sumo output
 *.out.xml
 *.output.xml
