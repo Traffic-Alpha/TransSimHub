@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-05-28 10:45:53 by Eclipse SUMO netconvert Version 1.19.0
+-->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <type-files value="D:\ProgramData\Anaconda3\envs\trans\lib\site-packages\tshub\sumo_tools\./osm_build_type/net.typ.xml"/>
+        <osm-files value="C:\Users\ricca\OneDrive\OneDrive%20-%20CUHK-Shenzhen\RA_419\UAV_Path_planing\code\map_dataset\berlin_UAM\berlin_UAM.osm"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\ricca\OneDrive\OneDrive%20-%20CUHK-Shenzhen\RA_419\UAV_Path_planing\code\map_dataset\berlin_UAM\berlin_UAM.net.xml"/>
+        <output.street-names value="true"/>
+        <output.original-names value="true"/>
+    </output>
+
+    <processing>
+        <geometry.remove value="true"/>
+        <roundabouts.guess value="true"/>
+    </processing>
+
+    <building_defaults>
+        <default.lanenumber value="3"/>
+    </building_defaults>
+
+    <tls_building>
+        <tls.discard-simple value="true"/>
+        <tls.guess value="true"/>
+        <tls.guess.threshold value="12"/>
+        <tls.join value="true"/>
+        <tls.guess-signals value="true"/>
+        <tls.green.time value="30"/>
+        <tls.layout value="incoming"/>
+    </tls_building>
+
+    <ramp_guessing>
+        <ramps.guess value="true"/>
+    </ramp_guessing>
+
+    <edge_removal>
+        <keep-edges.by-vclass value="passenger"/>
+    </edge_removal>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+        <junctions.join value="true"/>
+        <junctions.corner-detail value="5"/>
+    </junctions>
+
+</configuration>
