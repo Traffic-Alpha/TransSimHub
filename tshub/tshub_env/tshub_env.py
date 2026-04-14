@@ -56,18 +56,18 @@ class TshubEnvironment(BaseSumoEnvironment):
                  vehicle_action_type:str = 'lane', hightlight:bool = False,
                  tls_action_type:str = 'next_or_not', delta_time:int=5,
                  net_file: str = None, route_file: str = None, 
-                 trip_info: str = None, statistic_output: str = None, summary: str = None, queue_output: str = None, 
+                 trip_info: str = None, statistic_output: str = None, summary: str = None, queue_output: str = None, fcd_output: str = None, 
                  tls_state_add: List = None, use_gui: bool = False, is_libsumo: bool = False, 
                  begin_time=0, num_seconds=20000, max_depart_delay=100000, time_to_teleport=-1, 
                  sumo_seed: str = 'random', tripinfo_output_unfinished:bool=True, collision_action:str=None,
                  remote_port: int = None, num_clients: int = 1
         ) -> None:
         
-        super().__init__(sumo_cfg, net_file, route_file, 
-                         trip_info, statistic_output, summary, queue_output, 
-                         tls_state_add, use_gui, is_libsumo, 
-                         begin_time, num_seconds, max_depart_delay, time_to_teleport, 
-                         sumo_seed, tripinfo_output_unfinished, 
+        super().__init__(sumo_cfg, net_file, route_file,
+                         trip_info, statistic_output, summary, queue_output, fcd_output,
+                         tls_state_add, use_gui, is_libsumo,
+                         begin_time, num_seconds, max_depart_delay, time_to_teleport,
+                         sumo_seed, tripinfo_output_unfinished,
                          collision_action, remote_port, num_clients
                         )
 
