@@ -44,6 +44,7 @@ class BaseSumoEnvironment(ABC):
                 statistic_output:str=None, # 输出整个仿真过程的统计信息
                 summary:str=None, # 记录每一秒的状态, 这里为文件输出的位置, https://sumo.dlr.de/docs/Simulation/Output/Summary.html, halting 与车辆是否到达终点无关
                 queue_output:str=None, # 记录每一秒, 每一个车道的排队长度, 这里为输出文件位置, https://sumo.dlr.de/docs/Simulation/Output/QueueOutput.html
+                fcd_output:str=None, # 记录车辆轨迹 (fcd-output)
                 tls_state_add:List[str]=None, # 是否记录 traffic light
                 use_gui:bool=False, # 使用 sumo-gui 或是 sumo
                 is_libsumo:bool=False, # 是否使用 libsumo
@@ -67,6 +68,7 @@ class BaseSumoEnvironment(ABC):
         self.statistic_output = statistic_output # 记录总体的信息
         self.summary = summary # 记录每一秒的综合信息
         self.queue_output = queue_output # 记录每一个车道的排队长度
+        self.fcd_output = fcd_output # 记录车辆轨迹
         self.tls_state_add = tls_state_add # 记录信号灯信息
 
         # 多个 traci 连接
@@ -124,6 +126,11 @@ class BaseSumoEnvironment(ABC):
         if self.queue_output is not None:
             new_queue_output_path = f"{os.path.splitext(self.queue_output)[0]}_{self.reset_num}{os.path.splitext(self.queue_output)[1]}"
             shutil.copy(self.queue_output, new_queue_output_path)
+
+        # Check and copy `self.fcd_output` if it's not None
+        if self.fcd_output is not None:
+            new_fcd_output_path = f"{os.path.splitext(self.fcd_output)[0]}_{self.reset_num}{os.path.splitext(self.fcd_output)[1]}"
+            shutil.copy(self.fcd_output, new_fcd_output_path)
 
         # Check and copy each file in `self.tls_state_add` if it's not None
         # 这里需要确保 output 的文件名字和 add 的文件名是一样的
@@ -215,6 +222,8 @@ class BaseSumoEnvironment(ABC):
             sumo_cmd.extend(['--summary', self.summary])
         if self.queue_output is not None: # 输出每个车道的排队长度
             sumo_cmd.extend(['--queue-output', self.queue_output])
+        if self.fcd_output is not None: # 输出车辆轨迹
+            sumo_cmd.extend(['--fcd-output', self.fcd_output])
         if self.tls_state_add is not None: # !, 注意, 需要额外去指定探测器, 不然会没有探测器
             assert isinstance(self.tls_state_add, list), '指定需要的 tls add 文件'
             sumo_cmd.extend(['-a', ','.join(self.tls_state_add)])
