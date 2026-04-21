@@ -2,11 +2,11 @@
 @Author: WANG Maonan
 @Date: 2024-05-29 15:23:55
 @Description: 将 Map 划分为 Grid, 从而获得 Grid 内部的信息
-@LastEditTime: 2024-05-29 16:36:12
+LastEditTime: 2026-02-13 15:06:36
 '''
 import numpy as np
 from typing import Tuple, List
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from scipy.interpolate import griddata as scipy_griddata
 
 @dataclass

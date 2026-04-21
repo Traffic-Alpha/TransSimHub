@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-30 17:02:20
 @Description: 从 tshub 中获得 "Veh"（车辆）、"Air"（航空）和 "Traf"（信号灯）的状态
-@LastEditTime: 2023-09-25 21:10:55
+LastEditTime: 2026-02-12 16:09:51
 '''
 import math
 import numpy as np
@@ -69,5 +69,6 @@ while not done:
         }
     }
     obs, reward, info, done = tshub_env.step(actions=actions)
+
     logger.info(f"SIM: {info['step_time']} \n{dict_to_str(obs)}")
 tshub_env._close_simulation()

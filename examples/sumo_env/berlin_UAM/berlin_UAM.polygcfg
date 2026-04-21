@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-05-28 10:45:57 by Eclipse SUMO polyconvert Version 1.19.0
+-->
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/polyconvertConfiguration.xsd">
+
+    <input>
+        <net-file value="C:\Users\ricca\OneDrive\OneDrive%20-%20CUHK-Shenzhen\RA_419\UAV_Path_planing\code\map_dataset\berlin_UAM\berlin_UAM.net.xml"/>
+        <osm-files value="C:\Users\ricca\OneDrive\OneDrive%20-%20CUHK-Shenzhen\RA_419\UAV_Path_planing\code\map_dataset\berlin_UAM\berlin_UAM.osm"/>
+        <osm.merge-relations value="1"/>
+        <type-file value="D:\ProgramData\Anaconda3\envs\trans\lib\site-packages\tshub\sumo_tools\./osm_build_type/poly.typ.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\ricca\OneDrive\OneDrive%20-%20CUHK-Shenzhen\RA_419\UAV_Path_planing\code\map_dataset\berlin_UAM\berlin_UAM.poly.xml"/>
+    </output>
+
+    <building_defaults>
+        <discard value="true"/>
+    </building_defaults>
+
+</configuration>

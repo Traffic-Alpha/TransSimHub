@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2023-08-25 13:28:22
 @Description: 获得 Traffic Light Signal State
-@LastEditTime: 2023-08-30 16:23:38
+LastEditTime: 2026-02-12 16:05:49
 '''
 import sumolib
 from loguru import logger
