@@ -6,6 +6,9 @@
 Welcome to TransSimHub's documentation!
 =======================================
 
+Documentation deployment is now built from the ``main`` branch with GitHub Actions.
+Updated on 2026-08-15.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
