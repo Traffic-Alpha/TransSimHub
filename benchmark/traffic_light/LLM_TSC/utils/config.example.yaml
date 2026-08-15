@@ -1,4 +1,0 @@
-OPENAI_API_BASE: "https://api.openai.com/v1"
-OPENAI_PROXY: ""
-OPENAI_API_KEY: "REPLACE_WITH_OPENAI_API_KEY"
-OPENAI_API_MODEL: "gpt-3.5-turbo-16k"
