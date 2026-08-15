@@ -15,6 +15,7 @@ from .aircraft_type.stationary import StationaryAction
 from .aircraft_type.horizontal_movement import HorizontalMovementAction
 from .aircraft_type.vertical_movement import VerticalMovementAction
 from .aircraft_type.combined_movement import CombinedMovementAction
+from .dynamics import create_dynamics
 from ..utils.get_abs_path import get_abs_path
 
 @dataclass
@@ -23,7 +24,7 @@ class AircraftInfo:
     aircraft_type: str
     action_type: str # aircraft 的动作类型
     position: tuple[float, float, float]
-    speed: tuple[float, float, float]
+    speed: float # 速度大小 (action 给出的指令速度), m/s
     heading: tuple[float, float, float]
     communication_range: float
     cover_radius: float
@@ -32,6 +33,11 @@ class AircraftInfo:
     img_file: str = None
     custom_update_cover_radius: Callable[[], None] = None
     sumo: traci.connection.Connection = None
+    # 动力学相关 (将动作空间与状态演化解耦), 默认 kinematic 与历史行为一致
+    dynamics_type: str = 'kinematic' # 'kinematic' 或 'point_mass'
+    dynamics_params: Dict[str, Any] = None # 传给动力学的参数, 例如 point_mass 的 max_speed/max_accel
+    dt: float = 1.0 # 每次 control 对应的物理时间步长 (秒)
+    velocity: Tuple[float, float, float] = None # 速度向量 (vx, vy, vz), None 时由 speed*heading 初始化
 
     def __post_init__(self) -> None:
         """
@@ -47,7 +53,16 @@ class AircraftInfo:
             self.aircraft_action = VerticalMovementAction(id=self.id)
         elif _action == aircraft_action_type.CombinedMovement:
             self.aircraft_action = CombinedMovementAction(id=self.id)
-        
+
+        # 初始化动力学模型 (与动作空间解耦)
+        self.dynamics = create_dynamics(self.dynamics_type, self.dynamics_params)
+
+        # 初始化速度向量: 由初始 speed 沿单位航向方向给出
+        if self.velocity is None:
+            unit = self._unit(self.heading)
+            s = float(self.speed) if isinstance(self.speed, (int, float)) else 0.0
+            self.velocity = self._scale(unit, s) if unit is not None else (0.0, 0.0, 0.0)
+
         # 初始化 aircraft
         self.current_file_path = get_abs_path(__file__)
         if self.custom_update_cover_radius is None:
@@ -56,8 +71,20 @@ class AircraftInfo:
         self.check_sumo_visualization() # 检查是否需要可视化
 
     @staticmethod
+    def _unit(vec: Tuple[float, float, float]):
+        """返回单位向量, 零向量返回 None."""
+        n = math.sqrt(vec[0]**2 + vec[1]**2 + vec[2]**2)
+        if n == 0:
+            return None
+        return (vec[0]/n, vec[1]/n, vec[2]/n)
+
+    @staticmethod
+    def _scale(unit: Tuple[float, float, float], speed: float) -> Tuple[float, float, float]:
+        return (speed*unit[0], speed*unit[1], speed*unit[2])
+
+    @staticmethod
     def update_cover_radius(position, communication_range) -> float:
-        """
+        r"""
         根据当前位置的高度更新地面覆盖半径。支持自定义计算的方式
             1. 获取 position[2](height) 和 communication_range 的值。
             2. 计算地面覆盖半径：radius = sqrt(communication_range**2 - height**2)
@@ -151,10 +178,13 @@ class AircraftInfo:
             img_file: str = None,
             custom_update_cover_radius=None,
             sumo = None,
+            dynamics_type: str = 'kinematic',
+            dynamics_params: Dict[str, Any] = None,
+            dt: float = 1.0,
         ):
         """
         创建 AircraftInfo 实例。
-        
+
         Args:
             id (str): aircraft ID。
             aircraft_type (str): aircraft 的类型，不同类型通信范围可以不一样。
@@ -163,22 +193,31 @@ class AircraftInfo:
             speed (float): aircraft 的速度。
             heading (Tuple[float, float, float]): aircraft 的航向。
             communication_range (float): aircraft 的通信范围。
+            dynamics_type (str): 动力学模型, 'kinematic' (默认, 无惯性) 或 'point_mass' (含惯性).
+            dynamics_params (Dict[str, Any], optional): 动力学参数, 如 point_mass 的 max_speed/max_accel.
+            dt (float): 每次 control 对应的物理时间步长 (秒). Defaults to 1.0.
 
         Returns:
             AircraftInfo: 创建的 AircraftInfo 实例。
         """
         logger.info(f'SIM: Init Aircraft: {id}.')
         aircraft = cls(
-            id, aircraft_type, 
-            action_type, position, speed, heading, communication_range, 0.0, 
+            id, aircraft_type,
+            action_type, position, speed, heading, communication_range, 0.0,
             if_sumo_visualization, color,
-            img_file, custom_update_cover_radius, sumo
+            img_file, custom_update_cover_radius, sumo,
+            dynamics_type=dynamics_type, dynamics_params=dynamics_params, dt=dt,
         )
         aircraft.cover_radius = aircraft.custom_update_cover_radius(aircraft.position, aircraft.communication_range)
         return aircraft
     
-    def update_features(self, position:Tuple[float, float, float], speed:float, heading:Tuple[float, float, float]) -> None:
+    def update_features(self,
+                        position:Tuple[float, float, float],
+                        velocity:Tuple[float, float, float],
+                        speed:float,
+                        heading:Tuple[float, float, float]) -> None:
         self.position = position
+        self.velocity = velocity
         self.speed = speed
         self.heading = heading
 
@@ -193,10 +232,17 @@ class AircraftInfo:
 
     def control_aircraft(self, action) -> None:
         speed, heading_index = action
-        new_position, heading = self.aircraft_action.execute(
-            position=self.position,
+        # Step 1. Action: 动作空间 -> 目标速度向量
+        velocity_command = self.aircraft_action.execute(
             speed=speed, heading_index=heading_index
         )
-        self.update_features(new_position, speed, heading)
+        # Step 2. Dynamics: 根据动力学模型更新位置与速度
+        new_position, new_velocity = self.dynamics.step(
+            position=self.position, velocity=self.velocity,
+            velocity_command=velocity_command, dt=self.dt,
+        )
+        # heading 取实际运动方向; 速度为 0 时保持原 heading
+        heading = self._unit(new_velocity) or self.heading
+        self.update_features(new_position, new_velocity, speed, heading)
         self.cover_radius = self.custom_update_cover_radius(self.position, self.communication_range) # 更新地面可视化范围
         self.update_sumo_visualization() # 更新可视化结果

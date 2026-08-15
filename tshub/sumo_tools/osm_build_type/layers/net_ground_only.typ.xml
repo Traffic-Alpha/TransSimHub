@@ -1,0 +1,13 @@
+<!--
+    叠加层：忽略高架/快速路，只保留地面交通。
+    叠加在基础 net.typ.xml 之后（scenario_build(netconvert_typemap=["net", "net_ground_only"]）),
+    对高速/快速路等级设 discard="true" → 这些 edge 不会被写入 .net.xml，
+    只留 primary 及以下的地面道路。
+    注意：按道路“等级”丢弃，而非按 bridge=yes 的具体路段。
+-->
+<types xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/types_file.xsd">
+    <type id="highway.motorway"       discard="true"/>
+    <type id="highway.motorway_link"  discard="true"/>
+    <type id="highway.trunk"          discard="true"/>
+    <type id="highway.trunk_link"     discard="true"/>
+</types>

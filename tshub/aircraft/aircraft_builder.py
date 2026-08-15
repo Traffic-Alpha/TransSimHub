@@ -52,6 +52,9 @@ class AircraftBuilder(BaseBuilder):
             img_file: str = None,
             custom_update_cover_radius = None,
             sumo = None,
+            dynamics_type: str = 'kinematic',
+            dynamics_params: Dict[str, any] = None,
+            dt: float = 1.0,
         ) -> None:
         """
         创建 aircraft 并将其添加到 aircraft_dict 中。
@@ -67,11 +70,14 @@ class AircraftBuilder(BaseBuilder):
             None
         """
         aircraft = AircraftInfo.create(
-            id, aircraft_type, action_type, 
+            id, aircraft_type, action_type,
             position, speed, heading, communication_range,
-            if_sumo_visualization, color, 
+            if_sumo_visualization, color,
             img_file, custom_update_cover_radius,
             sumo,
+            dynamics_type=dynamics_type,
+            dynamics_params=dynamics_params,
+            dt=dt,
         )
         self.aircraft_dict[id] = aircraft
 

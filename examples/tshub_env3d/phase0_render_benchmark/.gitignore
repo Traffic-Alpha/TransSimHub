@@ -1,0 +1,6 @@
+# Phase 0 运行产物 (基准图 / 报告 / set_logger 日志), 不入库
+_outputs/
+_baseline_outputs/
+_scene/
+20*_*/
+*.log

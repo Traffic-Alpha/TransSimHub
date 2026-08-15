@@ -169,3 +169,40 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Claude Code
+CLAUDE.md
+
+# 大体积的 HDR 天空贴图 (本地提供, 不入库): _assets_3d/skybox/sky_<day|dust>.hdr
+tshub/tshub_env3d/_assets_3d/skybox/*.hdr
+
+# Local training / experiment artifacts
+**/tensorboard/
+**/ppo_tensorboard/
+**/mappo_models/
+**/ppo_models/
+**/outputs/
+**/events.out.tfevents.*
+*.tripinfo.xml
+
+# Local learning scratch space
+torchrl_learn/
+
+# Local credentials
+benchmark/traffic_light/LLM_TSC/utils/config.yaml
+
+# Local OSM / SUMO generated datasets
+benchmark/aircraft_SNIR/berlin_UAM/
+examples/tshub_dataset/
+examples/sumo_env/kowloon_police_uav/**/*.osm
+examples/sumo_env/kowloon_police_uav/**/*.net.xml
+examples/sumo_env/kowloon_police_uav/**/*.poly.xml
+examples/sumo_env/kowloon_police_uav/**/*.rou.xml
+examples/sumo_env/kowloon_police_uav/**/*.sumocfg
+
+# Local 3D assets distributed through releases
+examples/tshub_env3d/**/3d_assets/*.glb
+tshub/tshub_env3d/_assets_3d/environment/
+tshub/tshub_env3d/_assets_3d/vehicles/**/*.glb
+tshub/tshub_env3d/_assets_3d/vehicles/_previews/
+tshub/tshub_env3d/_assets_3d/skybox/env_*/

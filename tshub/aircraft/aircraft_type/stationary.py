@@ -10,7 +10,6 @@ class StationaryAction(AircraftAction):
     def __init__(self, id) -> None:
         super().__init__(id)
     
-    def execute(self, *args, **kwargs) -> None:
-        position = kwargs['position']
-        heading = (0,0,0) # heading 为 0, 保持不变
-        return position, heading
+    def execute(self, speed: float = 0.0, heading_index: int = 0):
+        # 保持不动, 目标速度为 0
+        return (0.0, 0.0, 0.0)

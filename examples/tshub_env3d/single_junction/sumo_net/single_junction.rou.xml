@@ -35,13 +35,16 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <vType id="background" length="5.00" color="220,220,220" tau="1.0"/>
+    <vType id="taxi" length="5.00" color="yellow" tau="1.0"/>
+    <vType id="police" length="5.00" color="blue" tau="1.0"/>
+    <vType id="emergency" length="6.50" color="255,165,0" tau="1.0"/>
+    <vType id="fire_engine" length="7.10" color="red" tau="1.0"/>
     <vehicle id="E0__0__background.0" type="background" depart="0.84" departLane="random">
         <route edges="E0 E1"/>
     </vehicle>
     <vehicle id="-E1__0__background.0" type="background" depart="3.58" departLane="random">
         <route edges="-E1 E3"/>
     </vehicle>
-    <vType id="taxi" length="5.00" color="yellow" tau="1.0"/>
     <vehicle id="E0__0__taxi.0" type="taxi" depart="4.16" departLane="random">
         <route edges="E0 -E2"/>
     </vehicle>
@@ -51,7 +54,6 @@
     <vehicle id="-E1__0__background.1" type="background" depart="6.54" departLane="random">
         <route edges="-E1 -E0"/>
     </vehicle>
-    <vType id="police" length="5.00" color="blue" tau="1.0"/>
     <vehicle id="-E1__0__police.0" type="police" depart="6.80" departLane="random">
         <route edges="-E1 -E0"/>
     </vehicle>
@@ -61,7 +63,6 @@
     <vehicle id="-E3__0__background.1" type="background" depart="10.82" departLane="random">
         <route edges="-E3 -E0"/>
     </vehicle>
-    <vType id="emergency" length="6.50" color="255,165,0" tau="1.0"/>
     <vehicle id="E2__0__emergency.0" type="emergency" depart="10.88" departLane="random">
         <route edges="E2 -E0"/>
     </vehicle>
@@ -86,7 +87,6 @@
     <vehicle id="-E3__0__background.2" type="background" depart="19.28" departLane="random">
         <route edges="-E3 -E2"/>
     </vehicle>
-    <vType id="fire_engine" length="7.10" color="red" tau="1.0"/>
     <vehicle id="-E1__0__fire_engine.0" type="fire_engine" depart="20.32" departLane="random">
         <route edges="-E1 E3"/>
     </vehicle>

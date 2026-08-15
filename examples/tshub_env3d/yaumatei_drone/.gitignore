@@ -1,0 +1,14 @@
+# 渲染输出与日志 (可重新生成)
+_outputs_drone/
+visualizations/
+20[0-9][0-9]-*/
+*.log
+
+# 静态场景 glb (Blender 构建产物, 内嵌贴图体积大; 按 render 脚本头两步重建)
+scene_env/
+
+# 中间/草稿数据 (HK1980 投影中间件、轨迹采样、路由生成草稿)
+add/
+*.hk1980.*
+flight_trajectory*.csv
+trips.trips.xml

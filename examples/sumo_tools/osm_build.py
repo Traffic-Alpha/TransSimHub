@@ -15,7 +15,23 @@ set_logger(current_file_path('./'))
 if __name__ == '__main__':
     osm_file = current_file_path("../sumo_env/osm_berlin/berlin.osm")
     output_directory = current_file_path("../sumo_env/osm_berlin/env/")
+
+    # 默认: 使用内置完整版 typemap (net / poly)
     scenario_build(
         osm_file=osm_file,
         output_directory=output_directory
     )
+
+    # ##############################
+    # typemap 组合用法 (按需取消注释)
+    # ##############################
+    # netconvert_typemap / poly_typemap 支持传列表来叠加多个 typemap,
+    # 列表项可以是内置短名 (osm_build_type/ 或 osm_build_type/layers/ 下的文件),
+    # 也可以是自备的文件路径. 多个 typemap 按顺序合并, 后者覆盖前者同名 type.
+    #
+    # scenario_build(
+    #     osm_file=osm_file,
+    #     output_directory=output_directory,
+    #     netconvert_typemap=["net", "net_ground_only"],  # 完整地面路网, 去掉高架/快速路
+    #     poly_typemap=["poly", "poly_buildings_only"],   # 只保留建筑/设施 (含警局)
+    # )

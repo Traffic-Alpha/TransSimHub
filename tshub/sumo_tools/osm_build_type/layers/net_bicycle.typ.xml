@@ -1,0 +1,10 @@
+<!--
+    叠加层：为自行车道追加属性（同步自 SUMO osmNetconvertBicycle.typ.xml）。
+    叠加在基础 net.typ.xml 之后。
+-->
+<types xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/types_file.xsd">
+    <type id="cycleway.lane"           bikeLaneWidth="1.25" allow="bicycle"/>
+    <type id="cycleway.opposite_lane"  bikeLaneWidth="1.25" allow="bicycle"/>
+    <type id="cycleway.track"          bikeLaneWidth="1.5" allow="bicycle"/>
+    <type id="cycleway.opposite_track" bikeLaneWidth="1.5" allow="bicycle"/>
+</types>

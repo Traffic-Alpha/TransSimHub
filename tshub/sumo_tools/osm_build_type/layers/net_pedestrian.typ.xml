@@ -1,0 +1,14 @@
+<!--
+    叠加层：为主要道路追加人行道（同步自 SUMO osmNetconvertPedestrians.typ.xml）。
+    叠加在基础 net.typ.xml 之后，只覆盖/追加已有 type 的部分属性（sidewalkWidth / disallow）。
+-->
+<types xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/types_file.xsd">
+    <type id="highway.primary"        sidewalkWidth="3" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.primary_link"   sidewalkWidth="3" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.secondary"      sidewalkWidth="3" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.secondary_link" sidewalkWidth="3" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.tertiary"       sidewalkWidth="3" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.tertiary_link"  sidewalkWidth="2" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.unclassified"   sidewalkWidth="2" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+    <type id="highway.residential"    sidewalkWidth="2" disallow="pedestrian rail rail_urban rail_electric rail_fast tram drone aircraft scooter container wheelchair subway cable_car ship"/>
+</types>

@@ -18,13 +18,10 @@ class CombinedMovementAction(AircraftAction):
                         for elevation in ELEVATIONS
                     ]
 
-    def execute(self, 
-                position:Tuple[float, float, float], 
-                speed: float, heading_index: int) -> None:
+    def execute(self, speed: float, heading_index: int) -> Tuple[float, float, float]:
         heading_combinations = self.combinations[heading_index]
         heading = self.calculate_heading_3d(*heading_combinations)
-        new_position = self.calculate_new_position(position=position, speed=speed, heading=heading)
-        return new_position, heading
+        return self._scale(heading, speed)
 
     def calculate_heading_3d(self, azimuth:float, elevation:float) -> Tuple[float, float, float]:
         # 将方位角和俯仰角转换为弧度

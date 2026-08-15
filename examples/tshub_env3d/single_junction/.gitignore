@@ -1,0 +1,6 @@
+# 渲染/可视化产物 + set_logger 日志, 不入库
+_seg_vis/
+_outputs/
+2026-*_*/
+20*_*/
+*.log

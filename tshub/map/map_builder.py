@@ -24,7 +24,7 @@ class MapBuilder(BaseBuilder):
         self.radio_map_files = radio_map_files # 传入每一个坐标的信息
 
         self.map_info = {
-            'lane': dict(), # 车道信息
+            'lane_shape': dict(), # 车道的静态几何 (动态的交通状态在 tshub/lane/, 见 obs['lane_state'])
             'node': dict(), # 节点信息
             'building': dict(), # 建筑物信息
             'grid': dict(), # 将 map 且分为 grid, 统计每个 grid 内部的信息
@@ -46,15 +46,19 @@ class MapBuilder(BaseBuilder):
             for _lane in e._lanes: # 获取每一个 edge 所有的 lane
                 lane_id = _lane.getID()
                 lane_length = _lane.getLength() # 获得 lane 的长度
+                lane_center = _lane.getShape() # 车道中心线
+                lane_width = _lane.getWidth() # 车道宽度
                 lane_shape = sumolib.geomhelper.line2boundary(
-                    _lane.getShape(), _lane.getWidth()
+                    lane_center, lane_width
                 ) # 获得每一个 lane 的 shape
-                self.map_info['lane'][lane_id] = PolygonInfo.create(
+                self.map_info['lane_shape'][lane_id] = PolygonInfo.create(
                     id=lane_id,
                     edge_id=edge_id,
                     length=lane_length,
                     polygon_type='lane',
                     shape=lane_shape,
+                    center_shape=lane_center, # 边界多边形不可逆, 中心线要单独存
+                    width=lane_width,
                     building_levels=None,
                     node_type=None,
                     node_coord=None

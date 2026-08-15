@@ -24,7 +24,7 @@ map_builder = MapBuilder(
 map_infos = map_builder.get_objects_infos()
 
 # Get Lane infos in the Map
-logger.info(f'SIM: \n{dict_to_str(map_infos['lane'])}')
+logger.info(f'SIM: \n{dict_to_str(map_infos['lane_shape'])}')
 
 # Get Node Infos in the Map
 logger.info(f'SIM: \n{dict_to_str(map_infos['node'])}')

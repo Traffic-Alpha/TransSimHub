@@ -14,24 +14,20 @@ class HorizontalMovementAction(AircraftAction):
     def __init__(self, id, ) -> None:
         super().__init__(id)
 
-    def execute(self, 
-                position:Tuple[float, float, float], 
-                speed: float, heading_index: int) -> None:
+    def execute(self, speed: float, heading_index: int) -> Tuple[float, float, float]:
         """
         Executes the horizontal movement action.
 
         Args:
-            position (Tuple[float, float, float]): The current position of the aircraft.
             speed (float): The speed of the aircraft.
             heading_index (int): The index of the desired heading angle.
 
         Returns:
-            Tuple[float, float, float]: The new position of the aircraft after the movement.
+            Tuple[float, float, float]: The target velocity (vx, vy, vz) of the aircraft.
         """
         heading_angle = self.ANGLES[heading_index]
         heading = self.calculate_heading(heading_angle)
-        new_position = self.calculate_new_position(position=position, speed=speed, heading=heading)
-        return new_position, heading
+        return self._scale(heading, speed)
 
     def calculate_heading(self, angle: float) -> Tuple[float, float, float]:
         """

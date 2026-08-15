@@ -1,0 +1,83 @@
+'''
+@Author: WANG Maonan
+@Date: 2024-07-08 19:43:50
+@Description: RGB Sensor, 绑定在场景的 obejct 上
+LastEditTime: 2025-03-31 12:12:30
+'''
+from loguru import logger
+
+import numpy as np
+from typing import Tuple
+from .base_sensors.base_camera_sensor import CameraSensor
+from .cameras.build_offscreen_camera import build_offscreen_camera
+from tshub.tshub_env3d.scene import seg_color_to_label
+
+class RGBSensor(CameraSensor):
+    """A sensor that renders color values from around its target actor.
+    """
+    def __init__(
+        self,
+        camera_name:str,
+        camera_mask,
+        showbase_instance,
+        root_np,
+        init_element_pose,
+        element_dimensions:Tuple[float, float, float],
+        fig_width:int=800,
+        fig_height:int=600,
+        fig_resolution:float=0.1,
+        rig=None, # 相机规格 (CameraRig), 决定位姿/朝向
+        *args, **kwargs,
+    ) -> None:
+        super().__init__()
+        self.init_element_pose = init_element_pose
+        self.element_dimensions = element_dimensions
+        height_override = kwargs.get("height")
+        self.camera = build_offscreen_camera(
+            name=camera_name,
+            mask=camera_mask,
+            width=fig_width,
+            height=fig_height,
+            resolution=fig_resolution,
+            showbase_instance=showbase_instance,
+            root_np=root_np,
+            rig=rig,
+            height_override=height_override,
+            carrier_dimensions=element_dimensions,
+        ) # 创建相机, 这个相机是绑定在 sensor 上面的
+        
+        # 初始化相机镜头 (这里可以传入其他参数, 例如传感器的高度)
+        self.init_actor(element_pose=self.init_element_pose, *args, **kwargs)
+
+    def init_actor(self, element_pose, *args, **kwargs) -> None:
+        """初始化相机的位置
+        """
+        self.camera.init_pos(pose=element_pose, *args, **kwargs)
+
+    def step(self, element_pose) -> None:
+        """更新 camera 的位置, 确保可以获得指定 element 的信息
+        """
+        self.camera.update(element_pose) # 高度
+    
+    def __call__(self):
+        """获得 offscreen rgb sensor 的结果
+        """
+        assert self.camera is not None, "RGB has not been initialized"
+
+        ram_image = self.camera.wait_for_ram_image(img_format="RGB")
+        mem_view = memoryview(ram_image)
+        image: np.ndarray = np.frombuffer(mem_view, np.uint8)
+        width, height = self.camera.image_dimensions # 输出图像的分辨率
+        image.shape = (height, width, 3)
+        image = np.flipud(image)
+        # seg 相机: 把纯色分割图转成单通道 label-id 图 (H, W) uint8
+        if getattr(self.camera, "rig", None) is not None and self.camera.rig.modality == 'seg':
+            return seg_color_to_label(image)
+        return image
+
+    def teardown(self) -> None:
+        """销毁 sensor 和其绑定的 camera，释放资源。
+        """
+        if self.camera:
+            self.camera.teardown()  # 移除 camera 节点
+            self.camera = None  # 清除 camera 引用，便于垃圾回收

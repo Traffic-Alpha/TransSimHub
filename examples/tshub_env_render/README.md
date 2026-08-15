@@ -6,7 +6,7 @@
 -->
 # Visualization for TransSimHub
 
-TransSimHub supports pixel-based state output. There are two rendering modes provided by TransSimHub, namely `rgb` and `sumo_gui`. Each of these rendering modes supports three perspectives: `global`, `local intersection`, and `follow vehicle`. Rendering the scene is straightforward, simply use the `.render()` method. The `mode` parameter is used to specify whether to render with `rgb` or `sumo_gui`.
+TransSimHub supports pixel-based state output. There are two rendering modes provided by TransSimHub, namely `rgb` and `sumo_gui`. Both modes are **focus-only** and support two perspectives: `local intersection` and `follow vehicle`. There is no global view — for whole-network situational awareness use the mesoscopic dashboard (`tshub.visualization.meso`, see `examples/dashboard/`), which is far faster and clearer on large networks. Rendering the scene is straightforward, simply use the `.render()` method. The `mode` parameter is used to specify whether to render with `rgb` or `sumo_gui`.
 
 The code below renders in `rgb` mode and uses `plt2arr` to convert `plt` to `array`.
 
@@ -14,8 +14,14 @@ The code below renders in `rgb` mode and uses `plt2arr` to convert `plt` to `arr
 from tshub.utils.plt_to_array import plt2arr
 
 obs, reward, info, done = tshub_env.step(actions=actions)
-fig = tshub_env.render(mode='rgb')
+fig = tshub_env.render(
+    focus_id='25663429', focus_type='node', focus_distance=80,
+    mode='rgb',
+)
 fig_array = plt2arr(fig) # convert fig to array
+
+# NOTE: the figure is reused across frames -- save it or convert it to an array
+# before calling render() again.
 ```
 
 By changing the `mode` to `sumo_gui`, you can output in `sumo-gui` style. In this mode, you need to pass in a file path, and the result will be saved directly to the specified folder. Note that this rendering method requires `sumo-gui` to be enabled and the simulation window to be fullscreen, otherwise the output image will be incomplete.
@@ -23,12 +29,13 @@ By changing the `mode` to `sumo_gui`, you can output in `sumo-gui` style. In thi
 ```python
 obs, reward, info, done = tshub_env.step(actions=actions)
 fig = tshub_env.render(
+    focus_id='25663429', focus_type='node', focus_distance=80,
     mode='sumo_gui',
     save_folder=image_save_folder
 )
 ```
 
-Both `rgb` and `sumo_gui` support three visualization modes: global rendering, local intersection rendering, and follow vehicle rendering. Each will be introduced in detail below. The following is a diagram that summarizes the six rendering methods:
+Both `rgb` and `sumo_gui` support two visualization modes: local intersection rendering and follow vehicle rendering. Each will be introduced in detail below. The following is a diagram that summarizes the four rendering methods:
 
 ```
 TransSimHub Rendering Modes
@@ -37,43 +44,15 @@ TransSimHub Rendering Modes
 |   |
 |   |-- RGB Rendering Mode
 |   |   |
-|   |   |-- Global Rendering
 |   |   |-- Local Intersection Rendering
 |   |   |-- Follow Vehicle Rendering
 |   |
 |   |-- SUMO-GUI Rendering Mode
 |       |
-|       |-- Global Rendering
 |       |-- Local Intersection Rendering
 |       |-- Follow Vehicle Rendering
 
 ```
-
-## Global Rendering
-
-When only `mode` and `save_folder` are passed into `render`, without specifying `focus_id`, it will save the global simulation effect.
-
-```python
-obs, reward, info, done = tshub_env.step(actions=actions)
-fig = tshub_env.render(
-    mode='sumo_gui', # 'rgb'
-    save_folder=image_save_folder
-)
-```
-
-Below are examples of global rendering effects in `rgb` and `sumo-gui` modes:
-
-<table>
-  <tr>
-    <td><img src="./assets/rgb_global.gif" width="450"/></td>
-    <td><img src="./assets/sumogui_global.gif" width="450"/></td>
-  </tr>
-  <tr>
-    <td align="center">RGB Mode Global</td>
-    <td align="center">SUMO-GUI Mode Global</td>
-  </tr>
-</table>
-
 
 ## Local Intersection Rendering
 

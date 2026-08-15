@@ -8,3 +8,4 @@ TransSimHub Objects
     aircraft
     vehicle
     traffic_light
+    lane_edge

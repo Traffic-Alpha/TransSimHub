@@ -15,8 +15,10 @@ from ..aircraft.aircraft_builder import AircraftBuilder
 from ..traffic_light.traffic_light_builder import TrafficLightBuilder
 from ..vehicle.vehicle_builder import VehicleBuilder
 from ..person.person_builder import PersonBuilder
-from ..visualization.visualize_map import render_map
-from ..visualization.filter_objects import filter_object
+from ..lane.lane_builder import LaneBuilder
+from ..edge.edge_builder import EdgeBuilder
+from ..visualization.micro import LocalMapRenderer
+from ..visualization.micro import compute_focus_window
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -51,6 +53,8 @@ class TshubEnvironment(BaseSumoEnvironment):
                  is_aircraft_builder_initialized:bool = True, 
                  is_traffic_light_builder_initialized:bool = True,
                  is_person_builder_initialized:bool = True,
+                 is_lane_builder_initialized:bool = False,
+                 is_edge_builder_initialized:bool = False,
                  poly_file:str = None, osm_file:str = None, radio_map_files:Dict[str, str]=None,
                  tls_ids:List[str] = None, aircraft_inits:Dict[str, Any] = None,
                  vehicle_action_type:str = 'lane', hightlight:bool = False,
@@ -76,6 +80,8 @@ class TshubEnvironment(BaseSumoEnvironment):
         self.is_aircraft_builder_initialized = is_aircraft_builder_initialized
         self.is_traffic_light_builder_initialized = is_traffic_light_builder_initialized
         self.is_person_builder_initialized = is_person_builder_initialized
+        self.is_lane_builder_initialized = is_lane_builder_initialized
+        self.is_edge_builder_initialized = is_edge_builder_initialized
 
         # Map Builder Input
         self.poly_file = poly_file
@@ -101,6 +107,8 @@ class TshubEnvironment(BaseSumoEnvironment):
 
         # For SUMI-GUI render
         self.render_count = 0
+        # mode='rgb' 的局部视角渲染器 (持有路网空间索引与复用的 figure), 首次 render 时创建
+        self._map_renderer = None
 
     def __init_builder(self) -> None:
         map_builder = (
@@ -131,18 +139,35 @@ class TshubEnvironment(BaseSumoEnvironment):
             if self.is_person_builder_initialized
             else None
         )
+        lane_builder = (
+            LaneBuilder(sumo=self.sumo)
+            if self.is_lane_builder_initialized
+            else None
+        )
+        edge_builder = (
+            EdgeBuilder(sumo=self.sumo)
+            if self.is_edge_builder_initialized
+            else None
+        )
 
+        # 注意 key 与 obs 的 key 一致. 车道/路段的交通状态用 'lane_state'/'edge_state',
+        # 与地图的静态几何 obs['lane_shape'] 区分开
         self.scene_objects = {
             'vehicle': vehicle_builder,
             'aircraft': aircraft_builder,
             'tls': tls_builder,
             'person': person_builder,
+            'lane_state': lane_builder,
+            'edge_state': edge_builder,
         }
 
     def reset(self) -> Dict[str, Any]:
         """重置环境, 返回初始的 obs
         """
         self._close_simulation() # 关闭仿真
+        if self._map_renderer is not None: # 路网可能变化, 渲染器连同 figure 一起重建
+            self._map_renderer.close()
+            self._map_renderer = None
         self._start_simulation() # 开启仿真
         self.__init_builder() # 初始化场景内的 builder
         obs = self.__computer_observation()
@@ -202,32 +227,44 @@ class TshubEnvironment(BaseSumoEnvironment):
 
         Args:
             mode (str, optional): 渲染的模式，包含 rgb 和 sumo_gui. Defaults to rgb.
-            focus_id (str, optional): 追踪模式，设置追踪 object 的 ID. Defaults to None. 如果设置为 None，就是全局渲染
-            focus_type (str, optional): 追踪 object 的类型，包含 vehicle 和 node. Defaults to None.
-            focus_distance (float, optional): 追踪覆盖的范围. Defaults to None.
-            save_folder (str, optional): 当 mode='sumo_gui' 的时候，图像保存的文件夹。 
+            focus_id (str, optional): 追踪 object 的 ID。mode='rgb' 时必填。
+            focus_type (str, optional): 追踪 object 的类型，包含 vehicle 和 node。
+                mode='rgb' 时必填。其中 node (路口) 是固定的，视野窗口整个 episode 都不变，
+                因此路网图层只会构建一次。
+            focus_distance (float, optional): 追踪覆盖的范围 (m)。mode='rgb' 时必填。
+            save_folder (str, optional): 当 mode='sumo_gui' 的时候，图像保存的文件夹。
+
+        Note:
+            mode='rgb' 只提供**局部视角**（跟随某辆车或某个路口）。全网态势请用
+            tshub.visualization.meso（中观大屏），它在大路网上快得多也清楚得多。
+
+            返回的 figure 是复用的：下一次 render 之前要先保存或转成数组。
         """
         if not self.is_map_builder_initialized:
             raise ValueError('需要初始化地图信息')
-        
-        # Step 1. Filter Object (找出符合要求的 object 坐标)
-        obs, x_range, y_range = filter_object(
-            self.obs, 
-            focus_id, focus_type, focus_distance
+
+        # 两种模式都只提供局部视角: 全网态势请用 tshub.visualization.meso (中观大屏)
+        if (focus_id is None) or (focus_type is None) or (focus_distance is None):
+            raise ValueError(
+                "render() 只支持局部视角, 需要同时给出 focus_id / focus_type / focus_distance. "
+                "如果想看全网的态势, 请使用 tshub.visualization.meso (中观大屏)."
+            )
+        x_range, y_range = compute_focus_window(
+            self.obs, focus_id, focus_type, focus_distance
         )
 
         # Step 2. Render Image (rgb or sumo-gui)
         if mode == 'rgb':
             if (x_range is None) and (y_range is None):
-                fig = None # 如果追踪的物体不在, 则 fig 直接返回 None
-            else:
-                map_lanes, map_nodes, vehicle_info = obs['lane'], obs['node'], obs['vehicle']
-                fig = render_map(
-                    focus_id,
-                    map_lanes, map_nodes, vehicle_info, 
-                    x_range=x_range, y_range=y_range
-                ) # 如果在, 则渲染 focus_id 附近的内容
-            return fig
+                return None # 如果追踪的物体不在, 则 fig 直接返回 None
+
+            if self._map_renderer is None: # 路网索引只建一次
+                self._map_renderer = LocalMapRenderer(
+                    map_lanes=self.obs['lane_shape'], map_nodes=self.obs['node'],
+                )
+            return self._map_renderer.render(
+                focus_id, self.obs['vehicle'], x_range=x_range, y_range=y_range,
+            )
         elif mode == 'sumo_gui':
             assert self.use_gui == True, '需要开启 GUI 界面才可以使用 SUMO-GUI 进行渲染。'
             assert save_folder is not None, '需要在 save_folder 设置文件保存的路径。'

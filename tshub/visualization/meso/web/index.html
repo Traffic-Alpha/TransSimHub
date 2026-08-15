@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TransSimHub Traffic Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>TransSimHub <span>Mesoscopic Traffic Dashboard</span></h1>
+    <div class="status">
+      <span id="conn" class="badge offline">Disconnected</span>
+      <span id="clock">t = --</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="map-panel">
+      <canvas id="map"></canvas>
+      <div class="map-tools">
+        <label><input type="radio" name="granularity" value="edge" checked> Edge</label>
+        <label><input type="radio" name="granularity" value="lane"> Lane</label>
+        <button id="reset-view" title="Fit the whole network">Reset view</button>
+      </div>
+      <div class="legend">
+        <span>Stopped</span>
+        <i style="background:#811f1f"></i><i style="background:#f23c32"></i><i
+          style="background:#ff974d"></i><i style="background:#63d668"></i>
+        <span>Free flow</span>
+      </div>
+      <div id="tooltip" class="tooltip"></div>
+    </section>
+
+    <aside class="side-panel">
+      <div class="kpi-grid">
+        <div class="kpi">
+          <label>Average speed</label><b id="kpi-speed">--</b>
+          <small id="kpi-speed-sub">of vehicles on the network</small>
+        </div>
+        <div class="kpi">
+          <label>Network at free flow</label><b id="kpi-freeflow">--</b>
+          <small id="kpi-freeflow-sub">100% = everyone at the speed limit</small>
+        </div>
+        <div class="kpi">
+          <label>Vehicles</label><b id="kpi-vehicles">--</b>
+          <small id="kpi-halting-sub">--</small>
+        </div>
+        <div class="kpi">
+          <label>Congested edges</label><b id="kpi-jam">--</b>
+          <small id="kpi-jam-sub">below half the speed limit</small>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Network breakdown</h2>
+        <div id="levels" class="levels"></div>
+        <div class="levels-legend">
+          <span><i style="background:#811f1f"></i>Stopped</span>
+          <span><i style="background:#f23c32"></i>Slow</span>
+          <span><i style="background:#ff974d"></i>Moderate</span>
+          <span><i style="background:#63d668"></i>Free</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Free-flow speed over time</h2>
+        <canvas id="trend" height="110"></canvas>
+      </div>
+
+      <div class="card">
+        <h2>Most congested edges <small>slowest first</small></h2>
+        <ol id="ranking" class="ranking"></ol>
+      </div>
+
+      <div class="card" id="uav-card">
+        <h2>UAV onboard cameras</h2>
+        <div id="uav-meta" class="uav-meta">No UAV</div>
+        <div id="images" class="image-grid"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 点击回传图像后的全屏查看层 -->
+  <div id="lightbox" class="lightbox">
+    <img id="lightbox-img" alt="">
+    <div id="lightbox-caption"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -17,9 +17,7 @@ class VerticalMovementAction(AircraftAction):
     def __init__(self, id) -> None:
         super().__init__(id)
 
-    def execute(self, position:Tuple[float, float, float], 
-                speed: float, heading_index: int) -> None:
+    def execute(self, speed: float, heading_index: int) -> Tuple[float, float, float]:
         heading = self.HEADINGS[heading_index]
-        new_position = self.calculate_new_position(position=position, speed=speed, heading=heading)
-        return new_position, heading
+        return self._scale(heading, speed)
 

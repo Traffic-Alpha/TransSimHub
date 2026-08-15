@@ -7,4 +7,5 @@ TransSimHub Documentation
 
     introduction/index
     installation/index
+    dashboard/index
     tshub3d_sensors/index
