@@ -52,6 +52,7 @@
     <polygonType id="man_made"                name="man_made"    color="1.0,.90,.90" layer="-1"/>
     <polygonType id="man_made.pipeline"       name="pipeline"    color="1.0,.90,.90" layer="-1"/>
     <polygonType id="building"                name="building"    color="1.0,.90,.90" layer="-1"/>
+    <polygonType id="building:part"           name="building"    color="1.0,.90,.90" layer="-1"/>
     <polygonType id="amenity"                 name="amenity"     color=".93,.78,.78" layer="-1"/>
     <polygonType id="amenity.parking"         name="parking"     color=".72,.72,.70" layer="-1"/>
 

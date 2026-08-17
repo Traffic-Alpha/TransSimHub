@@ -2,7 +2,7 @@
     叠加层：只保留建筑/设施，丢弃绿地、水域、土地利用等地物。
     叠加在基础 poly.typ.xml 之后（scenario_build(poly_typemap=["poly", "poly_buildings_only"]）),
     对自然/水域/landuse/leisure/sport 等类设 discard="true"，
-    保留 building / amenity / man_made / shop / historic（含 amenity=police 警局）。
+    保留 building / building:part / amenity / man_made / shop / historic（含 amenity=police 警局）。
 -->
 <polygonTypes>
     <polygonType id="waterway"                name="water"       color=".71,.82,.82" layer="-4" discard="true"/>

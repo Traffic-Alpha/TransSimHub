@@ -57,7 +57,7 @@ osm_build_type/ 目录约定 (两层): base 完整表  +  layers/ 叠加补丁
 import sumolib
 import subprocess
 import xml.etree.ElementTree as ET
-from typing import List, Literal, Union
+from typing import Dict, List, Literal, Union
 from pathlib import Path
 from loguru import logger
 from ..utils.get_abs_path import get_abs_path
@@ -163,6 +163,145 @@ DEFAULT_NETCONVERT_OPTS = (
     '--output.original-names'
 )
 
+OSM_TAGS_TO_PRESERVE = (
+    # Building geometry / height semantics.
+    'building', 'building:part', 'building:levels', 'building:height',
+    'height', 'min_height', 'building:min_level', 'roof:shape', 'roof:levels',
+    'roof:height',
+    # Common useful metadata. addr:* is handled by prefix below.
+    'name', 'name:en', 'name:zh', 'amenity', 'shop', 'man_made', 'historic',
+)
+
+OSM_TAG_PREFIXES_TO_PRESERVE = ('addr:',)
+
+
+def _osm_tags_by_element_id(osm_file: Path) -> Dict[str, Dict[str, str]]:
+    """Read OSM way/relation tags keyed by raw element id.
+
+    polyconvert keeps source ids in generated poly ids in the common cases
+    (``123``, ``123#1``, ``way_123``, ``rel_123``).  This map lets us add back
+    selected OSM tags that polyconvert does not write to additional-file params.
+    """
+    root = ET.parse(osm_file).getroot()
+    tags_by_id = {}
+    for elem_name, prefix in (('way', 'way'), ('relation', 'rel')):
+        elems = root.iter(elem_name)
+        for elem in elems:
+            elem_id = elem.get('id')
+            if not elem_id:
+                continue
+            tags = {
+                tag.get('k'): tag.get('v')
+                for tag in elem.findall('tag')
+                if tag.get('k') and tag.get('v') is not None
+            }
+            if not tags:
+                continue
+            tags_by_id.setdefault(str(elem_id), tags)
+            tags_by_id[f'{prefix}_{elem_id}'] = tags
+            if elem_name == 'relation':
+                tags_by_id[f'relation_{elem_id}'] = tags
+    return tags_by_id
+
+
+def prepare_osm_for_polyconvert(osm_file: Union[str, Path], output_osm: Union[str, Path]) -> int:
+    """Create a polyconvert input that keeps closed ``building:part`` ways.
+
+    SUMO polyconvert ignores ways that only have ``building:part`` in some
+    versions.  For polygon conversion only, add ``building=yes`` to those closed
+    ways so the official converter keeps their footprint.  The original
+    ``building:part`` tag is left intact and later preserved as a poly param.
+
+    Returns the number of ways patched in the generated copy.
+    """
+    osm_file = Path(osm_file)
+    output_osm = Path(output_osm)
+    tree = ET.parse(osm_file)
+    changed = 0
+
+    for way in tree.getroot().iter('way'):
+        refs = [nd.get('ref') for nd in way.findall('nd') if nd.get('ref')]
+        if len(refs) < 4 or refs[0] != refs[-1]:
+            continue
+        tags = {
+            tag.get('k'): tag
+            for tag in way.findall('tag')
+            if tag.get('k')
+        }
+        if 'building:part' in tags and 'building' not in tags:
+            ET.SubElement(way, 'tag', {'k': 'building', 'v': 'yes'})
+            changed += 1
+
+    if changed:
+        ET.indent(tree, space='  ')
+        tree.write(output_osm, encoding='utf-8', xml_declaration=True)
+    return changed
+
+
+def _poly_id_candidates(poly_id: str) -> List[str]:
+    if not poly_id:
+        return []
+    base_id = str(poly_id).split('#', 1)[0]
+    candidates = [str(poly_id), base_id]
+    for prefix in ('way_', 'rel_', 'relation_'):
+        if base_id.startswith(prefix):
+            candidates.append(base_id[len(prefix):])
+    return list(dict.fromkeys(candidates))
+
+
+def _selected_osm_tags(tags: Dict[str, str]) -> Dict[str, str]:
+    selected = {}
+    for key, value in tags.items():
+        if key in OSM_TAGS_TO_PRESERVE or any(key.startswith(prefix) for prefix in OSM_TAG_PREFIXES_TO_PRESERVE):
+            selected[key] = value
+    return selected
+
+
+def _set_param(poly, key: str, value: str) -> bool:
+    for param in poly.findall('param'):
+        if param.get('key') == key:
+            if param.get('value') == value:
+                return False
+            param.set('value', value)
+            return True
+    ET.SubElement(poly, 'param', {'key': key, 'value': value})
+    return True
+
+
+def enrich_poly_with_osm_tags(poly_file: Union[str, Path], osm_file: Union[str, Path]) -> int:
+    """Add selected source OSM tags back to generated building polygons.
+
+    SUMO polyconvert converts the footprint/type but normally drops tags such as
+    ``building:levels``.  TSHub needs those tags later for 3D height generation,
+    so we preserve them as SUMO ``<param>`` elements.
+    """
+    poly_file = Path(poly_file)
+    osm_file = Path(osm_file)
+    tags_by_id = _osm_tags_by_element_id(osm_file)
+    tree = ET.parse(poly_file)
+    changed = 0
+
+    for poly in tree.getroot().iter('poly'):
+        if poly.get('type') != 'building':
+            continue
+
+        tags = None
+        for candidate in _poly_id_candidates(poly.get('id')):
+            tags = tags_by_id.get(candidate)
+            if tags:
+                break
+        if not tags:
+            continue
+
+        for key, value in _selected_osm_tags(tags).items():
+            if _set_param(poly, key, value):
+                changed += 1
+
+    if changed:
+        ET.indent(tree, space='  ')
+        tree.write(poly_file, encoding='utf-8', xml_declaration=True)
+    return changed
+
 
 def scenario_build(
     osm_file:str,
@@ -189,8 +328,9 @@ def scenario_build(
         subprocess.CalledProcessError: _description_
         Exception: _description_
     """
-    osm_file = Path(osm_file)
-    output_directory = Path(output_directory)
+    osm_file = Path(osm_file).resolve()
+    output_directory = Path(output_directory).resolve()
+    output_directory.mkdir(parents=True, exist_ok=True)
     file_name = osm_file.stem # osm 文件的名字
     lefthand = _is_left_hand_traffic(driving_side)
 
@@ -223,6 +363,15 @@ def scenario_build(
     # polyconvert config
     # ###################
     logger.info(f'SIM: 开始设置 polyconvert 的参数.')
+    poly_osm_file = output_directory/f'{file_name}.polyconvert.osm'
+    patched_building_parts = prepare_osm_for_polyconvert(osm_file, poly_osm_file)
+    if patched_building_parts:
+        logger.info(
+            f'SIM: 为 polyconvert 临时补充 {patched_building_parts} 个 closed building:part 的 building tag.'
+        )
+    else:
+        poly_osm_file = osm_file
+
     # 解析 + (多文件时) 合并 typemap; 支持单个/列表/内置短名
     poly_typemap = _merge_typemaps(
         _resolve_typemap_paths(poly_typemap, 'poly'),
@@ -231,7 +380,7 @@ def scenario_build(
     poly_cfg = output_directory/f'{file_name}.polygcfg' # 配置文件
     polyconvert_opts = [polyconvert]
     polyconvert_opts += ['--type-file', poly_typemap] # 保留的 poly type 类型
-    polyconvert_opts += ['--osm-files', osm_file] # 输入的 osm 文件
+    polyconvert_opts += ['--osm-files', poly_osm_file] # 输入的 osm 文件
     polyconvert_opts += ['--discard', 'true'] # 去掉 unknown 的 polygon
     polyconvert_opts += ['--osm.merge-relations', '1']
     polyconvert_opts += ["-n", net_file, "-o", poly_file]
@@ -257,3 +406,8 @@ def scenario_build(
             logger.info(f'SIM: !!!命令 {command} 执行失败!!!')
             logger.info(f'SIM: 错误信息为: {e.output.decode()}')
             raise Exception("SIM: 调用失败，存在错误返回")
+
+    enriched = enrich_poly_with_osm_tags(poly_file, osm_file)
+    logger.info(
+        f'SIM: 已向 {poly_file} 回填 {enriched} 个 OSM building tag 参数.'
+    )
