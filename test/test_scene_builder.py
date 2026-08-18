@@ -1,12 +1,14 @@
 '''
 @Author: WANG Maonan
 @Date: 2026-06-01 00:00:00
-@Description: 渲染器无关场景描述层 (vis3d_scene) 的单元测试.
+@Description: 渲染器无关场景描述层 (tshub_env3d.scene) 的单元测试.
 重点验证: (1) 该层不依赖 panda3d; (2) build_frame/build_tls_rigs/validate 行为正确.
 @LastEditTime: 2026-06-01 00:00:00
 '''
 import sys
 import math
+import tempfile
+from pathlib import Path
 import unittest
 
 
@@ -16,12 +18,12 @@ class TestSceneBuilder(unittest.TestCase):
         import tshub.tshub_env3d.scene  # noqa: F401
         self.assertFalse(
             any(m == 'panda3d' or m.startswith('panda3d.') for m in sys.modules),
-            "vis3d_scene 不应该 import panda3d"
+            "tshub_env3d.scene 不应该 import panda3d"
         )
 
     def test_build_frame_vehicle_and_aircraft(self):
-        from tshub.tshub_env3d.scene import build_frame
-        from tshub.tshub_env3d.scene.utils.core_math import vec_to_radians, vec_2d
+        from tshub.tshub_env3d.core import build_frame
+        from tshub.tshub_env3d.core.utils.core_math import vec_to_radians, vec_2d
 
         obs = {
             'vehicle': {
@@ -47,13 +49,13 @@ class TestSceneBuilder(unittest.TestCase):
         self.assertEqual(a.position, (5.0, 6.0, 100.0))
 
     def test_build_frame_empty(self):
-        from tshub.tshub_env3d.scene import build_frame
+        from tshub.tshub_env3d.core import build_frame
         frame = build_frame({})
         self.assertEqual(frame.vehicles, {})
         self.assertEqual(frame.aircraft, {})
 
     def test_build_tls_rigs(self):
-        from tshub.tshub_env3d.scene import build_tls_rigs
+        from tshub.tshub_env3d.core import build_tls_rigs
         init_obs = {
             'tls': {
                 'J1': {
@@ -81,12 +83,12 @@ class TestSceneBuilder(unittest.TestCase):
         self.assertIn('position', rigs['J1_0'])
 
     def test_build_tls_rigs_no_config(self):
-        from tshub.tshub_env3d.scene import build_tls_rigs
+        from tshub.tshub_env3d.core import build_tls_rigs
         self.assertEqual(build_tls_rigs({}, {}), {})
         self.assertEqual(build_tls_rigs({'tls': {'J1': {}}}, {}), {})
 
     def test_validate_sensor_config(self):
-        from tshub.tshub_env3d.scene import validate_sensor_config
+        from tshub.tshub_env3d.core import validate_sensor_config
         self.assertTrue(validate_sensor_config({'tls': {'J1': {'sensor_types': ['junction_front_rgb']}}}))
         self.assertTrue(validate_sensor_config({}))
         # 非法 object 类别
@@ -95,9 +97,28 @@ class TestSceneBuilder(unittest.TestCase):
         self.assertFalse(validate_sensor_config({'vehicle': {'v1': {'sensor_types': ['not_a_sensor']}}}))
 
     def test_renderer_backend_is_abstract(self):
-        from tshub.tshub_env3d.scene import RendererBackend
+        from tshub.tshub_env3d.core import RendererBackend
         with self.assertRaises(TypeError):
             RendererBackend()  # 抽象类不能实例化
+
+    def test_poly_building_levels_are_used_as_height(self):
+        from tshub.tshub_env3d.scene.scene_data.static_scene import parse_buildings
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            poly = tmp / "buildings.poly.xml"
+            poly.write_text(
+                '<additional>'
+                '<poly id="100#1" type="building" shape="0,0 1,0 1,1">'
+                '<param key="building:levels" value="10"/></poly>'
+                '<poly id="200" type="building" shape="2,0 3,0 3,1">'
+                '<param key="height" value="42 m"/></poly>'
+                '</additional>'
+            )
+
+            buildings = parse_buildings(str(poly), building_level_height=3.2)
+
+        self.assertEqual([b["height"] for b in buildings], [32.0, 42.0])
 
 
 if __name__ == '__main__':

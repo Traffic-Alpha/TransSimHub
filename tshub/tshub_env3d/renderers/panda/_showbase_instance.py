@@ -32,7 +32,7 @@ class _ShowBaseInstance(ShowBase):
         """
         loadPrcFileData("", f"{key} {value}")
         
-    def __new__(cls, use_render_pipeline=False):
+    def __new__(cls):
         # Singleton pattern:  ensure only 1 ShowBase instance
         if "__it__" not in cls.__dict__:
             if cls._debug_mode <= DEBUG_MODE.INFO:

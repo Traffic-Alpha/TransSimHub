@@ -10,7 +10,7 @@ import numpy as np
 from typing import Tuple
 from .base_sensors.base_camera_sensor import CameraSensor
 from .cameras.build_offscreen_camera import build_offscreen_camera
-from tshub.tshub_env3d.scene import seg_color_to_label
+from tshub.tshub_env3d.core import seg_color_to_label
 
 class RGBSensor(CameraSensor):
     """A sensor that renders color values from around its target actor.

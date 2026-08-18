@@ -8,11 +8,10 @@ LastEditTime: 2025-07-28 21:14:29
 '''
 import math
 from loguru import logger
-from typing import Dict, Optional, List, Union
+from typing import Dict, List
 
 from direct.task import Task
 
-from tshub.tshub_env3d.scene.utils.colors import Colors, SceneColors
 
 from tshub.tshub_env3d.renderers.panda.masks import CamMask
 from tshub.tshub_env3d.renderers.panda.segmentation import tag_seg
@@ -22,7 +21,7 @@ from tshub.tshub_env3d.renderers.panda.base_render import DEBUG_MODE, BACKEND_LI
 from tshub.utils.get_abs_path import get_abs_path
 
 # 渲染器无关的场景描述层
-from tshub.tshub_env3d.scene import SceneFrame, SceneStatic, RendererBackend
+from tshub.tshub_env3d.core import SceneFrame, SceneStatic, RendererBackend
 
 # 场景渲染步骤
 from .rendering_components import (
@@ -74,7 +73,6 @@ class TSHubRenderer(RendererBackend):
         _ShowBaseInstance.set_rendering_backend(rendering_backend=rendering_backend)
         # 每一个仿真都有自己的 Renderer, 但是所有的 Renderer object 共用 ShowBaseInstance
         self._showbase_instance: _ShowBaseInstance = _ShowBaseInstance() # 初始化 Pnada3D ShowBase
-        self._interest_color: Optional[Union[Colors, SceneColors]] = SceneColors.Agent # 希望 ego 车辆的颜色
         
         # 初始化场景
         self.setup(scenario_glb_dir)
@@ -115,8 +113,6 @@ class TSHubRenderer(RendererBackend):
             showbase_instance=self._showbase_instance,
             scenario_glb_dir=scenario_glb_dir,
             skybox_dir=self.current_file_path("../../_assets_3d/skybox/"),
-            terrain_dir=self.current_file_path("../../_assets_3d/terrain/"),
-            map_road_lane_glsl_dir=self.current_file_path("../../_assets_3d/map_road_lines/"),
             sky=self.sky,
         )
         # 完成了场景的初始化

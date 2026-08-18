@@ -11,14 +11,14 @@ import unittest
 class TestSensorRig(unittest.TestCase):
     def test_registry_covers_all_valid_sensors(self):
         """CAMERA_RIGS 必须覆盖 VALID_SENSORS 中的每一个 sensor_type."""
-        from tshub.tshub_env3d.scene import CAMERA_RIGS, VALID_SENSORS
+        from tshub.tshub_env3d.core import CAMERA_RIGS, VALID_SENSORS
         all_valid = {s for sensors in VALID_SENSORS.values() for s in sensors}
         missing = all_valid - set(CAMERA_RIGS)
         self.assertEqual(missing, set(), f"these sensor_types have no rig: {missing}")
 
     def test_modality_and_carrier_parsed(self):
         """每个 base rig 会派生 _rgb / _seg 两个 modality, carrier 保持不变."""
-        from tshub.tshub_env3d.scene import get_camera_rig
+        from tshub.tshub_env3d.core import get_camera_rig
         self.assertEqual(get_camera_rig('front_left_rgb').modality, 'rgb')
         self.assertEqual(get_camera_rig('front_left_seg').modality, 'seg')
         self.assertEqual(get_camera_rig('front_left_rgb').carrier, 'vehicle')
@@ -26,7 +26,7 @@ class TestSensorRig(unittest.TestCase):
         self.assertEqual(get_camera_rig('aircraft_rgb').carrier, 'aircraft')
 
     def test_unknown_sensor_raises(self):
-        from tshub.tshub_env3d.scene import get_camera_rig
+        from tshub.tshub_env3d.core import get_camera_rig
         with self.assertRaises(KeyError):
             get_camera_rig('nope')
 
@@ -36,7 +36,7 @@ class TestSensorRig(unittest.TestCase):
         heading 采用 tshub/SMARTS 约定: 0 度指向 +Y, 逆时针为正 (见 compute_camera_pose).
         front 的 pull_back 为负 (-1.8), 表示 eye 沿视线方向前移到车头, 而不是后退.
         """
-        from tshub.tshub_env3d.scene import get_camera_rig, compute_camera_pose
+        from tshub.tshub_env3d.core import get_camera_rig, compute_camera_pose
         rig = get_camera_rig('front_rgb')
         eye, target = compute_camera_pose(rig, (100.0, 200.0), carrier_heading_deg=0.0)
         # heading=0 -> 前方是 +Y; eye 在车头前 |pull_back| 处、抬高 height
@@ -49,7 +49,7 @@ class TestSensorRig(unittest.TestCase):
 
     def test_compute_pose_yaw_offset(self):
         """front_left 看向相对 heading -30 度 (即从 +Y 起逆时针转 -30 -> 60 度)."""
-        from tshub.tshub_env3d.scene import get_camera_rig, compute_camera_pose
+        from tshub.tshub_env3d.core import get_camera_rig, compute_camera_pose
         rig = get_camera_rig('front_left_rgb')
         _, target = compute_camera_pose(rig, (0.0, 0.0), carrier_heading_deg=0.0)
         ang = math.degrees(math.atan2(target[1], target[0]))
@@ -57,7 +57,7 @@ class TestSensorRig(unittest.TestCase):
 
     def test_compute_pose_top_down_and_height_override(self):
         """俯视相机看正下方; tls 用 height_override 覆盖相机高度."""
-        from tshub.tshub_env3d.scene import get_camera_rig, compute_camera_pose
+        from tshub.tshub_env3d.core import get_camera_rig, compute_camera_pose
         bev = get_camera_rig('bev_rgb')
         eye, target = compute_camera_pose(bev, (5.0, 6.0), carrier_heading_deg=123.0)
         self.assertEqual((eye[0], eye[1]), (5.0, 6.0))

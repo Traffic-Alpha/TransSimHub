@@ -14,7 +14,7 @@ from typing import Dict, List
 from ..traffic_elements.vehicle import Vehicle3DElement
 from ..traffic_elements.traffic_signals import TLS3DElement
 from ..traffic_elements.aircraft import Aircraft3DElement
-from tshub.tshub_env3d.scene import SceneFrame, SceneStatic, ObjectPose, validate_sensor_config
+from tshub.tshub_env3d.core import SceneFrame, SceneStatic, ObjectPose, validate_sensor_config
 
 
 class SceneSync(object):

@@ -2,7 +2,7 @@
 @Author: WANG Maonan
 @Date: 2024-07-03 23:21:22
 @Description: Panda 渲染后端用到的配置枚举 (调试级别 / 渲染后端字面量).
-渲染后端的接口契约见 tshub_env3d.scene.RendererBackend; 具体实现见 tshub_render.TSHubRenderer.
+渲染后端的接口契约见 tshub_env3d.core.RendererBackend; 具体实现见 tshub_render.TSHubRenderer.
 @LastEditTime: 2026-07-10
 '''
 from enum import IntEnum

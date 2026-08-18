@@ -10,13 +10,11 @@ LastEditTime: 2025-07-28 21:16:41
 from loguru import logger
 from typing import Any, Dict, List
 
-from .base_env3d import BaseSumoEnvironment3D
-
 from ..tshub_env.tshub_env import TshubEnvironment # tshub 与 sumo 交互
 from tshub.tshub_env3d.renderers import create_renderer # 按名称选择渲染后端
-from tshub.tshub_env3d.scene import SceneStatic, build_frame, build_tls_rigs # 渲染器无关的场景描述
+from tshub.tshub_env3d.core import SceneStatic, build_frame, build_tls_rigs # 渲染器无关的场景描述
 
-class Tshub3DEnvironment(BaseSumoEnvironment3D):
+class Tshub3DEnvironment:
     def __init__(
             # TshubEnvironment 的参数 (与 SUMO 交互)
             self, sumo_cfg: str, 

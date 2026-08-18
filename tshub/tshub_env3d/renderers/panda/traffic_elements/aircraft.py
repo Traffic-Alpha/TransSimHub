@@ -9,7 +9,7 @@ from loguru import logger
 
 from .base_element import BaseElement
 from tshub.tshub_env3d.renderers.panda.masks import CamMask
-from tshub.tshub_env3d.scene import select_aircraft_model_name
+from tshub.tshub_env3d.core import select_aircraft_model_name
 from tshub.utils.get_abs_path import get_abs_path
 
 # 导入传感器

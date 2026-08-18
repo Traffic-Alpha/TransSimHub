@@ -11,7 +11,7 @@ from .base_element import BaseElement
 
 # 导入传感器
 from tshub.tshub_env3d.renderers.panda.masks import CamMask
-from tshub.tshub_env3d.scene import select_vehicle_model_name # 车辆模型选择 (各后端共用)
+from tshub.tshub_env3d.core import select_vehicle_model_name # 车辆模型选择 (各后端共用)
 from tshub.utils.get_abs_path import get_abs_path
 
 class Vehicle3DElement(BaseElement):

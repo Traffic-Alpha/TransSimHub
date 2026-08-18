@@ -11,7 +11,7 @@ seg 相机通过 Panda 的 tag-state 对带该标签的节点套一个 flat shad
 from panda3d.core import Shader, ShaderAttrib, RenderState
 
 from tshub.utils.get_abs_path import get_abs_path
-from tshub.tshub_env3d.scene import SEG_RENDER_COLORS
+from tshub.tshub_env3d.core import SEG_RENDER_COLORS
 
 _current_file_path = get_abs_path(__file__)
 

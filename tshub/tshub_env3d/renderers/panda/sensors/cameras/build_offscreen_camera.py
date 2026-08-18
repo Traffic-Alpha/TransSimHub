@@ -15,7 +15,7 @@ from panda3d.core import (
 )
 
 from .offscreen_camera.camera import OffscreenCamera
-from tshub.tshub_env3d.scene import CameraRig
+from tshub.tshub_env3d.core import CameraRig
 from tshub.tshub_env3d.renderers.panda.segmentation import configure_seg_camera
 
 

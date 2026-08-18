@@ -1,12 +1,12 @@
 '''
-@Description: 渲染后端集合. 每个后端实现 scene.RendererBackend.
+@Description: 渲染后端集合. 每个后端实现 core.RendererBackend.
 
 当前在线后端只有 Panda3D (实时, 供 loop 内感知). 离线写实渲染 (Blender/Cycles)
 是独立的离线路径, 不走这个 create_renderer 工厂.
 
 通过 create_renderer 按名称选择后端; 采用懒加载, 只在选用某后端时才 import 其依赖.
 '''
-from ..scene import RendererBackend
+from ..core import RendererBackend
 
 AVAILABLE_RENDERERS = ('panda',)
 

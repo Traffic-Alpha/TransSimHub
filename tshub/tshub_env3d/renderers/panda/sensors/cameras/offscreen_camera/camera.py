@@ -9,8 +9,8 @@ from typing import Tuple
 from dataclasses import dataclass
 
 from .base_offscreen_camera import BaseOffscreenCamera, _BaseOffCameraMixin
-from tshub.tshub_env3d.scene.utils.coordinates import Pose
-from tshub.tshub_env3d.scene import CameraRig, compute_camera_pose
+from tshub.tshub_env3d.core.utils.coordinates import Pose
+from tshub.tshub_env3d.core import CameraRig, compute_camera_pose
 
 
 @dataclass

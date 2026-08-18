@@ -15,8 +15,8 @@ import numpy as np
 from typing import Tuple, List
 from abc import ABC, abstractmethod
 
-from tshub.tshub_env3d.scene.utils.coordinates import Pose, Heading
-from tshub.tshub_env3d.scene import get_camera_rig
+from tshub.tshub_env3d.core.utils.coordinates import Pose, Heading
+from tshub.tshub_env3d.core import get_camera_rig
 from tshub.tshub_env3d.renderers.panda.masks import FULL_CAM_MASK
 from tshub.tshub_env3d.renderers.panda.sensors.rgb_sensor import RGBSensor
 
