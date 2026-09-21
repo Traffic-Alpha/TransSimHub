@@ -88,9 +88,10 @@ def make_style_materials(style):
     }
 
 
-def add_ground(bbox, material, z=-0.05):
-    """远处绿地平面 (略低于路面)."""
+def add_ground(bbox, material, z=-0.05, margin=0.0):
+    """远处绿地平面 (略低于路面); margin 是相对路网包围盒外扩的米数."""
     xmin, ymin, xmax, ymax = bbox
+    xmin, ymin, xmax, ymax = xmin - margin, ymin - margin, xmax + margin, ymax + margin
     verts = [(xmin, ymin, z), (xmax, ymin, z), (xmax, ymax, z), (xmin, ymax, z)]
     mesh = bpy.data.meshes.new("ground")
     obj = bpy.data.objects.new("ground", mesh)
@@ -439,7 +440,8 @@ def build(scene_json, out_dir, asset_dir=None):
     line_style = CITY_BUILDER_STYLE["line"]
 
     # 1. 远处绿地 (包围盒平面, 最低)
-    ground_objs = [add_ground(data['bbox'], materials["ground"], z=z["ground"])]
+    ground_objs = [add_ground(data['bbox'], materials["ground"], z=z["ground"],
+                              margin=data.get('ground_margin', 0.0))]
 
     # 2. 路面 (深灰, z=0) + 路缘灰色铺装带 (中灰, z=-0.03, 贴着道路向外扩)
     road_objs = []

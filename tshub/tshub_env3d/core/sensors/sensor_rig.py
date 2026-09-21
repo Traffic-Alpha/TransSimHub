@@ -3,7 +3,7 @@
 @Date: 2026-06-01 00:00:00
 @Description: 渲染器无关的「相机 rig」规格 (carrier-mounted camera spec).
 
-把"相机挂在哪个载体上、相对位姿、fov、可见性(mask)"从具体渲染器中抽出来,
+把"相机挂在哪个载体上、相对位姿、fov、模态(rgb/seg)"从具体渲染器中抽出来,
 做成声明式数据 + 一个把 (载体世界位姿 + rig) 算成 (eye, target) 世界坐标的纯函数,
 这样各渲染后端共用同一套相机定义, 不必各自硬编码.
 
@@ -116,7 +116,7 @@ _BASE_RIGS = {
     ),
 }
 
-# 基础相机几何 (base name -> CameraRig), 供后端按相机几何引用 (可见性无关)
+# 基础相机几何 (base name -> CameraRig), 供后端按相机几何引用 (与模态无关)
 BASE_CAMERA_RIGS: Dict[str, CameraRig] = dict(_BASE_RIGS)
 
 # sensor_type 字符串 -> CameraRig (展开 _rgb / _seg 两种模态)

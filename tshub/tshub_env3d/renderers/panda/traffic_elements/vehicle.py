@@ -10,8 +10,8 @@ from typing import Tuple
 from .base_element import BaseElement
 
 # 导入传感器
-from tshub.tshub_env3d.renderers.panda.masks import CamMask
 from tshub.tshub_env3d.core import select_vehicle_model_name # 车辆模型选择 (各后端共用)
+from tshub.tshub_env3d.renderers.panda.model_pool import instance_model, model_dimensions
 from tshub.utils.get_abs_path import get_abs_path
 
 class Vehicle3DElement(BaseElement):
@@ -45,15 +45,16 @@ class Vehicle3DElement(BaseElement):
         """Create a vehicle node.
         """
         veh_model_path = self._select_vehicle_model() # 随机选择车辆的模型
-        self.veh_node_path = self.showbase_instance.loader.loadModel(veh_model_path)
-        self.get_node_dimensions(node_path=self.veh_node_path)
-        self.veh_node_path.setName(f"vehicle-{self.element_id}")
+        # 共享几何: 同款车只加载一次, 之后只是 instance (车流进出很频繁, 见 model_pool)
+        self.veh_node_path = instance_model(
+            self.showbase_instance, veh_model_path, f"vehicle-{self.element_id}"
+        )
+        self.length, self.width, self.height = model_dimensions(
+            self.showbase_instance, veh_model_path)
 
         pose = self.get_element_pose_from_bumper() # 车辆坐标转换
         pos, heading = pose.as_panda3d() # 转换为位置和角度
         self.veh_node_path.setPosHpr(*pos, heading, 0, 0)
-        self.veh_node_path.hide(CamMask.AllOn) # 首先不让所有相机看到
-        self.veh_node_path.show(CamMask.VehMask) # 接着只让部分相机可以看到
         
         return True
 
@@ -135,10 +136,3 @@ class Vehicle3DElement(BaseElement):
         for _sensor_id, _sensor in self.sensors.items():
             # 更新 camera 的位置, 车辆的 sensor 跟着车辆跑就行
             _sensor.step(self.get_element_pose_from_bumper())
-    
-    def get_sensor(self):
-        sensor_data = {}
-        for _sensor_id, _sensor in self.sensors.items():
-            ego_rgb = _sensor() # 调用 call 获得传感器数据
-            sensor_data[_sensor_id] = ego_rgb
-        return sensor_data

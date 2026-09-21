@@ -18,7 +18,6 @@ class RGBSensor(CameraSensor):
     def __init__(
         self,
         camera_name:str,
-        camera_mask,
         showbase_instance,
         root_np,
         init_element_pose,
@@ -27,6 +26,7 @@ class RGBSensor(CameraSensor):
         fig_height:int=600,
         fig_resolution:float=0.1,
         rig=None, # 相机规格 (CameraRig), 决定位姿/朝向
+        ortho_size=None, # 路口俯视正交相机覆盖的世界尺寸 (米). 为 None 时用 rig 默认值.
         *args, **kwargs,
     ) -> None:
         super().__init__()
@@ -34,8 +34,8 @@ class RGBSensor(CameraSensor):
         self.element_dimensions = element_dimensions
         height_override = kwargs.get("height")
         self.camera = build_offscreen_camera(
+            ortho_override=ortho_size,
             name=camera_name,
-            mask=camera_mask,
             width=fig_width,
             height=fig_height,
             resolution=fig_resolution,

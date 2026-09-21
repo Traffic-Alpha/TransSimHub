@@ -13,7 +13,6 @@ from panda3d.core import (
     Vec4,
     DirectionalLight,
 )
-from tshub.tshub_env3d.renderers.panda.masks import CamMask
 from tshub.tshub_env3d.renderers.panda.segmentation import tag_seg
 
 class SceneLoader(object):
@@ -25,16 +24,29 @@ class SceneLoader(object):
     BUILDING_FILENAME = "buildings.glb"
     VEGETATION_FILENAME = "vegetation.glb"
     PROPS_FILENAME = "props.glb"
-    SKY_COLORS = {
-        "day": {
+    # 天空风格: 一档同时决定「天空渐变」与「打光」.
+    # 以前只有天空颜色, 灯光是写死的 —— 结果 dust 只换了张天空壁纸, 地面受光一点没变
+    # (实测 day/dust 地面逐字节相同). 现在把灯光并进同一档里, 单一真相源.
+    #   horizon/zenith/clear : 程序化天空渐变 (skybox shader 的 uniform)
+    #   ambient              : 平摊补光 (填充阴影)
+    #   directional          : 主方向光 (太阳), 略偏暖
+    #   light_direction      : 太阳方向 (指向场景中心的方向向量)
+    SKY_STYLES = {
+        "day": { # 晴天: 天空偏蓝, 主光中性略暖
             "horizon": (0.68, 0.78, 0.86),
             "zenith": (0.36, 0.58, 0.82),
             "clear": (0.62, 0.74, 0.86, 1),
+            "ambient": (0.80, 0.82, 0.86, 1),
+            "directional": (1.30, 1.26, 1.17, 1),
+            "light_direction": (-1, -1, -0.5),
         },
-        "dust": {
+        "dust": { # 沙尘: 天空偏沙黄, 主光变暖变弱 (尘埃吸收), 环境光同样偏暖
             "horizon": (0.78, 0.70, 0.58),
             "zenith": (0.53, 0.62, 0.72),
             "clear": (0.72, 0.66, 0.56, 1),
+            "ambient": (0.86, 0.80, 0.70, 1),
+            "directional": (1.16, 1.00, 0.76, 1),
+            "light_direction": (-1, -1, -0.35), # 太阳压低一点, 影子更长
         },
     }
 
@@ -79,9 +91,6 @@ class SceneLoader(object):
             map_np = self._showbase_instance.loader.loadModel(map_path, noCache=True)
             node_path = self._root_np.attachNewNode(self.ROAD_MAP_NODE_NAME)
             map_np.reparent_to(node_path)
-            # 定义 mask
-            node_path.hide(CamMask.AllOn)
-            node_path.show(CamMask.MapMask) # 只给部分 camera 展示
             tag_seg(node_path, 'road') # 语义分割: 路面
             # 路面/路缘颜色来自 glb 材质 (Blender 示意风格纯色), 不再用 setColor 覆盖
             map_bounds = map_np.getBounds()
@@ -110,8 +119,6 @@ class SceneLoader(object):
         model = self._showbase_instance.loader.loadModel(path, noCache=True)
         buildings_np = self._root_np.attachNewNode("buildings")
         model.reparent_to(buildings_np)
-        buildings_np.hide(CamMask.AllOn)
-        buildings_np.show(CamMask.MapMask) # 环境几何
         tag_seg(buildings_np, 'building') # 语义分割: 建筑
         # 外墙颜色来自 glb 材质 (Blender 示意风格浅灰灰模), 不再用 setColor 覆盖
         logger.info(f"SIM: 建筑加载成功.")
@@ -126,8 +133,6 @@ class SceneLoader(object):
         model = self._showbase_instance.loader.loadModel(path, noCache=True)
         vegetation_np = self._root_np.attachNewNode("vegetation")
         model.reparent_to(vegetation_np)
-        vegetation_np.hide(CamMask.AllOn)
-        vegetation_np.show(CamMask.MapMask)
         tag_seg(vegetation_np, 'ground')
         logger.info(f"SIM: 植被加载成功.")
         return vegetation_np
@@ -141,8 +146,6 @@ class SceneLoader(object):
         model = self._showbase_instance.loader.loadModel(path, noCache=True)
         props_np = self._root_np.attachNewNode("props")
         model.reparent_to(props_np)
-        props_np.hide(CamMask.AllOn)
-        props_np.show(CamMask.MapMask)
         tag_seg(props_np, 'pole')  # 语义分割: 路灯/长椅等街道设施
         logger.info(f"SIM: 路边小物件加载成功.")
         return props_np
@@ -157,8 +160,6 @@ class SceneLoader(object):
         model = self._showbase_instance.loader.loadModel(road_lines_path, noCache=True)
         solid_lines_np = self._root_np.attachNewNode("road_lines")
         model.reparent_to(solid_lines_np)
-        solid_lines_np.hide(CamMask.AllOn)
-        solid_lines_np.show(CamMask.MapMask) # 只给部分 camera 展示
         tag_seg(solid_lines_np, 'road_edge') # 语义分割: 道路边界线/路缘 (单独一类)
         logger.info(f"SIM: 加载道路线成功.")
         return solid_lines_np
@@ -174,23 +175,35 @@ class SceneLoader(object):
         model = self._showbase_instance.loader.loadModel(lane_lines_path, noCache=True)
         dashed_lines_np = self._root_np.attachNewNode("lane_lines")
         model.reparent_to(dashed_lines_np)
-        dashed_lines_np.hide(CamMask.AllOn)
-        dashed_lines_np.show(CamMask.MapMask) # 只给部分 camera 展示
         tag_seg(dashed_lines_np, 'lane') # 语义分割: 车道分隔线 (单独一类)
         logger.info(f"SIM: 加载车道线成功.")
         return dashed_lines_np
 
 
+    def _sky_style(self) -> dict:
+        """取当前 sky 对应的风格 (天空渐变 + 灯光)."""
+        style = self.SKY_STYLES.get(self.sky)
+        if style is None:
+            raise ValueError(f"SIM: 不支持的天空类型: {self.sky!r}, 可选: {sorted(self.SKY_STYLES)}")
+        return style
+
     def setup_lighting(
-            self, 
-            ambient_color: Vec4 = Vec4(0.80, 0.82, 0.86, 1),   # 平摊补光 (填充阴影, 与 IBL 一起提亮)
-            directional_color: Vec4 = Vec4(1.30, 1.26, 1.17, 1),  # 略暖的主方向光 (太阳, 加强)
+            self,
+            ambient_color: Vec4 = None,      # 缺省时取当前 sky 风格的环境光
+            directional_color: Vec4 = None,  # 缺省时取当前 sky 风格的主方向光
             light_height: int = 100,
-            light_direction: Vec3 = None  # 可选光照方向
+            light_direction: Vec3 = None     # 缺省时取当前 sky 风格的太阳方向
         ) -> None:
-        """设置光照
-        """
-        logger.info("SIM: 设置光照.")
+        """设置光照 (默认跟随 sky 风格, 见 SKY_STYLES)."""
+        style = self._sky_style()
+        if ambient_color is None:
+            ambient_color = Vec4(*style["ambient"])
+        if directional_color is None:
+            directional_color = Vec4(*style["directional"])
+        if light_direction is None:
+            light_direction = Vec3(*style["light_direction"])
+        logger.info(f"SIM: 设置光照 (sky={self.sky}, ambient={tuple(round(c,2) for c in ambient_color)}, "
+                    f"directional={tuple(round(c,2) for c in directional_color)}).")
         
         # 确保 map_center 是 Vec3 类型
         if isinstance(self.map_center, tuple):
@@ -213,8 +226,6 @@ class SceneLoader(object):
         directional_light_node_path = self._root_np.attachNewNode(directional_light)
 
         # 设置光源位置
-        if light_direction is None:
-            light_direction = Vec3(-1, -1, -0.5)  # 默认斜45度方向
         light_direction.normalize()
 
         light_pos = map_center - light_direction * self.map_radius
@@ -230,17 +241,13 @@ class SceneLoader(object):
         """初始化程序化 city-builder 天空.
         """
         logger.info(f"SIM: 初始化 Skybox.")
-        sky_colors = self.SKY_COLORS.get(self.sky)
-        if sky_colors is None:
-            raise ValueError(f"SIM: 不支持的天空类型: {self.sky!r}, 可选: {sorted(self.SKY_COLORS)}")
+        sky_colors = self._sky_style()
+
         self._showbase_instance.setBackgroundColor(*sky_colors["clear"])
         # 加载 skybox 模型
         skybox = self._showbase_instance.loader.loadModel(self.skybox_dir/"skybox.bam")
         skybox_scale = self.map_radius * 2 # 设置 skybox 的大小
         skybox.set_scale(skybox_scale)
-        # 设置 skybox 的 mask
-        skybox.hide(CamMask.AllOn)
-        skybox.show(CamMask.SkyBoxMask) # 只给部分 camera 展示
         tag_seg(skybox, 'sky') # 语义分割: 天空
 
         skybox_shader = Shader.load(
@@ -263,8 +270,16 @@ class SceneLoader(object):
         skybox.set_depth_write(False) # skybox 不会遮挡任意的对象
         skybox.set_compass()  # This makes the skybox fixed relative to the camera's rotation
 
-        # IBL: 用与天空一致的 cubemap 给 simplepbr 设环境光照, 让明亮天空真正照亮地面/车辆
-        # (解决「天空亮但地面/车暗」的不一致; cubemap 由 skybox/gen_env_cubemap.py 生成).
+        # IBL: 用与天空一致的 cubemap 给 simplepbr 设环境光照 (cubemap 由 gen_env_cubemap.py 生成).
+        #
+        # ⚠ 目前这段**对画面没有影响** (2026-08-18 实测): 关掉它、或在 day/dust 之间切换,
+        #   传感器图像逐字节不变. 两个原因:
+        #   (1) setup_lighting 末尾的 root_np.setShaderAuto() 会用 Panda 内置 shader generator
+        #       覆盖 simplepbr 的 PBR shader, 而内置 shader 不认识 sh_coeffs / filtered_env_map;
+        #   (2) 即便去掉 (1), EnvMap 的准备是异步的 —— 离屏渲染下 is_prepared 一直是 pending,
+        #       球谐系数虽然算了出来, 却没能送进 shader.
+        #   天空风格对画面的影响改为由 SKY_STYLES 的 ambient/directional 直接给出 (见 setup_lighting).
+        #   保留这段是因为它离修好只差上面两点; 真要修需要重调一轮观感.
         env_dir = self.skybox_dir / f"env_{self.sky}"
         pipeline = getattr(self._showbase_instance, 'pipeline', None)
         if pipeline is not None and env_dir.exists():
@@ -281,9 +296,6 @@ class SceneLoader(object):
             ground_np = self._showbase_instance.loader.loadModel(ground_path, noCache=True)
             node_path = self._root_np.attachNewNode("ground_node")
             ground_np.reparent_to(node_path) # 将 ground_np（地面模型的 NodePath）作为子节点附加到了 node_path 上
-            # 定义 mask
-            ground_np.hide(CamMask.AllOn)
-            ground_np.show(CamMask.GroundMask) # 只给部分 camera 展示
             tag_seg(node_path, 'ground') # 语义分割: 地面/草地
             # 设置地面的颜色
             ground_np.set_bin('background', 1)  # Ensure terrain is rendered after skybox

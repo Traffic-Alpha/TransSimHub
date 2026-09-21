@@ -3,16 +3,14 @@
 @Date: 2026-06-01 00:00:00
 @Description: 渲染后端接口 (tshub3d 与具体渲染引擎之间的契约).
 
-放在 scene/ 根目录: 它既不属于「场景状态」也不属于某个后端, 而是两者之间的边界.
-在线后端 (Panda3D) 实现它, 供 Tshub3DEnvironment 每步调用; 离线高精度渲染
-(Blender) 不实现它 —— 那条路径是「导出剧集数据 -> 后台批量渲染」, 见 scene/export/.
-@LastEditTime: 2026-08-15
+在线后端 (Panda3D) 实现它, 供 Tshub3DEnvironment 每步调用;
+离线高精度渲染 (Blender) 不实现它 —— 那条路径是「导出剧集数据 -> 后台批量渲染」.
+@LastEditTime: 2026-08-18 15:00:30
 '''
 from abc import ABC, abstractmethod
 from typing import Any
 
 from .state.scene_elements import SceneFrame, SceneStatic
-
 
 class RendererBackend(ABC):
     """渲染后端接口. 任何渲染引擎 (Panda3D / PyTorch3D / moderngl / ...) 实现它,

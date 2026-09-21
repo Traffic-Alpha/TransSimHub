@@ -54,7 +54,19 @@ WEATHER_STYLES = {
         # 雨天的雾要克制: 起雾远一点、上限低一点, 否则路面被雾提亮, 反而不像下雨
         'fog': {'color': (0.55, 0.58, 0.62), 'start': 40.0, 'depth': 500.0, 'strength': 0.45},
         'wet': 0.9,
-        'overlay': {'count': 2200, 'length': 60, 'angle': 14.0, 'strength': 0.45},
+        'overlay': {'count': 2200, 'length': 60, 'angle_range': (-20.0, 20.0),
+                    'strength': 0.45},
+    },
+    # 暴雨: 更暗、更湿，深色粗雨丝在明亮 BEV 背景上也清晰可见
+    'heavy_rain': {
+        'light': {'sun_energy': 0.35, 'sun_size_deg': 25.0, 'sky_strength': 0.72,
+                  'sun_temperature': 6800, 'aerosol': 3.5, 'exposure': -0.68},
+        'fog': {'color': (0.48, 0.53, 0.58), 'start': 55.0, 'depth': 480.0,
+                'strength': 0.38},
+        'wet': 1.0,
+        'overlay': {'kind': 'dark_rain', 'count': 3000, 'length': 78, 'width': 3,
+                    'angle_range': (-40.0, 40.0), 'strength': 0.68,
+                    'color': (0.22, 0.29, 0.36)},
     },
 }
 
@@ -171,7 +183,8 @@ def _blur3(arr: np.ndarray) -> np.ndarray:
     return out / 5.0
 
 
-def _rain_alpha(width, height, count, length, angle_deg, rng) -> np.ndarray:
+def _rain_alpha(width, height, count, length, angle_deg, rng,
+                streak_width: int = 1) -> np.ndarray:
     alpha = np.zeros((height, width), np.float32)
     rad = math.radians(angle_deg)
     dx, dy = math.sin(rad), -math.cos(rad) # 斜向下
@@ -186,15 +199,20 @@ def _rain_alpha(width, height, count, length, angle_deg, rng) -> np.ndarray:
         # 雨丝头尾淡出, 看起来更像高速运动的水线
         fade = value * np.clip(np.sin(np.pi * steps / max(seg_len - 1, 1)), 0.15, 1.0)
         np.maximum.at(alpha, (yy, xx), fade.astype(np.float32))
-    return _blur3(alpha)
+    expanded = alpha.copy()
+    for offset in range(1, max(1, int(streak_width))):
+        np.maximum(expanded, np.roll(alpha, offset, axis=1), out=expanded)
+        np.maximum(expanded, np.roll(alpha, -offset, axis=1), out=expanded)
+    return _blur3(expanded)
 
 
 def make_overlay_image(overlay: dict, width: int, height: int, seed: int = 0):
-    """生成一张白色雨丝图 (黑底), 供合成器以 Screen 方式叠加."""
+    """生成雨丝图；普通雨用白色 Screen，暴雨用深色 Alpha 混合."""
     rng = np.random.default_rng(seed)
     alpha = _rain_alpha(width, height, int(overlay.get('count', 1500)),
                         int(overlay.get('length', 55)),
-                        float(overlay.get('angle', 14.0)), rng)
+                        float(overlay.get('angle', 14.0)), rng,
+                        streak_width=int(overlay.get('width', 1)))
 
     image = bpy.data.images.get(OVERLAY_IMAGE)
     if image is not None and tuple(image.size) != (width, height):
@@ -203,8 +221,13 @@ def make_overlay_image(overlay: dict, width: int, height: int, seed: int = 0):
     if image is None:
         image = bpy.data.images.new(OVERLAY_IMAGE, width, height, alpha=True, float_buffer=True)
     pixels = np.empty((height, width, 4), np.float32)
-    pixels[..., 0] = pixels[..., 1] = pixels[..., 2] = alpha
-    pixels[..., 3] = 1.0
+    if overlay.get('kind') == 'dark_rain':
+        color = overlay.get('color', (0.22, 0.29, 0.36))
+        pixels[..., 0], pixels[..., 1], pixels[..., 2] = color
+        pixels[..., 3] = alpha * float(overlay.get('strength', 0.68))
+    else:
+        pixels[..., 0] = pixels[..., 1] = pixels[..., 2] = alpha
+        pixels[..., 3] = 1.0
     image.pixels.foreach_set(pixels.ravel())
     image.update() # 通知 Blender 像素已变 (逐帧重新生成时必须)
     return image
@@ -238,7 +261,8 @@ def ensure_compositor_group():
     return group
 
 
-def setup_compositor(fog: dict = None, overlay_image=None, overlay_strength: float = 0.3) -> None:
+def setup_compositor(fog: dict = None, overlay_image=None, overlay_strength: float = 0.3,
+                     overlay_kind: str = None) -> None:
     """建立合成器节点组: 渲染结果 -> (深度雾) -> (粒子叠加) -> 输出."""
     _clear_compositor()
     if not fog and overlay_image is None:
@@ -285,11 +309,14 @@ def setup_compositor(fog: dict = None, overlay_image=None, overlay_strength: flo
 
         overlay_mix = nodes.new('ShaderNodeMix')
         overlay_mix.data_type = 'RGBA'
-        overlay_mix.blend_type = 'SCREEN'
+        overlay_mix.blend_type = 'MIX' if overlay_kind == 'dark_rain' else 'SCREEN'
         overlay_mix.location = (600, 0)
-        _socket(overlay_mix, 'Factor_Float').default_value = float(overlay_strength)
         links.new(current, _socket(overlay_mix, 'A_Color'))
         links.new(image_node.outputs['Image'], _socket(overlay_mix, 'B_Color'))
+        if overlay_kind == 'dark_rain':
+            links.new(image_node.outputs['Alpha'], _socket(overlay_mix, 'Factor_Float'))
+        else:
+            _socket(overlay_mix, 'Factor_Float').default_value = float(overlay_strength)
         current = _out_socket(overlay_mix, 'Result_Color')
 
     links.new(current, output.inputs[0])
@@ -307,7 +334,8 @@ def set_overlay_frame(index: int, overlay: dict, resolution) -> None:
     group = bpy.data.node_groups.get(COMPOSITOR_GROUP)
     if group is None or group.nodes.get(OVERLAY_NODE) is None:
         return
-    make_overlay_image(overlay, int(resolution[0]), int(resolution[1]), seed=index)
+    seed = int(overlay.get('episode_seed', 0)) + int(index)
+    make_overlay_image(overlay, int(resolution[0]), int(resolution[1]), seed=seed)
 
 
 # ---------------------------------------------------------------- #
@@ -332,7 +360,7 @@ def apply_weather(name='clear', resolution=(1280, 720), seed: int = 0) -> dict:
     if cfg.get('wet'):
         apply_road_wetness(cfg['wet'])
 
-    overlay_cfg = cfg.get('overlay')
+    overlay_cfg = overlay_config(name, seed=seed)
     overlay_image = None
     if overlay_cfg:
         overlay_image = make_overlay_image(overlay_cfg, int(resolution[0]), int(resolution[1]), seed)
@@ -340,12 +368,22 @@ def apply_weather(name='clear', resolution=(1280, 720), seed: int = 0) -> dict:
         fog=cfg.get('fog'),
         overlay_image=overlay_image,
         overlay_strength=(overlay_cfg or {}).get('strength', 0.3),
+        overlay_kind=(overlay_cfg or {}).get('kind'),
     )
     print(f'[weather] {name}: fog={bool(cfg.get("fog"))} '
           f'rain_overlay={bool(overlay_cfg)} wet={cfg.get("wet", 0)}')
     return dict(cfg.get('light', {}))
 
 
-def overlay_config(name) -> dict:
-    """取该天气的粒子层配置 (没有则 None), 供逐帧刷新使用."""
-    return resolve_weather(name).get('overlay')
+def overlay_config(name, seed: int = 0) -> dict:
+    """解析 episode 级雨丝配置；方向固定于 episode，不同 episode 可复现地变化."""
+    source = resolve_weather(name).get('overlay')
+    if not source:
+        return None
+    overlay = dict(source)
+    overlay['episode_seed'] = int(seed)
+    angle_range = overlay.get('angle_range')
+    if angle_range:
+        rng = np.random.default_rng(seed)
+        overlay['angle'] = float(rng.uniform(float(angle_range[0]), float(angle_range[1])))
+    return overlay

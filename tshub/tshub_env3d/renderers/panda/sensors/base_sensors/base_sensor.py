@@ -24,13 +24,3 @@ class BaseSensor(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def __call__(self, *args: Any, **kwds: Any) -> Any:
         raise NotImplementedError
-
-    @property
-    def mutable(self) -> bool:
-        """If this sensor mutates on call."""
-        return True
-
-    @property
-    def serializable(self) -> bool:
-        """If this sensor can be serialized."""
-        return True

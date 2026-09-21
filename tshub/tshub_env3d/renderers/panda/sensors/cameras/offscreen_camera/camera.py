@@ -3,7 +3,7 @@
 @Date: 2026-07-10
 @Description: 统一的 offscreen 相机 —— 由 CameraRig 驱动, 取代原先 11 个几乎重复的相机子类
 (front/back/side/bev/junction/aircraft). 相机几何 (eye/target) 来自渲染器无关的
-scene.sensor_rig.compute_camera_pose; 本类只负责 Panda 侧的 setPos/lookAt/setH.
+core.sensors.sensor_rig.compute_camera_pose; 本类只负责 Panda 侧的 setPos/lookAt/setH.
 '''
 from typing import Tuple
 from dataclasses import dataclass

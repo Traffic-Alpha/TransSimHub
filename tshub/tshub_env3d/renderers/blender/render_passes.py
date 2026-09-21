@@ -75,32 +75,48 @@ def _linear_rgba(color255):
 # ---------------------------------------------------------------- #
 # 语义分割
 # ---------------------------------------------------------------- #
+# 动态层每帧都要重新着色 (车辆增删); 其余是静态场景, 着一次就够
+_DYNAMIC_LAYERS = ('vehicles', 'aircraft')
+_colored_static = set()   # 已着色的静态物体名, 避免每帧重扫几千个物体
+
+
+def _color_collection(coll, class_name, skip_seen: bool) -> int:
+    color = _linear_rgba(SEG_COLORS[class_name])
+    count = 0
+    for obj in coll.all_objects:
+        if skip_seen:
+            if obj.name in _colored_static:
+                continue
+            _colored_static.add(obj.name)
+        obj.color = color
+        count += 1
+    return count
+
+
 def assign_seg_colors() -> int:
     """给每个物体写上所属类别的颜色 (object.color), 供 seg 覆盖材质读取.
 
     车辆/飞行器是 collection instance: 模板物体和实例化用的 Empty 都要着色 ——
     不同情况下 Cycles 的 Object Info 可能取到其中任意一个.
+
+    性能: 静态场景 (路面/建筑/植被/小物件, 大图上有几千个物体) 只在第一次着色,
+    之后每帧只处理动态层与新导入的车模模板 —— 否则每帧白扫一遍整个场景.
     """
     count = 0
     for layer, class_name in SEG_LAYER_CLASS.items():
         coll = bpy.data.collections.get(layer)
         if coll is None:
             continue
-        color = _linear_rgba(SEG_COLORS[class_name])
-        for obj in coll.all_objects:
-            obj.color = color
-            count += 1
+        # 动态层每帧重着 (车辆会增删, 同名复用也不会漏)
+        count += _color_collection(coll, class_name, skip_seen=layer not in _DYNAMIC_LAYERS)
 
-    # 模板 collection 里的真实几何 (未挂到场景, all_objects 扫不到)
+    # 模板 collection 里的真实几何 (未挂到场景, all_objects 扫不到); 模板只在首次导入时新增
     from scene_assembly import TEMPLATE_PREFIX
     for coll in bpy.data.collections:
         if not coll.name.startswith(TEMPLATE_PREFIX):
             continue
         class_name = 'aircraft' if 'evetol' in coll.name or 'aircraft' in coll.name else 'vehicle'
-        color = _linear_rgba(SEG_COLORS[class_name])
-        for obj in coll.all_objects:
-            obj.color = color
-            count += 1
+        count += _color_collection(coll, class_name, skip_seen=True)
     return count
 
 

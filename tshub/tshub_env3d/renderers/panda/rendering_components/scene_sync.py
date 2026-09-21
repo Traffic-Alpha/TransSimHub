@@ -80,6 +80,7 @@ class SceneSync(object):
             root_np = self.root_np,
             showbase_instance = self.showbase_instance,
             tls_camera_height = rig['tls_camera_height'],
+            junction_bev_ortho_size = rig.get('junction_bev_ortho_size'),
         )
         element.attach_sensors_to_element(rig['sensor_types'])
         self._tls_elements[tls_element_id] = element

@@ -38,6 +38,7 @@ def build_static_scene_data(
     buildings_poly: str = None,
     building_level_height: float = 3.2,
     apron_width: float = 5.0,
+    ground_margin: float = 60.0,
 ) -> dict:
     """组装 Blender build_scene.py 消费的静态场景纯数据.
 
@@ -47,6 +48,9 @@ def build_static_scene_data(
             建筑轮廓与高度 (height / building:levels) 都只从该文件读.
         building_level_height: 每层楼对应的米数 (OSM building:levels 换算用).
         apron_width: 路缘硬质铺装带相对道路向外扩展的宽度 (米).
+        ground_margin: 地面 (ground) 相对路网包围盒向外扩展的宽度 (米).
+            路网包围盒就是路面本身的范围, 不留余量的话贴着地图边缘的一圈临街面
+            会因为落在盒外而被丢掉 (地面之外就是虚空, 摆了也没地方站).
     """
     # --- 与输入模式无关的部分: 路面 / 路缘 / 车道线 / 转向箭头 ---
     road_polys = sumo_net._compute_road_polygons()
@@ -57,6 +61,7 @@ def build_static_scene_data(
     roads, apron = build_road_meshes(road_polys, apron_width)
     data = {
         'bbox': bbox_list,
+        'ground_margin': ground_margin,
         'roads': roads,
         'apron': apron,
         'lane_dividers': polylines_to_json(lane_dividers),
@@ -75,7 +80,10 @@ def build_static_scene_data(
         greens = parse_green_areas(buildings_poly)
 
     # --- 道具摆放: 树/小物件两种模式都有; 建筑仅在「不带 poly」时由这里摆 ---
-    data['scatter'] = build_scatter(road_polys, data['buildings'], greens, bbox_list)
+    # 道具可以摆到地面边缘, 所以用外扩后的范围来判断是否越界
+    scatter_bbox = [bbox_list[0] - ground_margin, bbox_list[1] - ground_margin,
+                    bbox_list[2] + ground_margin, bbox_list[3] + ground_margin]
+    data['scatter'] = build_scatter(road_polys, data['buildings'], greens, scatter_bbox)
     return data
 
 

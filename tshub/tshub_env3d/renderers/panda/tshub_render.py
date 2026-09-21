@@ -13,7 +13,6 @@ from typing import Dict, List
 from direct.task import Task
 
 
-from tshub.tshub_env3d.renderers.panda.masks import CamMask
 from tshub.tshub_env3d.renderers.panda.segmentation import tag_seg
 from tshub.tshub_env3d.renderers.panda._showbase_instance import _ShowBaseInstance
 from tshub.tshub_env3d.renderers.panda.base_render import DEBUG_MODE, BACKEND_LITERALS
@@ -195,13 +194,6 @@ class TSHubRenderer(RendererBackend):
         self._showbase_instance.camera.lookAt(*self.map_center)  # Adjust the camera to look at the center of the model
         self._showbase_instance.camLens.set_fov(90)
 
-        # 获取 Camera 节点
-        camera_node = self._showbase_instance.cam
-        # 设置 camera 的 mask
-        camera_node.node().setCameraMask(
-            CamMask.MapMask | CamMask.VehMask | CamMask.GroundMask |
-            CamMask.SkyBoxMask | CamMask.AircraftMask
-        )
         return Task.cont
     
     # ----------------- #

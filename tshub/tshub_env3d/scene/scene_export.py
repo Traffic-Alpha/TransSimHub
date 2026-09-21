@@ -20,7 +20,8 @@ from .scene_data import build_static_scene_data, write_static_scene_json
 def export_scene_geometry(net_file: str, out_json: str,
                           buildings_poly: str = None,
                           building_level_height: float = 3.2,
-                          apron_width: float = 5.0) -> str:
+                          apron_width: float = 5.0,
+                          ground_margin: float = 60.0) -> str:
     """从 SUMO net 提取道路三角网格 + 路缘带 + 车道/边线 + 包围盒 (+ 可选建筑轮廓), 写出 JSON.
 
     Args:
@@ -29,6 +30,8 @@ def export_scene_geometry(net_file: str, out_json: str,
         building_level_height: 每层楼对应的米数, 用于 poly param
             building:levels -> height.
         apron_width: 路缘灰色铺装带相对道路向外扩展的宽度 (米).
+        ground_margin: 地面相对路网包围盒向外扩展的宽度 (米), 让最外圈的
+            临街建筑/树/小物件有地方站.
     Returns: out_json 路径.
     """
     net = SumoNet3D(net_file)
@@ -37,6 +40,7 @@ def export_scene_geometry(net_file: str, out_json: str,
         buildings_poly=buildings_poly,
         building_level_height=building_level_height,
         apron_width=apron_width,
+        ground_margin=ground_margin,
     )
     return write_static_scene_json(data, out_json)
 

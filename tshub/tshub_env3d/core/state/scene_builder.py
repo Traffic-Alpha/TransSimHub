@@ -95,6 +95,10 @@ def build_tls_rigs(tshub_init_obs: Dict[str, Any],
         sensor_types = sensor_config['tls'][tls_id].get('sensor_types', [])
         tls_camera_height = sensor_config['tls'][tls_id].get('tls_camera_height', 10)
         junction_bev_height = sensor_config['tls'][tls_id].get('junction_bev_height', 60)
+        # 俯视正交相机覆盖的世界尺寸 (米). 不给则沿用 rig 上的默认值; 给了则
+        # 两个后端 (Panda / Blender) 都按它取景, 否则不同场景会被强制成同一
+        # 个窗口, 而按场景生成的车道掩膜就与画面对不上.
+        junction_bev_ortho_size = sensor_config['tls'][tls_id].get('junction_bev_ortho_size')
 
         # 区分两类路口相机: 「每条 in-road 一个」(junction_front/back) 与「一个路口一个」的俯视 (junction_bev)
         road_sensors = [s for s in sensor_types if not s.startswith('junction_bev')]
@@ -124,5 +128,6 @@ def build_tls_rigs(tshub_init_obs: Dict[str, Any],
                 'heading': 0.0,
                 'sensor_types': bev_sensors,
                 'tls_camera_height': junction_bev_height,
+                'junction_bev_ortho_size': junction_bev_ortho_size,
             }
     return tls_rigs

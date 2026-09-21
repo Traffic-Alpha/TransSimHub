@@ -64,25 +64,23 @@ def extract_lane_turn_markings(sumo_net, base_distance: float = 9.0) -> list:
             if len(shape) < 2:
                 continue
 
-            movement_pairs = [
-                (direction, _movement_direction_to_turn(direction))
-                for direction in {conn.getDirection() for conn in lane.getOutgoing()}
-            ]
-            movement_pairs = [
-                (direction, turn)
-                for direction, turn in movement_pairs
-                if turn != "unknown"
-            ]
-            movement_pairs = sorted(
-                movement_pairs,
-                key=lambda item: turn_order.get(item[1], turn_order["unknown"]),
+            # 排序键带上方向码本身: 只按箭头顺序排的话, r/R (右转/微右转) 这类
+            # 映射到同一个 turn 的码是并列的, 顺序就由 set 的迭代顺序决定,
+            # 每次导出都可能不同 (Python 的字符串哈希是随机化的).
+            directions = sorted(
+                (
+                    direction
+                    for direction in {conn.getDirection() for conn in lane.getOutgoing()}
+                    if _movement_direction_to_turn(direction) != "unknown"
+                ),
+                key=lambda direction: (turn_order[_movement_direction_to_turn(direction)], direction),
             )
-            if not movement_pairs:
+            if not directions:
                 continue
 
             center, heading = _point_back_from_end(shape, base_distance)
-            directions = [direction for direction, _turn in movement_pairs]
-            turns = [turn for _direction, turn in movement_pairs]
+            # r 和 R 都是右转, 地面箭头只画一个
+            turns = list(dict.fromkeys(_movement_direction_to_turn(d) for d in directions))
             markings.append(
                 {
                     "lane_id": lane.getID(),

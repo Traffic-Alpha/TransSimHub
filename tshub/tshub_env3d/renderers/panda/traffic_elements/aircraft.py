@@ -8,8 +8,8 @@ from typing import Tuple
 from loguru import logger
 
 from .base_element import BaseElement
-from tshub.tshub_env3d.renderers.panda.masks import CamMask
 from tshub.tshub_env3d.core import select_aircraft_model_name
+from tshub.tshub_env3d.renderers.panda.model_pool import instance_model, model_dimensions
 from tshub.utils.get_abs_path import get_abs_path
 
 # 导入传感器
@@ -44,15 +44,15 @@ class Aircraft3DElement(BaseElement):
 
     def create_node(self) -> None:
         aircraft_model_path = self._select_aircraft_model()
-        self.aircraft_node_path = self.showbase_instance.loader.loadModel(aircraft_model_path)
-        self.get_node_dimensions(node_path=self.aircraft_node_path)
-        self.aircraft_node_path.setName(f"aircraft-{self.element_id}")
+        self.aircraft_node_path = instance_model(
+            self.showbase_instance, aircraft_model_path, f"aircraft-{self.element_id}"
+        )
+        self.length, self.width, self.height = model_dimensions(
+            self.showbase_instance, aircraft_model_path)
 
         pose = self.get_element_pose_from_center()
         pos, heading = pose.as_panda3d()
         self.aircraft_node_path.setPosHpr(*pos, heading, 0, 0)
-        self.aircraft_node_path.hide(CamMask.AllOn)
-        self.aircraft_node_path.show(CamMask.AircraftMask)
 
     def _select_aircraft_model(self) -> str:
         self.aircraft_model_name = select_aircraft_model_name(self.aircraft_type)
@@ -114,10 +114,3 @@ class Aircraft3DElement(BaseElement):
         self.update_element_position_heading(new_position, new_heading)
         for _sensor_id, _sensor in self.sensors.items():
             _sensor.step(self.get_element_pose_from_center())
-    
-    def get_sensor(self):
-        sensor_data = {}
-        for _sensor_id, _sensor in self.sensors.items():
-            ego_rgb = _sensor()
-            sensor_data[_sensor_id] = ego_rgb
-        return sensor_data

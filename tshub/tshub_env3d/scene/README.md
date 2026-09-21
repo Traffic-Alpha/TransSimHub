@@ -123,7 +123,8 @@ scene/
 
 | key | 内容 |
 |---|---|
-| `bbox` | `[xmin, ymin, xmax, ymax]`，SUMO 平面坐标（米） |
+| `bbox` | `[xmin, ymin, xmax, ymax]`，SUMO 平面坐标（米）——就是**路网本身**的范围 |
+| `ground_margin` | 地面相对 `bbox` 外扩的米数（默认 60）；最外圈的临街树/楼/小物件就站在这圈里 |
 | `roads` / `apron` | `[{vertices: [[x,y],…], faces: [[i,j,k],…]}]` 三角网格 |
 | `lane_dividers` / `edge_borders` | 折线 `[[[x,y],…],…]`，车道线 / 道路边线 |
 | `turn_markings` | 车道转向箭头：`{lane_id, turn, center, heading, lane_width}` |

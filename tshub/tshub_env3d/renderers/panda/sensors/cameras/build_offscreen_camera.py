@@ -21,14 +21,14 @@ from tshub.tshub_env3d.renderers.panda.segmentation import configure_seg_camera
 
 def build_offscreen_camera(
     name: str, # camera_id
-    mask,
     width: int,
     height: int,
     resolution: float,
     showbase_instance,
     root_np,
-    rig: CameraRig, # 相机规格 (决定位姿/朝向), 见 scene.sensor_rig
+    rig: CameraRig, # 相机规格 (决定位姿/朝向), 见 core.sensors.sensor_rig
     height_override: float = None,
+    ortho_override: float = None,
     carrier_dimensions=None,
 ) -> OffscreenCamera:
     """生成一个 offscreen 的 camera. 每一个 camera 都会绑定在一个 sensor 上面, 由 CameraRig 决定角度.
@@ -84,7 +84,10 @@ def build_offscreen_camera(
     # setup camera
     if rig.top_down:
         lens = OrthographicLens()
-        if rig.ortho_size is not None:
+        if ortho_override is not None:
+            # 调用方按场景给出的正交覆盖尺寸, 优先于 rig 上的默认值.
+            view_height = float(ortho_override)
+        elif rig.ortho_size is not None:
             view_height = float(rig.ortho_size)
         else:
             view_height = max(60.0, float(height_override or 60.0) * 1.6)
@@ -99,9 +102,6 @@ def build_offscreen_camera(
         scene=root_np, lens=lens
     )
     camera_np.reparentTo(root_np) # 设置 camera 在 node 上
-
-    # mask is set to make undesirable objects invisible to this camera
-    camera_np.node().setCameraMask(mask)
 
     # seg 相机: 配置 tag-state, 对各类节点套 flat 标签色 shader (覆盖 simplepbr 着色)
     if rig.modality == 'seg':

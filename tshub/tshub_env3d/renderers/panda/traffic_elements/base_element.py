@@ -17,7 +17,6 @@ from abc import ABC, abstractmethod
 
 from tshub.tshub_env3d.core.utils.coordinates import Pose, Heading
 from tshub.tshub_env3d.core import get_camera_rig
-from tshub.tshub_env3d.renderers.panda.masks import FULL_CAM_MASK
 from tshub.tshub_env3d.renderers.panda.sensors.rgb_sensor import RGBSensor
 
 class BaseElement(ABC):
@@ -67,19 +66,6 @@ class BaseElement(ABC):
             length=self.element_length
         )
 
-    def get_node_dimensions(self, node_path) -> None:
-        # 获取节点的边界
-        node_bound = node_path.getBounds()
-
-        # 获取边界的最小和最大点
-        min_point = node_bound.getMin()
-        max_point = node_bound.getMax()
-
-        # 计算长、宽和高
-        self.length = max_point.getX() - min_point.getX()
-        self.width = max_point.getY() - min_point.getY()
-        self.height = max_point.getZ() - min_point.getZ()
-
     def update_element_position_heading(
             self, 
             new_position:Tuple[float, float], 
@@ -115,6 +101,13 @@ class BaseElement(ABC):
     def begin_rendering_node(self):
         raise NotImplementedError
 
+    def get_sensor(self) -> dict:
+        """读取挂在本 element 上的所有传感器数据: {sensor_id: image}.
+
+        三类 element (vehicle / tls / aircraft) 的读法完全一样, 故放在基类.
+        """
+        return {sensor_id: sensor() for sensor_id, sensor in self.sensors.items()}
+
     # ----------- #
     # 添加 Sensor
     # ----------- #
@@ -122,10 +115,10 @@ class BaseElement(ABC):
     _carrier: str = None
 
     def attach_sensor_to_element(self, sensor_type: str) -> None:
-        """按 sensor_type 从注册表 (scene.sensor_rig) 取 CameraRig, 派生 mask, 挂载一个 RGBSensor.
+        """按 sensor_type 从注册表 (core.sensors.sensor_rig) 取 CameraRig, 挂载一个 RGBSensor.
 
-        取代原先各 element 里硬编码的 sensor_configs (camera_mask + camera_type):
-        现在 mask 由 rig.visibility 派生, 相机由 rig 直接驱动, 单一真相源为 CAMERA_RIGS.
+        取代原先各 element 里硬编码的 sensor_configs: 相机完全由 rig 驱动,
+        单一真相源为 CAMERA_RIGS.
         """
         rig = get_camera_rig(sensor_type)
         if self._carrier is not None and rig.carrier != self._carrier:
@@ -134,7 +127,6 @@ class BaseElement(ABC):
             )
         self.sensors[sensor_type] = RGBSensor(
             camera_name=self._gen_sensor_name(sensor_type, self.element_id),
-            camera_mask=FULL_CAM_MASK,
             showbase_instance=self.showbase_instance,
             root_np=self.root_np,
             init_element_pose=self._sensor_init_pose(),

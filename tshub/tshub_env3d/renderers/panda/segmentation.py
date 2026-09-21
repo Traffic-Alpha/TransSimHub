@@ -3,10 +3,11 @@
 @Date: 2026-07-10
 @Description: Panda 侧的语义分割支持.
 
-机制: 给场景各类节点打一个 "seg" 标签 (road/lane/building/ground/sky/vehicle/aircraft);
+机制: 给场景各类节点打一个 "seg" 标签 (标签值见 core.sensors.seg_classes 的类别名);
 seg 相机通过 Panda 的 tag-state 对带该标签的节点套一个 flat shader 状态 (输出该类的标签色),
 从而覆盖掉正常的 simplepbr 着色, 一趟渲染出「每类一个纯色」的图 (rgb 相机不受影响).
-颜色/类别定义来自渲染器无关的 scene.seg_classes.
+颜色/类别定义来自渲染器无关的 core.sensors.seg_classes;
+打标签的位置在 rendering_components/scene_loader.py 与 tshub_render.py (各加载点直接调 tag_seg).
 '''
 from panda3d.core import Shader, ShaderAttrib, RenderState
 
@@ -16,16 +17,6 @@ from tshub.tshub_env3d.core import SEG_RENDER_COLORS
 _current_file_path = get_abs_path(__file__)
 
 SEG_TAG = "seg"  # 节点上的标签 key
-
-# 场景节点名 -> 语义类别 (road_lines=道路边界线单独一类; lane_lines=车道分隔线)
-NODE_SEG_CLASS = {
-    "road_map": "road",
-    "road_lines": "road_edge",
-    "lane_lines": "lane",
-    "buildings": "building",
-    "ground_node": "ground",
-    "vehicles": "vehicle",
-}
 
 _seg_shader = None
 

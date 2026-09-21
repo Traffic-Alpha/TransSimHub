@@ -22,45 +22,6 @@ from .core_math import (
 )
 
 
-class Dimensions(NamedTuple):
-    """Representation of the size of a 3-dimensional form."""
-
-    length: float
-    width: float
-    height: float
-
-    @classmethod
-    def init_with_defaults(
-        cls, length: float, width: float, height: float, defaults: Dimensions
-    ) -> Dimensions:
-        """Create with the given default values"""
-        if not length or length == -1:
-            length = defaults.length
-        if not width or width == -1:
-            width = defaults.width
-        if not height or height == -1:
-            height = defaults.height
-        return cls(length, width, height)
-
-    @classmethod
-    def copy_with_defaults(cls, dims: Dimensions, defaults: Dimensions) -> Dimensions:
-        """Make a copy of the given dimensions with a default option."""
-        return cls.init_with_defaults(dims.length, dims.width, dims.height, defaults)
-
-    @property
-    def as_lwh(self) -> Tuple[float, float, float]:
-        """Convert to a tuple consisting of (length, width, height)."""
-        return (self.length, self.width, self.height)
-
-    def equal_if_defined(self, length: float, width: float, height: float) -> bool:
-        """Test if dimensions are matching."""
-        return (
-            (not self.length or self.length == -1 or self.length == length)
-            and (not self.width or self.width == -1 or self.width == width)
-            and (not self.height or self.height == -1 or self.height == height)
-        )
-
-
 _numpy_points = {}
 _shapely_points = {}
 
@@ -172,11 +133,6 @@ class BoundingBox:
             z=(self.min_pt.z + self.max_pt.z) / 2,
         )
 
-    @property
-    def as_dimensions(self) -> Dimensions:
-        """The box dimensions. This will lose offset information."""
-        return Dimensions(length=self.length, width=self.width, height=self.height)
-
     def contains(self, pt: Point) -> bool:
         """Determines if the given point is within this bounding box. If any bounding box
         coordinates are None, it is considered unbounded on that dimension/axis.
@@ -235,7 +191,11 @@ class Heading(float):
 
     @classmethod
     def from_sumo(cls, sumo_heading) -> Heading:
-        """Sumo's space uses degrees, 0 faces north, and turns clockwise."""
+        """Sumo's space uses degrees, 0 faces north, and turns clockwise.
+
+        NOTE: core/export/blender_export.py 有一份等价的纯 math 实现
+        (sumo_heading_to_ccw_deg), 那边刻意不依赖 numpy/shapely. 改这里要同步改那边.
+        """
         heading = Heading.flip_clockwise(math.radians(sumo_heading))
         h = Heading(heading)
         h._source = "sumo"
@@ -354,6 +314,9 @@ class Pose:
             front_bumper_position: The (x, y) position of the center front of the front bumper
             heading: The heading of the pose
             length: The length dimension of the object's physical bounds
+
+        NOTE: core/export/blender_export.py 有一份等价的纯 math 实现
+        (front_bumper_to_center), 那边刻意不依赖 numpy/shapely. 改这里要同步改那边.
         """
         assert isinstance(front_bumper_position, np.ndarray)
         assert front_bumper_position.shape == (2,), f"{front_bumper_position.shape}"

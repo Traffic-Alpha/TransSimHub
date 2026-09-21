@@ -250,10 +250,18 @@ def setup_render(resolution=(1280, 720), samples: int = 64,
         scene.view_settings.exposure = exposure
     set_color_management(view_transform, look)
 
+    # 静态场景在整段剧集里不变, 但 Cycles 默认每次 render() 都重新导出场景 + 重建 BVH.
+    # 我们每帧要 render 很多次 (相机数 x 通道数), 所以必须打开 persistent data:
+    # 实测 single_junction (255 物体) 1932ms -> 276ms, ymt (4690 物体) 5072ms -> 246ms.
+    # 代价是常驻内存变高 (BVH 一直留着), 对我们这种「静态场景 + 少量动态物体」完全划算.
+    scene.render.use_persistent_data = True
+
     if engine == 'CYCLES':
         scene.cycles.samples = int(samples)
         scene.cycles.use_denoising = denoise
         scene.cycles.device = 'GPU' if setup_gpu() else 'CPU'
+        if denoise:
+            setup_denoiser()
 
 
 def set_color_management(view_transform: str = 'Standard', look: str = 'None') -> None:
@@ -295,6 +303,40 @@ def setup_gpu() -> bool:
         return True
     print('[assembly] 未找到可用 GPU, 回退 CPU 渲染')
     return False
+
+
+def setup_denoiser() -> None:
+    """把降噪放到 GPU 上.
+
+    **必须在本次进程的第一次 render() 之前调用.** 我们开了 use_persistent_data,
+    Cycles session 跨帧复用, 而降噪设备是在 session 创建时定死的 —— 渲完第一帧
+    再改 denoising_use_gpu 不会有任何效果 (排查时被这一点骗过很久).
+
+    为什么要专门做这件事: Blender 出厂默认 denoising_use_gpu=False, 即
+    OpenImageDenoise 跑在 CPU 上; 这个默认值不随 .blend 保存, 只能在渲染时设
+    (和 setup_gpu 同理). 症状是「显存占着, GPU 利用率长期是 0, 几十个 CPU 线程
+    满载」—— 路径追踪早就渲完了, 时间全耗在 CPU 降噪上.
+
+    实测 (RTX 4090 + Xeon 6133 x80 线程, 18.5k 面的路口场景, 1274x1274, samples=8):
+                                    单帧 wall   单帧 CPU 时间
+        OIDN 在 CPU (出厂默认)        1.560s      104.6s
+        OIDN 在 GPU                   0.137s        1.2s
+        OptiX 降噪器                  0.106s        1.2s
+        不降噪                        0.069s        0.6s
+    路径追踪本身只要 0.069s: 默认配置下 96% 的时间是 CPU 在降噪.
+    完整 60 帧剧集 (含车辆同步与写 PNG): 2.10s/帧 -> 0.685s/帧.
+
+    这里固定用 OpenImageDenoise 而不是更快一点的 OptiX 降噪器: 两者在整段剧集上
+    只差 4%, 但 OptiX 出的像素和 OIDN 不一样 (实测 PSNR 44dB), 会和已经渲好的
+    数据对不上; OIDN 的 CPU 版与 GPU 版逐像素最大只差 1/255 (PSNR 61dB).
+    GPU 不支持 OIDN 时 Cycles 会自己退回 CPU, 所以无条件打开是安全的.
+    """
+    cycles = bpy.context.scene.cycles
+    cycles.use_denoising = True
+    cycles.denoiser = 'OPENIMAGEDENOISE'
+    cycles.denoising_use_gpu = True
+    print(f'[assembly] 降噪: OpenImageDenoise (GPU, quality={cycles.denoising_quality}, '
+          f'prefilter={cycles.denoising_prefilter})')
 
 
 # ---------------------------------------------------------------- #

@@ -20,6 +20,7 @@ class TLS3DElement(BaseElement):
             root_np=None, 
             showbase_instance=None,
             tls_camera_height:int=10,
+            junction_bev_ortho_size:float=None,
         ) -> None:
         """模拟路口摄像头
 
@@ -38,12 +39,14 @@ class TLS3DElement(BaseElement):
             element_id, element_position, element_heading, element_length, root_np, showbase_instance
         )
         self.tls_camera_height = tls_camera_height # 路口摄像头的高度
+        self.junction_bev_ortho_size = junction_bev_ortho_size # 路口俯视正交相机覆盖的世界尺寸 (米). 为 None 时用 rig 默认值.
     
     _carrier = 'tls'
 
     def _sensor_extra_kwargs(self) -> dict:
         """路口相机架在传入的绝对高度 (tls_camera_height / junction_bev_height)."""
-        return {'height': self.tls_camera_height}
+        return {'height': self.tls_camera_height,
+                'ortho_size': self.junction_bev_ortho_size}
 
     def create_node(self) -> None:
         pass
@@ -59,10 +62,3 @@ class TLS3DElement(BaseElement):
         """更新 sensor 的位置, 这里信号灯的摄像机是不需要移动的
         """
         pass
-    
-    def get_sensor(self):
-        sensor_data = {}
-        for _sensor_id, _sensor in self.sensors.items():
-            ego_rgb = _sensor()
-            sensor_data[_sensor_id] = ego_rgb
-        return sensor_data

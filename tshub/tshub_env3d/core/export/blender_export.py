@@ -35,7 +35,20 @@ FRAMES_DIRNAME = 'frames'
 
 
 # ---------------------------------------------------------------- #
-# 纯几何工具 (与 core.utils.coordinates 中的实现等价, 但不引入 shapely/numpy)
+# 纯几何工具
+#
+# ⚠ 这三个函数与 core/utils/coordinates.py 的 Heading.from_sumo /
+#   radians_to_vec / Pose.from_front_bumper **语义完全等价, 是刻意的重复实现**.
+#
+#   为什么不直接复用: coordinates.py 是 SMARTS 派生的完整实现, 依赖 numpy + shapely
+#   (Point.as_shapely 有 shapely 缓存). 导出这条路径只需要两个几何公式, 不值得为此
+#   把这些依赖拖进来 —— 保持导出侧「只依赖标准库 + loguru」的轻量, 是有意的取舍
+#   (讨论于 2026-08-18, 决定: 保留轻依赖, 用注释登记重复).
+#
+#   ⇒ 改朝向/车头-中心 这两处约定时, 两边都要改:
+#       core/utils/coordinates.py  (Heading.from_sumo / Pose.from_front_bumper)
+#       core/export/blender_export.py (本节)
+#     test/ 下有断言两边等价的用例可以兜底.
 # ---------------------------------------------------------------- #
 def sumo_heading_to_ccw_deg(sumo_heading_deg: float) -> float:
     """SUMO 航向 (度, 0=正北, 顺时针) -> tshub/SMARTS 航向 (度, 0=+Y, 逆时针).
@@ -83,7 +96,8 @@ def build_camera_specs(
     specs: List[Dict[str, Any]] = []
 
     def _emit(element_id: str, sensor_type: str, carrier_xy, heading_deg,
-              carrier_z: float = 0.0, height_override: Optional[float] = None) -> None:
+              carrier_z: float = 0.0, height_override: Optional[float] = None,
+              ortho_override: Optional[float] = None) -> None:
         rig = get_camera_rig(sensor_type)
         if rig.modality in skip_modalities:
             return
@@ -98,7 +112,8 @@ def build_camera_specs(
             'eye': [float(v) for v in eye],
             'target': [float(v) for v in target],
             'fov_deg': rig.fov_deg,
-            'ortho_size': rig.ortho_size,
+            # 与 Panda 同源: 场景给了覆盖尺寸就用它, 两个后端才会框出同一个窗口.
+            'ortho_size': ortho_override or rig.ortho_size,
             'top_down': rig.top_down,
         })
 
@@ -118,7 +133,8 @@ def build_camera_specs(
         for sensor_type in rig_info.get('sensor_types', []):
             _emit(element_id, sensor_type,
                   rig_info['position'][:2], heading_deg,
-                  carrier_z=0.0, height_override=rig_info.get('tls_camera_height'))
+                  carrier_z=0.0, height_override=rig_info.get('tls_camera_height'),
+                  ortho_override=rig_info.get('junction_bev_ortho_size'))
 
     return specs
 

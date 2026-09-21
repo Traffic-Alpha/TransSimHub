@@ -32,7 +32,7 @@ extras_require={
     ],
     '3D': [
         'rtree',
-        'shapely',
+        'shapely>=2.1',  # constrained_delaunay_triangles (GEOS >= 3.11)
         'trimesh',
         'Panda3D',
         'panda3d-gltf',

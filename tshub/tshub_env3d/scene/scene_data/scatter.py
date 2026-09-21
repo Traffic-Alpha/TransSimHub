@@ -23,6 +23,7 @@ import random
 from shapely import affinity
 from shapely.geometry import Point, Polygon, box
 from shapely.ops import nearest_points, unary_union
+from shapely.prepared import prep
 
 
 # Placement style (metres).  Offsets are measured outward from the road edge.
@@ -30,7 +31,8 @@ SCATTER_STYLE = {
     "trees": {
         "assets": ("stylized_common_tree_3", "stylized_common_tree_5", "stylized_pine_5"),
         "offset": 5.8, "spacing": 9.0, "scale": (0.80, 1.10),  # street trees
-        "green_spacing": 8.0,                                   # trees in OSM greens
+        # trees in OSM greens: 只种 (inner, outer) 这条离路面的带, 抖动网格排布
+        "green_spacing": 8.0, "green_band": (9.0, 25.0),
     },
     # no-OSM only: buildings form short continuous street-frontage blocks.
     # Asset frontage is the local X width in metres; local -Y is the window facade.
@@ -38,8 +40,8 @@ SCATTER_STYLE = {
         "setback": 14.5, "block_gap": (18.0, 35.0), "cluster_size": (3, 5),
         "building_gap": (0.8, 1.8), "block_keep_prob": 0.9,
         "setback_jitter": 0.45, "yaw_jitter": 0.035, "scale": (0.70, 0.80),
-        "clearance": 0.8, "junction_clearance": 26.0,
-        "max_per_100m": 2.6, "min_total": 12, "max_total_cap": 350,
+        "clearance": 0.8, "junction_clearance": 8.0,  # 离路口面 (node polygon) 的距离
+        "max_per_100m": 2.6, "max_total_cap": 350,
         "assets": (
             ("c5640_building_01", 18.55, 11.51),
             ("c5640_building_02", 19.60, 13.46),
@@ -64,9 +66,27 @@ MAX_TREES = 1500
 MAX_PROPS = 500
 
 
+def _decimate(items, limit):
+    """超过上限时按固定步长均匀抽稀.
+
+    随机抽样 (rng.sample) 会把沿路等间距的行道树撕成忽疏忽密的一串, 看上去就是
+    "树没有沿着路种"; 固定步长则是整体变稀, 间距仍然均匀.
+    """
+    if len(items) <= limit:
+        return items
+    step = len(items) / limit
+    return [items[int(i * step)] for i in range(limit)]
+
+
 def _road_union(road_polys):
     """One (multi)polygon covering all drivable surface."""
     return unary_union([poly.buffer(0) for poly, _meta in road_polys])
+
+
+def _junction_union(road_polys):
+    """路口面 (SUMO node 多边形) 的并集; 车道面的 metadata 里带 lane_id, 路口面没有."""
+    polys = [poly.buffer(0) for poly, meta in road_polys if "lane_id" not in meta]
+    return unary_union(polys) if polys else None
 
 
 def _line_components(geom):
@@ -123,22 +143,32 @@ def _green_polygons(greens, road_union):
     return polys
 
 
-def _trees_in_greens(green_polys, bbox, style, rng, asset):
-    """Scatter trees inside OSM green areas (parks/forests), density by area."""
+def _trees_in_greens(green_polys, road_union, bbox, style, rng, asset):
+    """OSM 绿地里的树: 只种**靠路的一条带**, 并按抖动网格排布.
+
+    两个刻意的限制, 都是为了让绿化跟着道路走:
+    - 只取绿地与 road_union 的 (inner, outer) 环形缓冲带相交的部分 —— 远离道路
+      的大片林地在场景里既看不见又拖慢加载, 内圈让开则是留给行道树;
+    - 抖动网格 (jittered grid) 代替纯随机撒点 —— 随机撒点会明显聚团, 局部一坨树,
+      网格保证间距均匀, 加上抖动又不至于像果园一样死板.
+    """
     spacing = style["trees"]["green_spacing"]
-    cell = spacing * spacing
+    inner, outer = style["trees"]["green_band"]
+    band = road_union.buffer(outer).difference(road_union.buffer(inner))
+    jitter = spacing * 0.35
     trees = []
     for poly in green_polys:
-        minx, miny, maxx, maxy = poly.bounds
-        target = min(int(poly.area / cell), 300)
-        placed, attempts = 0, target * 6
-        for _ in range(attempts):
-            if placed >= target:
-                break
-            x, y = rng.uniform(minx, maxx), rng.uniform(miny, maxy)
-            if _in_bbox(x, y, bbox) and poly.contains(Point(x, y)):
-                trees.append(_tree(rng, x, y, style, asset))
-                placed += 1
+        area = poly.intersection(band)
+        if area.is_empty:
+            continue
+        keep = prep(area)
+        minx, miny, maxx, maxy = area.bounds
+        for col in range(int((maxx - minx) / spacing) + 1):
+            for row in range(int((maxy - miny) / spacing) + 1):
+                x = minx + (col + 0.5) * spacing + rng.uniform(-jitter, jitter)
+                y = miny + (row + 0.5) * spacing + rng.uniform(-jitter, jitter)
+                if _in_bbox(x, y, bbox) and keep.contains(Point(x, y)):
+                    trees.append(_tree(rng, x, y, style, asset))
     return trees
 
 
@@ -162,10 +192,8 @@ def _tree_placements(road_union, green_polys, bbox, style, seed):
     rng = random.Random(seed)
     tree_asset = rng.choice(style["trees"]["assets"])
     trees = _street_trees(road_union, bbox, style, rng, tree_asset)
-    trees.extend(_trees_in_greens(green_polys, bbox, style, rng, tree_asset))  # OSM parks/forests
-    if len(trees) > MAX_TREES:
-        trees = rng.sample(trees, MAX_TREES)
-    return trees
+    trees.extend(_trees_in_greens(green_polys, road_union, bbox, style, rng, tree_asset))  # OSM parks/forests
+    return _decimate(trees, MAX_TREES)
 
 
 def _building_footprint(x, y, yaw, frontage, depth):
@@ -175,14 +203,61 @@ def _building_footprint(x, y, yaw, frontage, depth):
     return affinity.translate(footprint, x, y)
 
 
-def _quadrant_key(x, y, bbox):
-    cx = (bbox[0] + bbox[2]) * 0.5
-    cy = (bbox[1] + bbox[3]) * 0.5
-    return ("R" if x >= cx else "L") + ("T" if y >= cy else "B")
+def _building_blocks(line, bs, rng):
+    """沿一条退线走一遍, 产出**成组**的候选楼: 每组是一段连续的临街立面 (block).
+
+    返回 block 而不是散楼, 是为了后面抽稀时能整组丢弃 —— 街区内部保持连续,
+    只是街区之间的空档变多, 这样才像一条街, 而不是零星散落的房子.
+    """
+    blocks = []
+    length = line.length
+    distance = rng.uniform(0.0, bs["block_gap"][1])
+    while distance < length:
+        if rng.random() > bs["block_keep_prob"]:
+            distance += rng.uniform(*bs["block_gap"])
+            continue
+        asset, native_frontage, native_depth = rng.choice(bs["assets"])
+        block = []
+        for _ in range(rng.randint(*bs["cluster_size"])):
+            scale = rng.uniform(*bs["scale"])
+            frontage = native_frontage * scale
+            center_d = distance + frontage * 0.5
+            if center_d >= length:
+                break
+            here = line.interpolate(center_d)
+            ahead = line.interpolate(min(center_d + 0.5, length))
+            ang = math.atan2(ahead.y - here.y, ahead.x - here.x)
+            nx, ny = -math.sin(ang), math.cos(ang)
+            jitter = rng.uniform(-bs["setback_jitter"], bs["setback_jitter"])
+            block.append({
+                "asset": asset, "scale": scale,
+                "x": here.x + nx * jitter, "y": here.y + ny * jitter,
+                "frontage": frontage, "depth": native_depth * scale,
+            })
+            distance += frontage + rng.uniform(*bs["building_gap"])
+        if block:
+            blocks.append(block)
+        distance += rng.uniform(*bs["block_gap"])
+    return blocks
 
 
-def _building_placements(road_union, bbox, style, seed):
+def _thin_blocks(blocks, quota):
+    """把一条线上的候选楼抽稀到 quota 栋左右, 按 block 整组丢, 沿线均匀分布."""
+    total = sum(len(block) for block in blocks)
+    if total <= quota or not blocks:
+        return blocks
+    keep = max(1, int(round(len(blocks) * quota / total)))
+    return _decimate(blocks, keep)
+
+
+def _building_placements(road_union, junctions, bbox, style, seed):
     """No-OSM only: a realistic street frontage of building models.
+
+    每条退线**各自**按自己的长度算名额 (max_per_100m) 再整组抽稀, 所以整张图的
+    沿街密度是均匀的。以前是所有线共用一个全局名额、按走到的先后先到先得,
+    名额一旦用完, 排在后面的线 (往往就是地图的某一侧或某几个街区) 一栋都分不到;
+    再叠上一个按 bbox 象限的配额, 同一象限里先走到的那段又会把配额吃光 ——
+    "某一侧建筑物很少" 就是这么来的.
 
     Buildings sit on a consistent setback line in short connected blocks, with
     larger gaps between blocks.  When OSM footprints exist they are extruded by
@@ -192,70 +267,29 @@ def _building_placements(road_union, bbox, style, seed):
     """
     rng = random.Random(seed + 7)
     bs = style["buildings"]
-    lo, hi = bs["scale"]
     placed, footprints = [], []
-    quadrant_counts = {}
-    ring = _line_ring(road_union, bs["setback"])
-    lines = list(_line_components(ring))
-    frontage_length = sum(line.length for line in lines)
-    max_buildings = int(round(frontage_length * bs["max_per_100m"] / 100.0))
-    max_buildings = max(bs["min_total"], min(max_buildings, bs["max_total_cap"]))
-    max_per_quadrant = max(1, int(math.ceil(max_buildings / 4.0)))
-    gap_lo, gap_hi = bs["building_gap"]
-    block_gap_lo, block_gap_hi = bs["block_gap"]
-    cluster_lo, cluster_hi = bs["cluster_size"]
-    clearance = bs["clearance"]
-    center_x = (bbox[0] + bbox[2]) * 0.5
-    center_y = (bbox[1] + bbox[3]) * 0.5
-    junction_clearance = bs.get("junction_clearance", 0.0)
-    for line in lines:
-        length = line.length
-        d = rng.uniform(0.0, block_gap_hi)
-        while d < length:
-            if rng.random() > bs["block_keep_prob"]:
-                d += rng.uniform(block_gap_lo, block_gap_hi)
-                continue
-            asset, native_frontage, native_depth = rng.choice(bs["assets"])
-            for _ in range(rng.randint(cluster_lo, cluster_hi)):
-                if len(placed) >= max_buildings:
-                    return placed
-                scale = rng.uniform(lo, hi)
-                frontage = native_frontage * scale
-                depth = native_depth * scale
-                center_d = d + frontage * 0.5
-                if center_d >= length:
-                    break
-                here = line.interpolate(center_d)
-                ahead = line.interpolate(min(center_d + 0.5, length))
-                ang = math.atan2(ahead.y - here.y, ahead.x - here.x)
-                nx, ny = -math.sin(ang), math.cos(ang)
-                j = rng.uniform(-bs["setback_jitter"], bs["setback_jitter"])
-                bx, by = here.x + nx * j, here.y + ny * j
-                if not _in_bbox(bx, by, bbox, margin=3.0):
-                    d += frontage + rng.uniform(gap_lo, gap_hi)
+    for line in _line_components(_line_ring(road_union, bs["setback"])):
+        quota = max(1, int(round(line.length * bs["max_per_100m"] / 100.0)))
+        for block in _thin_blocks(_building_blocks(line, bs, rng), quota):
+            for cand in block:
+                point = Point(cand["x"], cand["y"])
+                if not _in_bbox(cand["x"], cand["y"], bbox, margin=3.0):
                     continue
-                if junction_clearance and math.hypot(bx - center_x, by - center_y) < junction_clearance:
-                    d += frontage + rng.uniform(gap_lo, gap_hi)
+                # 路口四角留空: 按到真实路口面的距离算, 不是到地图中心的距离
+                if junctions is not None and junctions.distance(point) < bs["junction_clearance"]:
                     continue
-                _building_pt, road_pt = nearest_points(Point(bx, by), road_union)
-                road_ang = math.atan2(road_pt.y - by, road_pt.x - bx)
+                _building_pt, road_pt = nearest_points(point, road_union)
+                road_ang = math.atan2(road_pt.y - cand["y"], road_pt.x - cand["x"])
                 yaw = road_ang + math.pi / 2 + rng.uniform(-bs["yaw_jitter"], bs["yaw_jitter"])
-                quadrant = _quadrant_key(bx, by, bbox)
-                if quadrant_counts.get(quadrant, 0) >= max_per_quadrant:
-                    d += frontage + rng.uniform(gap_lo, gap_hi)
+                footprint = _building_footprint(cand["x"], cand["y"], yaw,
+                                                cand["frontage"], cand["depth"])
+                if any(footprint.buffer(bs["clearance"]).intersects(e) for e in footprints):
                     continue
-                footprint = _building_footprint(bx, by, yaw, frontage, depth)
-                padded = footprint.buffer(clearance)
-                if any(padded.intersects(existing) for existing in footprints):
-                    d += frontage + rng.uniform(gap_lo, gap_hi)
-                    continue
-                placed.append({"asset": asset, "pos": [bx, by], "yaw": yaw,
-                               "size": None, "height": None, "scale": scale})
+                placed.append({"asset": cand["asset"], "pos": [cand["x"], cand["y"]],
+                               "yaw": yaw, "size": None, "height": None,
+                               "scale": cand["scale"]})
                 footprints.append(footprint)
-                quadrant_counts[quadrant] = quadrant_counts.get(quadrant, 0) + 1
-                d += frontage + rng.uniform(gap_lo, gap_hi)
-            d += rng.uniform(block_gap_lo, block_gap_hi)
-    return placed
+    return _decimate(placed, bs["max_total_cap"])
 
 
 def _roadside_prop_placements(road_union, bbox, prop_style, rng):
@@ -291,9 +325,7 @@ def _prop_placements(road_union, bbox, style, seed):
     props = []
     for prop_style in style["props"].values():
         props.extend(_roadside_prop_placements(road_union, bbox, prop_style, rng))
-    if len(props) > MAX_PROPS:
-        props = rng.sample(props, MAX_PROPS)
-    return props
+    return _decimate(props, MAX_PROPS)
 
 
 def build_scatter(road_polys, buildings, greens, bbox, seed=0, style=None):
@@ -307,6 +339,8 @@ def build_scatter(road_polys, buildings, greens, bbox, seed=0, style=None):
     road_union = _road_union(road_polys)
     green_polys = _green_polygons(greens, road_union)
     trees = _tree_placements(road_union, green_polys, bbox, style, seed)
-    building_sites = [] if buildings else _building_placements(road_union, bbox, style, seed) # 如果 OSM 有建筑就不再随机放置建筑物
+    # 如果 OSM 有建筑就不再随机放置建筑物
+    building_sites = [] if buildings else _building_placements(
+        road_union, _junction_union(road_polys), bbox, style, seed)
     props = _prop_placements(road_union, bbox, style, seed)
     return {"trees": trees, "buildings": building_sites, "props": props}

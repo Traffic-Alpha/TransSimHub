@@ -8,7 +8,7 @@
 - ObjectPose : 单个可渲染物体的位姿 (车辆 / 飞行器);
 - SceneFrame : 某一仿真步的全量快照 (当前所有车辆与飞行器);
 - SceneStatic: 一局仿真中不变的场景信息 (地图 glb 目录、传感器配置、路口相机 rig).
-消费这些数据的后端接口见 scene/renderer_backend.py.
+消费这些数据的后端接口见 core/renderer_backend.py.
 @LastEditTime: 2026-08-15
 '''
 from dataclasses import dataclass, field

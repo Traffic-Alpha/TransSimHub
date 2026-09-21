@@ -31,7 +31,3 @@ class CameraSensor(BaseSensor):
 
     def teardown(self, **kwargs) -> None:
         self.camera.teardown()
-
-    @property
-    def serializable(self) -> bool:
-        return False
