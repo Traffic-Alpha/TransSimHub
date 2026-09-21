@@ -13,12 +13,19 @@
 注意: 因为几何是共享的, **不要对单辆车的 node 改材质/颜色** —— 会影响到同款所有车.
 现在没有这种用法 (车身颜色来自 glb 材质); 真要做逐车染色, 得对那辆车单独 copyTo.
 '''
+from pathlib import Path
 from typing import Dict
 
 from loguru import logger
+from panda3d.core import Filename
 
 _templates: Dict[str, object] = {} # glb 路径 -> 已加载并脱离场景图的模板 NodePath
 _dimensions: Dict[str, tuple] = {} # glb 路径 -> (length, width, height), 同款车尺寸相同
+
+
+def _model_filename(model_path: str) -> Filename:
+    """Return an absolute Panda VFS filename on Linux, macOS, and Windows."""
+    return Filename.from_os_specific(str(Path(model_path).resolve()))
 
 
 def instance_model(showbase_instance, model_path: str, name: str, parent=None):
@@ -30,12 +37,14 @@ def instance_model(showbase_instance, model_path: str, name: str, parent=None):
         name: 新 node 的名字 (如 vehicle-<id>).
         parent: 父节点; 为 None 时先挂在模板所在的游离节点下, 由调用方再 reparent.
     """
-    template = _templates.get(model_path)
+    model_file = _model_filename(model_path)
+    cache_key = model_file.get_fullpath()
+    template = _templates.get(cache_key)
     if template is None:
-        template = showbase_instance.loader.loadModel(model_path)
+        template = showbase_instance.loader.loadModel(model_file)
         template.detachNode() # 模板本身不参与渲染, 只作为实例源
-        _templates[model_path] = template
-        logger.debug(f"SIM: 模型模板已缓存 {model_path} (共 {len(_templates)} 个).")
+        _templates[cache_key] = template
+        logger.debug(f"SIM: 模型模板已缓存 {model_file} (共 {len(_templates)} 个).")
 
     holder = parent.attachNewNode(name) if parent is not None else showbase_instance.render.attachNewNode(name)
     template.instanceTo(holder)
@@ -48,17 +57,19 @@ def model_dimensions(showbase_instance, model_path: str):
     尺寸只取决于模型本身, 而 getBounds() 每辆车算一遍要 ~6ms (车流进出时很可观),
     所以按 glb 路径缓存.
     """
-    dims = _dimensions.get(model_path)
+    model_file = _model_filename(model_path)
+    cache_key = model_file.get_fullpath()
+    dims = _dimensions.get(cache_key)
     if dims is None:
-        template = _templates.get(model_path)
+        template = _templates.get(cache_key)
         if template is None: # 尚未加载过 (正常流程里 instance_model 会先跑)
-            template = showbase_instance.loader.loadModel(model_path)
+            template = showbase_instance.loader.loadModel(model_file)
             template.detachNode()
-            _templates[model_path] = template
+            _templates[cache_key] = template
         bounds = template.getBounds()
         lo, hi = bounds.getMin(), bounds.getMax()
         dims = (hi.getX() - lo.getX(), hi.getY() - lo.getY(), hi.getZ() - lo.getZ())
-        _dimensions[model_path] = dims
+        _dimensions[cache_key] = dims
     return dims
 
 
