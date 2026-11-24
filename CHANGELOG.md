@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2026-11-24 14:31:50
+ * @LastEditTime: 2026-11-24 14:43:28
 -->
 # Change Log
 
@@ -22,11 +22,11 @@ Planned as v2.4: the TSHub3D scene library.
 <!-- v2.3 -->
 ## [v2.3] - 2026-11-24
 
-### News
+### News 🎓
 
-I have attended my PhD graduation ceremony at CUHK-Shenzhen 🎓. Thank you to my supervisor, Prof. Simon Pun, to Yuheng Kan and Yirong Chen from my time at Shanghai AI Lab, and to everyone who supported me along the way.
+I have attended my PhD graduation ceremony at CUHK-Shenzhen. Thank you to my supervisor, Prof. Simon Pun, to Yuheng Kan and Yirong Chen from my time at Shanghai AI Lab, and to everyone who supported me along the way.
 
-顺利参加了香港中文大学（深圳）的博士毕业典礼 🎓。感谢导师 Simon Pun 教授，感谢在上海人工智能实验室期间指导我的 Yuheng Kan 和 Yirong Chen，也感谢一路以来支持和帮助我的每一个人。
+顺利参加了香港中文大学（深圳）的博士毕业典礼。感谢导师 Simon Pun 教授，感谢在上海人工智能实验室期间指导我的 Yuheng Kan 和 Yirong Chen，也感谢一路以来支持和帮助我的每一个人。
 
 **Acknowledgements 致谢**
 
