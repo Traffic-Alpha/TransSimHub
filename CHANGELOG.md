@@ -2,7 +2,7 @@
  * @Author: WANG Maonan
  * @Date: 2023-08-23 17:15:09
  * @Description: All notable changes to this project.
- * @LastEditTime: 2026-07-11 00:00:00
+ * @LastEditTime: 2026-11-24 14:31:50
 -->
 # Change Log
 
@@ -11,59 +11,222 @@ All text added must be human-readable.
 Copy and pasting the git commit messages is **NOT** enough. 
 
 ## [Unreleased] - XXXX-XX-XX
+
+Planned as v2.4: the TSHub3D scene library.
+
 ### Added
-- **Mesoscopic traffic state + live congestion dashboard** — a third visualization alongside the microscopic 2D (`TshubEnvironment.render` / SUMO-GUI) and 3D (`Tshub3DEnvironment`) paths, answering "where is the network congested" rather than "what is each vehicle doing". Three pieces:
-  - **`tshub/lane/` (`LaneBuilder`) and `tshub/edge/` (`EdgeBuilder`)** — new builders following the existing `BaseBuilder` convention, giving network-wide lane- and edge-level traffic state (`mean_speed`, `occupancy`, `halting_number`, `vehicle_count`, plus the derived congestion index `speed_relative` = actual speed / speed limit, the same quantity as SUMO meandata's `speedRelative`). Enabled with `is_lane_builder_initialized` / `is_edge_builder_initialized`, surfacing as `obs['lane_state']` / `obs['edge_state']`. Both subscribe once at creation (the lane/edge set never changes) and then read everything back in **one** `getAllSubscriptionResults` call per step, so the cost is O(number of lanes) and independent of the number of vehicles. Edge level drives the map colouring; lane level is for drilling into a road and seeing e.g. "left-turn lane queued, through lane free" — a difference the edge aggregate hides.
-  - **`tshub/visualization/meso/` (`DashboardServer`)** — a live browser dashboard: pannable/zoomable road-network map coloured by congestion, edge/lane granularity toggle, hover tooltips, KPI tiles, a congestion trend chart, a most-congested ranking, and the UAV's onboard camera images. Depends only on the standard library (`http.server` + SSE, no flask/fastapi) and **no vendored JS library** — the network map is a hand-written Canvas renderer, because SUMO networks are in Cartesian metres rather than lon/lat. It is fully decoupled from the environment: it only consumes `obs`, so any loop that can produce that data can drive it. `push()` never blocks the simulation — each browser gets a bounded queue and the oldest frame is dropped when it is full, so a slow or closed browser cannot stall the run. Per-frame congestion values are quantized to `uint8` and base64-encoded (round-trip error stays within half a quantization step, ≈0.002), keeping a 2000-edge network at a few KB per frame.
-  - **`tshub/aircraft/aircraft_nearby.py` (`find_objects_near_aircraft`)** — a pure function answering "which vehicles / junctions is this UAV over right now", used to tie the UAV's returned camera images to the congestion map. Distances are measured in the XY plane, deliberately ignoring altitude: a UAV filming from 100 m up is directly *over* the vehicle below it, and a 3D distance would call that "not nearby".
-  - Runnable examples under `examples/dashboard/` (meso-only, and meso + UAV onboard camera), plus `examples/lane/` and `examples/edge/` for the builders on their own.
-- **Renamed the map builder's static lane geometry key from `obs['lane']` to `obs['lane_shape']`**, so that the static geometry (`tshub/map/`) and the dynamic traffic state (`tshub/lane/`, `obs['lane_state']`) are distinguishable at a glance. The public `render(focus_type='lane')` API is unchanged — the focus type is mapped to the obs key internally.
-- **Local-view rendering reworked, and the global view removed** (`tshub/visualization/micro/`). `TshubEnvironment.render()` (both `rgb` and `sumo_gui`) is now **focus-only** — it always follows a vehicle or a junction, and raises if `focus_id`/`focus_type`/`focus_distance` are missing; whole-network views belong to the meso dashboard, which is far better at them. The rework fixes two real defects and one architectural problem:
-  - **Figure leak**: `render(mode='rgb')` created a new matplotlib figure every call and never closed it, and none of the callers closed it either — a 1000-step episode leaked 1000 figures. A single figure is now created once and reused.
-  - **`UserWarning` on every vehicle every frame**: the vehicle patch passed both `color` and `edgecolor`.
-  - **Per-frame cost was proportional to network size**, because the whole road network was redrawn as one `Line2D` per polygon segment (31k objects on kowloon) and `filter_object` ran an exact polygon-distance test against every lane/node in the network. Now a uniform-grid spatial index (`spatial_index.py`) fetches only what the view rectangle covers, geometry goes into a single `LineCollection`, and a prefetched region is reused until the view leaves it — so a **junction** focus (which never moves) builds the map layer exactly once per episode. Measured on kowloon (2927 lanes): **1.1 s → 1.9 ms per frame**, with `env.step` itself costing ~125 ms, i.e. rendering stopped being the bottleneck.
-- **Visualization is now organised by scope**: `tshub/visualization/micro/` (local view, down to individual vehicles) and `tshub/visualization/meso/` (whole-network browser dashboard, formerly `tshub/dashboard/`). Imports become `from tshub.visualization.meso import DashboardServer` and `from tshub.visualization.micro import LocalMapRenderer`.
-- Composable OSM typemaps for `scenario_build` (`tshub/sumo_tools/osm_build.py`): `netconvert_typemap` / `poly_typemap` now accept either a single file or a list that is layered in order (later entries override same-id types attribute-by-attribute). List items may be file paths or built-in short names. Shipped overlay layers under `osm_build_type/layers/`: `net_ground_only` (drop elevated/expressway motorway & trunk, keep only ground roads), `net_pedestrian`, `net_bicycle`, and `poly_buildings_only` (keep buildings/amenities, drop greenery & water). The bundled base `net.typ.xml` / `poly.typ.xml` were completed to match SUMO's full typemaps. Because `polyconvert --type-file` only accepts a single file, multiple typemaps are merged in-process into one `*.merged.*.typ.xml` before conversion.
-- **Image-based lighting (IBL) for the Panda 3D renderer** (`tshub/tshub_env3d/renderers/panda/`). simplepbr now gets an environment map so the bright sky actually illuminates the ground and vehicles — this fixes the "bright sky but dark, flat-looking ground/cars" mismatch. The sky lighting cubemaps are generated to roughly match the procedural city-builder sky by `_assets_3d/skybox/gen_env_cubemap.py` (output under `_assets_3d/skybox/env_<day|dust>/`); the zenith is kept brighter than the horizon so top-down (BEV / aircraft) views are not underexposed.
-- **Semantic segmentation sensors** for the Panda 3D renderer. Every camera can be requested as `<view>_rgb` (color) or `<view>_seg` (single-channel `(H,W)` uint8 label-id map). Classes/palette follow CARLA/Cityscapes conventions (unlabeled / road / lane / road_edge / building / ground / sky / vehicle / aircraft / pole), defined once in `tshub/tshub_env3d/core/sensors/seg_classes.py` with `seg_color_to_label` / `seg_label_to_color` helpers. Rendered via a flat per-class shader applied through a Panda tag-state, so it does not disturb the normal RGB cameras (measured cost ≈ 1.86× an RGB camera, so seg is opt-in per sensor).
-- **`junction_bev` traffic-light camera** — one top-down camera over the whole intersection centre (useful for traffic-signal-control training), height set by `junction_bev_height`.
-- **Vehicle asset tooling**: `_assets_3d/vehicles/normalize_vehicle_glb.py` normalizes a downloaded model to the tshub vehicle contract (front = +Z, up = +Y, pivot centred on the ground, real-world metres) and can pull a single car out of a "collection" glb by named part or spatial cluster; `examples/tshub_env3d/single_junction/split_car_pack.py` splits a circular car pack into individual, correctly-oriented, matte-painted vehicles.
-- **Phase-0 render benchmark + visual-regression harness** (`examples/tshub_env3d/phase0_render_benchmark/`): times each step split into SUMO vs render, sweeps camera counts, and saves per-frame images for pixel-diff regression.
-- **Aircraft model rendering in TSHub3D Panda**: aircraft are now rendered as scene objects instead of camera-only carriers. The Panda renderer includes an `AircraftMask`, aircraft scene node, model lookup (`core/models/aircraft_models.py`), and a new `aircraft_chase` camera rig for external follow shots. The single-junction example now demonstrates an eVTOL flying around the intersection instead of hovering in place.
-- **City-builder static scene generation** (`tshub/tshub_env3d/scene/`). The static-scene step now populates the world with buildings, trees, and roadside people, not just roads/lanes. Placement is computed in Stage 1 (shapely) and only *instanced* in Blender, so a full scene stays small (geometry is stored once per distinct asset — e.g. 1500 trees share ~8 meshes):
-  - **Buildings** — when an OSM `buildings.poly.xml` is given, each footprint is extruded to its **real per-building height** (from the OSM `<param key="height">`) as varied-colour city-builder massing (correct size/shape, and cheap even for thousands of buildings). Without OSM, detailed textured building models are placed on a realistic street *frontage* — consistent setback, spaced with gaps, aligned to face the street.
-  - **Trees** — lining the streets, scattered inside OSM green areas (parks/forest/`natural`), and filling the band between buildings.
-  - **Roadside props** — street lights and benches placed along the curb with per-asset density and orientation (lights face the carriageway), exported as `props.glb`.
-  - Bundled environment asset packs under `_assets_3d/environment/{buildings,trees,props}/`, normalized to real-world scale, upright, base at `z=0`. Placement is asset-aware: `scene_scatter.py` writes the chosen **asset name** into the scene JSON (buildings additionally carry their real frontage/depth, so blocks are laid out without overlap and with their window facade turned toward the road), and Blender instances that exact template.
-  - The `examples/tshub_env3d/yaumatei_drone/render_ymt_drone.py` example now **auto-builds** its scene through this pipeline (was a manual two-step process).
+
+- 60 ready-to-use 3D scenes from cities around the world (33 single intersections and 27 multi-intersection networks), released as open source.
+
+
+<!-- v2.3 -->
+## [v2.3] - 2026-11-24
+
+### News
+
+I have attended my PhD graduation ceremony at CUHK-Shenzhen 🎓. Thank you to my supervisor, Prof. Simon Pun, to Yuheng Kan and Yirong Chen from my time at Shanghai AI Lab, and to everyone who supported me along the way.
+
+顺利参加了香港中文大学（深圳）的博士毕业典礼 🎓。感谢导师 Simon Pun 教授，感谢在上海人工智能实验室期间指导我的 Yuheng Kan 和 Yirong Chen，也感谢一路以来支持和帮助我的每一个人。
+
+**Acknowledgements 致谢**
+
+- **Supervisor:** Prof. Simon Pun
+- **Simon's group:**
+  - PhD students: Aoyu Pang, Yuejiao Xie, Ziyao Wang, Hongyang Zhang, Ziyi Wang, Qianqian Wu
+  - Undergraduate students: Zhiheng Li, Yu Liu, Yin Luo
+- **Collaborators:**
+  - Shanghai AI Lab: Yirong Chen
+  - SenseTime: Yuheng Kan, Zian Ma, Chengcheng Xu
+  - Nanyang Technological University (NTU): Yuxin Cai
+  - Nokia Bell Labs: Chung Shue (Calvin) Chen, Laurent Roullet
+  - Tongji University: Prof. Xi Xiong, Lu Liu, Yuting Wang
+  - Beihang University: Prof. Zhiyong Cui, Kemou Jiang
+
 ### Changed
-- **Panda `sky` styles now drive the lighting, not just the sky gradient.** `sky='day'|'dust'` used to swap only the procedural skybox colours — the ground and vehicles rendered *byte-identically* between the two, because the ambient/directional light colours were hardcoded and simplepbr's image-based lighting never reached the scene (the scene root calls `setShaderAuto()`, which replaces simplepbr's PBR shader with Panda's built-in shader generator; and the env-map preparation stays pending in the offscreen path). `SceneLoader.SKY_COLORS` became `SKY_STYLES`, where each style also carries `ambient` / `directional` / `light_direction`, so `dust` now gets a warmer, dimmer, lower sun (ground MAD 0.00 → 13.3 versus `day`). The inert IBL block is kept but clearly annotated.
-- **Panda 3D renderer is now ~2.5× faster per step** with pixel-identical output: the offscreen readback no longer forces a redundant full re-render per sensor (`wait_for_ram_image` checks the RAM image before re-rendering), and rendering runs single-threaded so that one render frame equals the current frame (removed the `Cull/Draw` threading that returned a one-frame-stale image).
-- **Single vehicle-model set (no more low/high poly).** `_assets_3d/vehicles/` is now a flat `{background, ego, public_transport, event}/` layout. Background traffic expanded to 10 realistic passenger cars plus a taxi, chosen with a realistic weighted mix (sedans/SUVs common, sports cars rare); the taxi was moved out of `public_transport` into the background pool. Scene lighting (ambient / directional) rebalanced to work with the new IBL.
-- **11 near-identical offscreen-camera subclasses collapsed into one `CameraRig`-driven camera**, and sensor definitions unified into a single registry (`core/sensors/sensor_rig.py`) that derives the camera mask and the list of valid sensors — adding a camera type no longer needs edits in several files.
-- **`tshub_env3d/` reorganised by role in the pipeline** (breaking import change). It used to keep two unrelated things in `scene/`: the offline "build the static world once" pipeline, and the per-step renderer-agnostic contracts. They are now separate top-level packages:
-  - **`core/`** — the definitions every step needs and both backends share, with no `panda3d`/`bpy` import: `state/` (`SceneFrame`/`SceneStatic`, `build_frame`, `build_tls_rigs`), `sensors/` (camera rigs, segmentation classes), `models/` (object type → glb), `export/` (episode JSON for offline rendering), `utils/`, and the `RendererBackend` ABC. **`from tshub.tshub_env3d.scene import X` becomes `from tshub.tshub_env3d.core import X`.**
-  - **`scene/`** — only "generate the static scene" now: stage 1 (`export_scene_geometry`, plain Python) turns a SUMO net into `scene.json`; `scene/blender/` turns that into per-class glbs (`build_scene.py`) and then into a reusable, hand-tunable `scene.blend` (`build_blend.py`, moved here from `renderers/blender/` — producing a `.blend` is authoring, not rendering). The former `scene_generation/` sub-package was flattened away, and `scene_generation_utils/` became a single `scene/geometry.py`.
-  - **`renderers/`** — unchanged in scope: `panda/` (online) and `blender/` (offline: `render_episode.py`, `weather.py`, `render_passes.py`).
-- **Blender output passes are now independent, and rendering several of them is scheduled as one Blender run per pass.** `--passes` used to render RGB unconditionally, so `--passes seg` cost an RGB frame nobody asked for and there was no way to get seg or depth on their own; each name in `--passes` is now exactly what gets rendered (`rgb`, `seg`, `depth`, in any combination; unknown names are rejected instead of silently ignored). The scheduling change comes from measuring the passes separately (101 frames × 1 junction BEV camera, 1022×1022, 8 spp, Cycles GPU): `rgb` 143.1 s and `seg` 47.7 s run separately total 190.8 s, but asking one run for `rgb,seg` takes **302.9 s — 59 % more**. It is not the state switching that costs: rendering RGB only, but still doing `assign_seg_colors()` and entering/leaving `seg_mode()` every frame, comes to 145.9 s (+2 %). It is that **alternating RGB and seg renders invalidates `use_persistent_data` every single render** — each render sees a different `material_override`, so both passes pay a full scene re-export. So `examples/tshub_env3d/single_junction/render_blender.py` now launches one Blender per pass (startup + `.blend` load is ~1.5 s, negligible against that), with `--fused-passes` keeping the old single-run behaviour for comparison; and when a run does have a single non-RGB pass, `render_episode.py` hoists the pass state outside the frame loop so the scene never changes mid-episode. Output is unchanged: seg and depth are byte-identical to the fused path, RGB differs by at most 1/255 from Cycles sampling.
-### Deprecated
+
+- The 3D package is reorganised so that each part has one job: shared definitions, rendering, scene building, episode recording and asset tools. Code that imports 3D internals must update its imports; the main entry points (`Tshub3DEnvironment`, `IsaacRenderer`, the episode reader and writer) are unchanged.
+- Vehicles, event props, aircraft and pedestrians now share one 3D asset library, rebuilt by a single command. Episodes recorded with the old asset names must be recorded again.
+- Every 3D asset has a preview image with five views around the model.
+- The default ego vehicle is now an ordinary sedan, repainted like the other cars. The F1 car is kept as an easter egg.
+- The eVTOL model is about 6× lighter, and its tail propellers now spin.
+- The incident route generator (crashes, breakdowns, cones) now sits with the other SUMO route tools, so incidents also work in SUMO-only runs.
+
 ### Fixed
-- **Lighting bug washing out the whole scene.** In `SceneLoader.setup_lighting`, `set_color_temperature()` was called *after* `setColor()`; in Panda3D that overrides the colour with the full-intensity (~1.0) black-body colour, so the carefully-tuned dim ambient/directional values never took effect and everything looked over-exposed. Removed those calls (the temperature tint is folded into the RGB values).
-- **Vehicles rendered grey/white regardless of their paint.** glTF `metallicFactor` defaults to 1.0 (fully metallic/chrome) and simplepbr had no environment reflections, so painted cars showed as neutral grey. Vehicle bodies are now made non-metallic matte (with a brightened paint texture) during import, so their colours show correctly.
-- **Black/overlapping intersection surface.** The static-scene road export buffered every SUMO lane including `internal` (junction connection) edges, so intersections filled with overlapping connection-lane strips that z-fought and rendered black. Internal edges are now skipped — the junction area is covered by the single node-junction polygon, giving clean grey intersections.
-- **Black building faces from OSM footprints.** Extruded buildings whose footprints were wound clockwise / concave / self-touching rendered with inward-facing (black) normals. Footprints are now normalized to CCW and each prism is closed with a base face and has its normals recalculated outward.
-- **Curb apron not following the road edge.** `scene_data/road_surface.py` triangulated with `shapely.ops.triangulate` (an **unconstrained** Delaunay, i.e. a convex-hull fill) and then kept only the triangles whose centroid falls inside the polygon. That is fine for the convex pieces (a single lane strip, a junction block), but the apron is the whole road-network union buffered outwards — a large **concave** polygon: its concavities were paved over with grey concrete (whole city blocks enclosed by roads got filled), while triangles hugging the boundary were dropped, leaving gaps along the kerb. On the Songdo scene that was 11108 m² of spurious apron and 9435 m² missing (true area 55383 m²); on ymt, 9228 m² spurious / 18654 m² missing. Triangulation now goes through GEOS's **constrained** Delaunay (`shapely.constrained_delaunay_triangles`), which respects the polygon boundary and its holes exactly — the error drops to 0 on both scenes, and the road surfaces themselves come out identical. Self-intersecting input polygons (SUMO occasionally emits one at a sharp bend) are cleaned with `buffer(0)` first. This raises the 3D extra's requirement to **shapely ≥ 2.1** (GEOS ≥ 3.11).
-- **Non-deterministic lane turn arrows.** `scene_data/lane_markings.py` collected each lane's movement codes into a `set` and sorted them by arrow order only. SUMO's `r`/`R` (right / partially right) both map to the same `right` arrow, so they tied and kept the set's iteration order — which varies between runs, because Python randomizes string hashing. Exporting the same net twice produced different `turn_markings` (`R+r+s` vs `r+R+s`). The sort key now includes the movement code itself, and duplicate arrows are collapsed (`right+right+straight` → `right+straight`, matching what the Blender side already drew). `scene.json` is now byte-identical across runs and across `PYTHONHASHSEED` values.
-- **Roadside trees clumping instead of lining the road** (`scene_data/scatter.py`). Two independent causes, both visible on the Beijing Changjianglu scene: (a) trees seeded from OSM green areas were rejection-sampled uniformly at random inside each park/forest polygon, so they landed in random clumps and, on a map whose green polygons sit off to one side, piled 95 of the scene's 212 trees into one corner far from any road. Green-area trees are now restricted to the ring 9–25 m outside the road surface (so they read as a planted verge, and the inner 9 m stays clear for the street trees) and are placed on a jittered grid rather than at random, which removes the clumping; (b) once a scene exceeded `MAX_TREES`/`MAX_PROPS`, the excess was dropped with `random.sample`, which tears the evenly spaced street rows into ragged runs — on ymt that thinned 1896 trees down to 1500 at random. Thinning now takes a fixed stride, so the rows stay evenly spaced.
-- **Scattered buildings missing from one side of the map** (`scene_data/scatter.py`, the no-OSM fallback that places building models along the street). Three bbox-centric shortcuts, all of which broke as soon as a network was anything other than one junction in the middle of the map: (a) every setback line shared **one global building budget**, consumed in the order the lines happened to come out of GEOS — on the ymt network the budget ran out at ring line 27 of 41, so 14 whole blocks got zero buildings; (b) a per-**bbox-quadrant** cap of `max_buildings/4` meant that within a quadrant whichever stretch was walked first ate the entire quadrant's allowance and the rest of that side stayed empty; (c) `junction_clearance` kept buildings away from the **centre of the bounding box** rather than from the junctions, punching a hole in the middle of the map while leaving every real intersection corner built up. Each setback line now gets its own quota from its own length (`max_per_100m`) and is thinned a whole street block at a time, so frontage density is uniform everywhere and blocks stay contiguous; junction clearance is measured against the real SUMO junction polygons (`_junction_union`, i.e. the road polygons that carry no `lane_id`); the quadrant cap is gone. On ymt, ring lines with no buildings went from 14/41 to 0/41.
-- **The ground plane stopped exactly at the road network, so the outermost street frontage was empty.** `ground.glb` was built from `scene.json`'s `bbox`, which is the extent of the road surface itself, and scatter rejected any tree/building/prop outside that same box — but the setback line for buildings sits 14.5 m *outside* the outermost road, so along every map edge the frontage was dropped and the world ended at the kerb. The scene data now carries a `ground_margin` (default 60 m, `export_scene_geometry(..., ground_margin=)`): the Blender ground plane is grown by it and scatter tests against the grown box, so the outer ring of trees, buildings and street furniture is placed and has ground to stand on. On single_junction that is 98→114 trees, 22→25 buildings, 56→61 props, all of the additions around the four arm ends.
+
+- The 3D box of a crashed car now covers only the car, not the debris around it.
+- The driver of a broken-down car now stays by the car.
+
+
+<!-- v2.2 -->
+## [v2.2] - 2026-11-12
+
+### Added
+
+- Weather and time of day for Isaac rendering: cloud cover, fog, rain, wet roads, and streetlights that turn on at night.
+- Fog is set by visibility distance and calibrated so that the camera sees the configured visibility.
+- Rain falls smoothly from frame to frame and replays identically. Lidars see raindrops as unlabelled points.
+- New weather presets: light fog, dense fog, light rain, rain and heavy rain.
+- Weather and lighting can change every episode, either set explicitly or drawn at random. Each episode records the values it used.
+
+<div align=center>
+   <img src="./assets/changelog/v2.2_weather_lighting.jpg" width="85%" >
+</div>
+<p align="center">The same camera under nine weather and lighting settings.</p>
+
+
+<!-- v2.1 -->
+## [v2.1] - 2026-11-08
+
+### Added
+
+- Pedestrians in 3D: SUMO pedestrians are rendered as eight realistic characters. Their walking animation follows their speed, they stand still when stopped, and they walk on top of raised sidewalks.
+- Vehicle wheels spin with the distance driven, and front wheels steer through turns (Ackermann geometry). Replayed episodes show the same wheel motion.
+- One reader for all common SUMO output files (trip info, trajectories, summary, queues, detectors, traffic-light programs, routes, …), returning pandas tables, plus plotting helpers.
+
+<div align=center>
+   <img src="./assets/changelog/v2.1_pedestrians.jpg" width="85%" >
+</div>
+<p align="center">Pedestrians at a crosswalk and on the raised sidewalk, and the eight pedestrian characters.</p>
+
+### Changed
+
+- Smoother turns at intersections: networks are built with more detailed junction paths, so turning vehicles no longer appear to slide sideways. Traffic results are practically unchanged (mean trip time within ±2%).
+- Building a network from OpenStreetMap is now a single call that creates both the road network and the building polygons. Underground buildings are no longer placed on the road.
+- The examples now use two scenarios: a single intersection with sidewalks and pedestrians, and an OSM network of Berlin.
+- Generated 3D scenes keep trees and street furniture off sidewalks and crosswalks.
+
 ### Removed
-- The `vehicle_model` (`'low'` / `'high'`) parameter from `Tshub3DEnvironment`, `TSHubRenderer`, `SceneSync`, `Vehicle3DElement` and `vehicle_models_dir`, together with the old `vehicles_low_poly` / `vehicles_high_poly` directories — only one vehicle-model set is kept now.
-- The unused Open3D rendering backend and assorted dead code (SMARTS-heritage shader-step scaffolding, the never-applied `unlit` shader, `RenderMasks`).
-- **The Panda per-camera visibility masks** (`renderers/panda/masks.py`: `CamMask` + `FULL_CAM_MASK`, plus the `hide/show` call at every scene-load site and the `mask` parameter threaded through `RGBSensor` → `build_offscreen_camera`). They existed for the old `_all` / `_vehicle` sensor split, where a "vehicle" camera rendered only vehicles on black. Since segmentation moved to a per-class shader, every camera renders the whole scene, so exactly one camera mask remained (all bits on) and the machinery had become a no-op. Verified behaviour-preserving: 116 images across junction/vehicle/aircraft × rgb/seg are pixel-identical (max MAD 0.0).
-- The legacy manual-`.blend` Blender workflow (`renderers/blender/blender_render.py`, `load_vehicles.py`) — superseded by the automated two-stage pipeline, and its depth code no longer worked on Blender 5. Also removed with it: `output_tools/` (`merge_gif`), `show_sensor_images.py`, and the stale `examples/tshub_env3d/{multi_junctions,map_model_merge}/` demos, which still used the pre-segmentation `*_all` sensor names.
-- The legacy direct-to-GLB scene path (`scene/element_to_glb/`, `SumoNet3D.to_glb()`, `glb_data.py`), unused since the Blender scene builder replaced it; `utils/colors.py` and the dead `_interest_color` field went with it. Also removed: unused shader assets (`_assets_3d/{terrain,map_road_lines}/`) together with the `terrain_dir` / `map_road_lane_glsl_dir` parameters that carried them, `_assets_3d/simple_car.glb`, and the `base_env3d.BaseSumoEnvironment3D` ABC (only `reset`/`step`, one implementer).
-### Security
+
+- The OSM filtering tool. The filtered map changed the generated network, so scenes now use the original OSM file.
+- The old SUMO output analysis scripts (replaced by the new readers), several old example scenarios, and the radio-map grid.
+
+
+<!-- v2.0 -->
+## [v2.0] - 2026-11-05 - A brand-new TransSimHub 🚀
+
+🎉 A full refactor of TransSimHub: 3D rendering moves to Isaac Sim, and the package is reorganised around what is being simulated.
+
+
+### Changed (breaking)
+
+- New package layout, grouped by what is simulated: the traffic simulation, the road network, SUMO traffic (vehicles, traffic lights, pedestrians, roads), aircraft, the 3D package and the SUMO tools. The examples follow the same layout.
+- `TshubEnvironment` follows the Gymnasium interface: `reset()` returns `(obs, info)` and `step()` returns `(obs, reward, terminated, truncated, info)`. Each module is turned on by passing its config.
+- The static road network (topology, traffic lights, geometry, buildings) is read once and available as `env.network`, instead of being part of every observation.
+- `info['ready']` lists the traffic lights, vehicles and aircraft that can act at the current step, so modules with different decision frequencies can be controlled together.
+- One simulation clock, with all times in seconds, so behaviour no longer depends on the step length. For example, a yellow light now lasts 3 s instead of 3 steps.
+- The random seed now takes effect; before, SUMO's default seed was often used instead.
+- In the `next_or_not` traffic-light action, `1` now switches to the next phase and `0` keeps the current one. Agents trained with the old meaning must be retrained.
+- 3D rendering runs on Isaac Sim; Blender is only used to build static scenes. Rendering is faster because scene updates are batched and vehicle models are reused.
+
+<div align=center>
+   <img src="./assets/changelog/v2.0_isaac_sim.jpg" width="85%" >
+</div>
+<p align="center">Isaac Sim rendering: a roadside camera with RGB, semantic segmentation and depth, a UAV camera, and drone chase and first-person cameras.</p>
+
+### Added
+
+- Trajectory control for vehicles: a planner sends future waypoints, and the vehicle follows them with a bicycle-model tracker (or perfectly, for testing) while the surrounding traffic reacts. Controlled vehicles can be handed back to SUMO.
+- New vehicle state: collisions, control mode, plan progress, and a reference path along the lanes ahead for planners.
+- Realistic UAV flight: a multirotor model with wind and gusts, energy use, and commands for velocity, waypoints, timed trajectories and vision-language navigation (forward, turn, ascend, descend, stop). One environment step can run until a command finishes.
+- V2X communication: vehicles, roadside units and UAVs exchange messages of any content. Delivery depends on distance, standard channel models, fading and message size, so large messages such as images arrive later. Signal timing (SPaT) and safety (BSM) messages are included.
+- Traffic lights report their current signal and the time to the next switch.
+
+### Changed
+
+- Traffic-light, vehicle and aircraft actions share the same internal structure; public imports are unchanged.
+
+### Removed
+
+- All 2D visualization (the matplotlib renderer, the web dashboard and SUMO-GUI screenshots). SUMO-GUI itself is still available.
+- The Panda3D renderer, the Blender episode renderer and the separate low/high-poly vehicle sets. Isaac Sim is now the only 3D renderer.
+- The old standalone V2I/V2V channel classes, replaced by the V2X module.
+- Unused utilities.
+
+### Fixed
+
+- Changing a phase duration had no effect.
+- Lane-change direction was inconsistent between action types. Left is now `+1` everywhere.
+- Traffic-light features assumed 12 movements.
+- The environment crashed on reset when no aircraft were configured.
+- Pedestrian crossings shifted the list of traffic-light connections, so incoming and outgoing roads included walking areas.
+- 3D scenes paved sidewalks and crosswalks as road. Crosswalks are now drawn as zebra stripes.
+- Underground OSM features, such as pipelines tagged as buildings, were placed as buildings.
+
+
+<!-- v1.9 -->
+## [v1.9] - 2026-09-21
+
+### Changed
+
+- The Panda3D sky styles (day, dusk) now change the scene lighting, not only the sky colour.
+- The 3D package is split into shared definitions, scene generation and renderers.
+- Blender renders RGB, segmentation and depth independently, each only when requested.
+
+<div align=center>
+   <img src="./assets/changelog/v1.9_blender_showcase.jpg" width="85%" >
+</div>
+<p align="center">Blender rendering: camera rigs, RGB / segmentation / depth, lighting and weather styles, and Panda3D vs Blender on the same camera.</p>
+
+### Fixed
+
+- Curbs did not follow the road edge on curved roads.
+- Lane turn arrows could differ between runs.
+- Roadside trees clumped together instead of lining the road.
+- Buildings were missing from one side of the map on networks with more than one junction.
+- The ground ended at the road network, leaving the outermost street frontage empty.
+
+
+<!-- v1.8 -->
+## [v1.8] - 2026-08-15
+
+### Added
+
+- Network-wide congestion state for every lane and road segment (mean speed, occupancy, queue), with a live browser dashboard that can also show a UAV's camera view.
+- Generated 3D scenes include buildings (with real heights from OpenStreetMap), trees along streets and in parks, and roadside pedestrians.
+- Street lights and benches are placed along the curb, using bundled building, tree and prop models at real-world scale.
+
+<div align=center>
+   <img src="./assets/changelog/v1.8_panda3d_vs_blender_styles.jpg" width="85%" >
+</div>
+<p align="center">A generated intersection with roadside trees and buildings, rendered by Panda3D and in five Blender lighting and weather styles.</p>
+
+### Changed
+
+- 2D rendering always follows a vehicle or a junction. It is much faster (from 1.1 s to 2 ms per frame on a large network) and no longer leaks memory.
+- Panda3D camera types are defined in one place, so adding a new camera is simpler.
+- One set of vehicle models replaces the low/high-poly sets: 10 realistic cars plus a taxi, in a realistic traffic mix.
+- The static lane geometry in observations is renamed `lane_shape`, to tell it apart from the lane traffic state.
+
+
+<!-- v1.7 -->
+## [v1.7] - 2026-03-31
+
+### News
+
+Today is my last day at Shanghai AI Lab, where I spent my joint PhD training. Next, I am moving to CUHK as a postdoc.
+
+今天是我在上海人工智能实验室联合培养的最后一天，接下来将前往香港中文大学（CUHK）从事博士后研究。
+
+### Added
+
+- Image-based lighting for the Panda3D renderer: the sky now lights the ground and vehicles, so scenes no longer look dark and flat under a bright sky.
+- Semantic segmentation cameras for the Panda3D renderer, with CARLA/Cityscapes-style classes (road, lane, building, vehicle, aircraft, …).
+- A top-down camera over the whole intersection, useful for traffic signal control.
+- Tools to import downloaded car models at the right size and orientation, and to split a car pack into single vehicles.
+
+<div align=center>
+   <img src="./assets/changelog/v1.7_panda3d_rgb_seg.jpg" width="80%" >
+</div>
+<p align="center">Panda3D top-down view of an intersection: RGB with image-based lighting, and semantic segmentation.</p>
+
+### Changed
+
+- The Panda3D renderer is about 2.5× faster per step, with identical images. Each camera image is now read back once instead of being rendered again, and rendering runs on a single thread, so every image belongs to the current step rather than the previous one.
+
+### Fixed
+
+- Scenes were over-exposed because the light colour settings were overridden.
+
 
 <!-- v1.6 -->
 ## [v1.6] - 2025-12-31 - Happy New Year 2026! 🎉
@@ -188,13 +351,13 @@ SCENARIO_CONFIGS = {
   - Added various vehicle types
   - Matched vehicle lengths with SUMO specifications
   - Added new 3D models: Police cars, Ambulances, Fire Engine, Taxi
-  - For details, see [TSHub3D Vehicles](./tshub/tshub_env3d/_assets_3d/vehicles/README.md)
+  - For details, see [TSHub3D Vehicles](./tshub/tsim3d/_assets_3d/vehicles/README.md)
 - Changed default vehicle color to yellow
 
 ### Fixed
 - Fixed junction camera positioning in TShub3D to properly face lanes (previously had offset issues)
 - Resolved synchronization issues between TShub3D rendering and SUMO information (rendering was lagging behind SUMO)
-- Added a new test example for 3D and SUMO synchronization, Single vehicle lane change scenario: [Vehicle Lane Change Example](./examples/tshub_env3d/map_model_merge/)
+- Added a new test example for 3D and SUMO synchronization, Single vehicle lane change scenario: [Vehicle Lane Change Example](./examples/tsim3d/map_model_merge/)
 
 <!-- v1.2 -->
 ## [v1.2] - 2024-12-30 - Happy New Year 2025!
@@ -222,7 +385,7 @@ SCENARIO_CONFIGS = {
 - Congratulations to Team **TSC-Master** from CUHKSZ for winning the second prize (fourth place overall) in the 2024 Tencent Kaiwu Global AI Competition under the Intelligent Traffic Signal Scheduling track, competing against 2,038 teams from 388 universities worldwide. [Winners List](https://aiarena.tencent.com/aiarena/zh/match/open-competition-2024?tab=score)
 
 <div align=center>
-   <img src="./assets/kaiwu_match.jpg" width="65%" >
+   <img src="./assets/changelog/kaiwu_match.jpg" width="65%" >
 </div>
 <p align="center">2024 Tencent Kaiwu Global AI Competition Rankings.</p>
 
@@ -252,8 +415,8 @@ In comparison to Carla:
 ### Added
 
 - **Highlight**: Introduction of 3D Visualization
-  - Automating the transformation of sumonet into 3D, [sumonet_to_tshub3d.py](./tshub/tshub_env3d/sumonet_to_tshub3d.py) expedites the conversion of SUMO Network to glb format for 3D display.
-  - Rendering SUMO environments into 3D, [tshub_env3d.py](./tshub/tshub_env3d/tshub_env3d.py), in conjunction with TSHub, concurrently rendering the sumo simulation information into a 3D scene.
+  - Automating the transformation of sumonet into 3D, [sumonet_to_tshub3d.py](./tshub/tsim3d/sumonet_to_tshub3d.py) expedites the conversion of SUMO Network to glb format for 3D display.
+  - Rendering SUMO environments into 3D, [tshub_env3d.py](./tshub/tsim3d/tshub_env3d.py), in conjunction with TSHub, concurrently rendering the sumo simulation information into a 3D scene.
   - For insights into various sensors, the Chinese version can be found [here](https://transsimhub.readthedocs.io/en/latest/locales/zh_CN/tshub3d_sensors/index.html), and the English version [here](https://transsimhub.readthedocs.io/en/latest/locales/en/tshub3d_sensors/index.html).
 - Enhanced [base_tls.py](./tshub/traffic_light/tls_type/base_tls.py) by integrating the entry road ID, angle, and position for each intersection.
 
@@ -605,11 +768,3 @@ TransSimHub Rendering Modes
 - Aircraft module:
   - Added `aircraft.py` file: Defines the `AircraftInfo` class that represents information about an aircraft.
   - Added `aircraft_builder.py` file: Provides methods to create and control aircraft.
-
-<!-- v0.6 -->
-<!-- 添加 uml 框架图 -->
-<!-- log 可以设置 level -->
-<!-- 环境适配 gym 和 rllib -->
-
-<!-- v0.7 -->
-<!-- 添加 feature process 模块 -->
